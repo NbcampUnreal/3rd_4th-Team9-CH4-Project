@@ -14,6 +14,9 @@
 #include "Interfaces/IPluginManager.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "TableRowConvertFunctionContainer.h"
+#include <fstream>
+#include <string>
 
 #define LOCTEXT_NAMESPACE "CSVToDataTableTool"
 
@@ -40,7 +43,7 @@ void UCSVToDataTableToolSubsystem::ConvertAllCSVsToDataTables()
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed to load DataTableToolSettings. Please check Project Settings."));
         FNotificationInfo Info(LOCTEXT("FailedLoadSettings", "CSV to DataTable Tool: Failed to load settings!"));
-        Info.ExpireDuration = 5.0f;
+        Info.ExpireDuration = 15.0f;
         FSlateNotificationManager::Get().AddNotification(Info);
         return;
     }
@@ -53,7 +56,7 @@ void UCSVToDataTableToolSubsystem::ConvertAllCSVsToDataTables()
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("CSV folder does not exist: %s"), *FullCSVFolderPath);
         FNotificationInfo Info(FText::Format(LOCTEXT("CSVFolderNotFound", "CSV folder not found: {0}"), FText::FromString(FullCSVFolderPath)));
-        Info.ExpireDuration = 5.0f;
+        Info.ExpireDuration = 15.0f;
         FSlateNotificationManager::Get().AddNotification(Info);
         return;
     }
@@ -65,7 +68,7 @@ void UCSVToDataTableToolSubsystem::ConvertAllCSVsToDataTables()
         {
             UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed to create Data Table output directory: %s"), *DataTablePackagePath);
             FNotificationInfo Info(FText::Format(LOCTEXT("CreateFolderFailed", "Failed to create Data Table folder: {0}"), FText::FromString(DataTablePackagePath)));
-            Info.ExpireDuration = 5.0f;
+            Info.ExpireDuration = 15.0f;
             FSlateNotificationManager::Get().AddNotification(Info);
             return;
         }
@@ -78,7 +81,7 @@ void UCSVToDataTableToolSubsystem::ConvertAllCSVsToDataTables()
     {
         UE_LOG(LogCSVToDataTableTool, Warning, TEXT("No CSV files found in %s"), *FullCSVFolderPath);
         FNotificationInfo Info(FText::Format(LOCTEXT("NoCSVFound", "No CSV files found in: {0}"), FText::FromString(FullCSVFolderPath)));
-        Info.ExpireDuration = 3.0f;
+        Info.ExpireDuration = 15.0f;
         FSlateNotificationManager::Get().AddNotification(Info);
         return;
     }
@@ -107,7 +110,7 @@ void UCSVToDataTableToolSubsystem::ConvertAllCSVsToDataTables()
 
     FNotificationInfo Info(FText::Format(LOCTEXT("ConversionSummary", "CSV to DataTable Conversion Finished. Processed: {0}, Failed: {1}"),
         FText::AsNumber(ProcessedCount), FText::AsNumber(FailedCount)));
-    Info.ExpireDuration = 5.0f;
+    Info.ExpireDuration = 15.0f;
     Info.bUseSuccessFailIcons = true;
     Info.Image = (FailedCount == 0) ? FSlateIcon(FAppStyle::GetAppStyleSetName(), "Notification.Success").GetIcon() : FSlateIcon(FAppStyle::GetAppStyleSetName(), "Notification.Fail").GetIcon();
     FSlateNotificationManager::Get().AddNotification(Info);
@@ -118,38 +121,44 @@ void UCSVToDataTableToolSubsystem::ConvertAllCSVsToDataTables()
 bool UCSVToDataTableToolSubsystem::ProcessCSVFile(const FString& InFullCSVFilePath, const FString& InDataTableName, const FString& InDataTablePackagePath, const FString& InStructName)
 {
     FString FileContent;
-    if (!FFileHelper::LoadFileToString(FileContent, *InFullCSVFilePath))
+    if (!ReadCSVFileWithSharedAccess(InFullCSVFilePath, FileContent))
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed to load CSV file: %s"), *InFullCSVFilePath);
         return false;
     }
 
-    TArray<FString> Lines;
+    /*if (!FFileHelper::LoadFileToString(FileContent, *InFullCSVFilePath))
+    {
+        UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed to load CSV file: %s"), *InFullCSVFilePath);
+        return false;
+    }*/
+
+    /*TArray<FString> Lines;
     FileContent.ParseIntoArrayLines(Lines);
 
     if (Lines.Num() < 1)
     {
         UE_LOG(LogCSVToDataTableTool, Warning, TEXT("CSV file is empty: %s"), *InFullCSVFilePath);
         return false;
-    }
+    }*/
 
-    TArray<FString> Headers;
+    /*TArray<FString> Headers;
     FString HeaderLine = Lines[0];
     HeaderLine.ParseIntoArray(Headers, TEXT(","), true);
     for (FString& Header : Headers)
     {
         Header = Header.TrimStartAndEnd();
-    }
+    }*/
 
-    if (Headers.Num() == 0)
+    /*if (Headers.Num() == 0)
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("CSV file has no headers: %s"), *InFullCSVFilePath);
         return false;
-    }
+    }*/
 
-    TArray<TSharedPtr<FJsonValue>> JsonValuesArray;
+    //TArray<TSharedPtr<FJsonValue>> JsonValuesArray;
 
-    for (int32 i = 1; i < Lines.Num(); ++i)
+    /*for (int32 i = 1; i < Lines.Num(); ++i)
     {
         FString CurrentLine = Lines[i];
         if (CurrentLine.TrimStartAndEnd().IsEmpty()) continue;
@@ -170,21 +179,21 @@ bool UCSVToDataTableToolSubsystem::ProcessCSVFile(const FString& InFullCSVFilePa
         }
 
         JsonValuesArray.Add(MakeShareable(new FJsonValueObject(JsonObject)));
-    }
+    }*/
 
-    FString JsonString;
-    TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&JsonString);
-    FJsonSerializer::Serialize(JsonValuesArray, JsonWriter, true);
-    JsonWriter->Close();
+    //FString JsonString;
+    //TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&JsonString);
+    //FJsonSerializer::Serialize(JsonValuesArray, JsonWriter, true);
+    //JsonWriter->Close();
 
-    UE_LOG(LogCSVToDataTableTool, Log, TEXT("Generated JSON for %s:\n%s"), *InDataTableName, *JsonString);
+    //UE_LOG(LogCSVToDataTableTool, Log, TEXT("Generated JSON for %s:\n%s"), *InDataTableName, *JsonString);
 
     UScriptStruct* RowStruct = FindStructByName(InStructName);
     if (!RowStruct)
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("Could not find struct '%s' for CSV file '%s'. Please ensure it exists and inherits from FTableRowBase."), *InStructName, *FPaths::GetBaseFilename(InFullCSVFilePath));
         FNotificationInfo Info(FText::Format(LOCTEXT("StructNotFound", "Struct '{0}' not found for '{1}'. Please create it!"), FText::FromString(InStructName), FText::FromString(FPaths::GetBaseFilename(InFullCSVFilePath))));
-        Info.ExpireDuration = 5.0f;
+        Info.ExpireDuration = 15.0f;
         FSlateNotificationManager::Get().AddNotification(Info);
         return false;
     }
@@ -192,7 +201,7 @@ bool UCSVToDataTableToolSubsystem::ProcessCSVFile(const FString& InFullCSVFilePa
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("Struct '%s' does not inherit from FTableRowBase. This is required for Data Tables. Skipping '%s'."), *InStructName, *FPaths::GetBaseFilename(InFullCSVFilePath));
         FNotificationInfo Info(FText::Format(LOCTEXT("NotFTableRowBase", "Struct '{0}' does not inherit from FTableRowBase for '{1}'. Required!"), FText::FromString(InStructName), FText::FromString(FPaths::GetBaseFilename(InFullCSVFilePath))));
-        Info.ExpireDuration = 5.0f;
+        Info.ExpireDuration = 15.0f;
         FSlateNotificationManager::Get().AddNotification(Info);
         return false;
     }
@@ -202,6 +211,11 @@ bool UCSVToDataTableToolSubsystem::ProcessCSVFile(const FString& InFullCSVFilePa
 
     if (DataTableToUse)
     {
+        TArray<FName> RowNames = DataTableToUse->GetRowNames();
+        for (const auto& RowName : RowNames)
+        {
+            DataTableToUse->RemoveRow(RowName);
+        }
         UE_LOG(LogCSVToDataTableTool, Log, TEXT("Found existing Data Table: %s. Updating..."), *DataTableAssetPath);
         if (DataTableToUse->RowStruct != RowStruct)
         {
@@ -224,7 +238,7 @@ bool UCSVToDataTableToolSubsystem::ProcessCSVFile(const FString& InFullCSVFilePa
         {
             UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed to create Data Table asset: %s"), *PackageName);
             FNotificationInfo Info(FText::Format(LOCTEXT("CreateDTFailed", "Failed to create Data Table: {0}"), FText::FromString(InDataTableName)));
-            Info.ExpireDuration = 5.0f;
+            Info.ExpireDuration = 15.0f;
             Info.Image = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Notification.Fail").GetIcon();
             FSlateNotificationManager::Get().AddNotification(Info);
             return false;
@@ -237,15 +251,25 @@ bool UCSVToDataTableToolSubsystem::ProcessCSVFile(const FString& InFullCSVFilePa
         UE_LOG(LogCSVToDataTableTool, Log, TEXT("Data Table '%s' created with RowStruct '%s'."), *InDataTableName, *RowStruct->GetName());
     }
 
-    TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonString);
+    //TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(JsonString);
 
-    DataTableToUse->CreateTableFromJSONString(JsonString);
+    //DataTableToUse->CreateTableFromJSONString(JsonString);
+
+    FConverter_Params Params;
+    Params.DataTable = DataTableToUse;
+    Params.CSVString = FileContent;
+
+    FString FunctionString = FString::Printf(TEXT("Create%s"), *InDataTableName);
+    UFunction* ConvertFunction = UTableRowConvertFunctionContainer::StaticClass()->FindFunctionByName(*FunctionString);
+    ProcessEvent(ConvertFunction, &Params);
+
+    //DataTableToUse->CreateTableFromCSVString(FileContent);
     if (DataTableToUse->GetRowMap().Num() == 0)
     {
         UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed to import JSON data into Data Table '%s'. Please ensure the CSV headers match the '%s' struct members and types correctly."), *InDataTableName, *RowStruct->GetName());
-        UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed JSON Content:\n%s"), *JsonString);
+        //UE_LOG(LogCSVToDataTableTool, Error, TEXT("Failed JSON Content:\n%s"), *JsonString);
         FNotificationInfo Info(FText::Format(LOCTEXT("ImportDTFailed", "Failed to import '{0}' data. Check CSV/Struct!"), FText::FromString(InDataTableName)));
-        Info.ExpireDuration = 7.0f;
+        Info.ExpireDuration = 15.0f;
         FSlateNotificationManager::Get().AddNotification(Info);
         return false;
     }
@@ -291,6 +315,22 @@ UScriptStruct* UCSVToDataTableToolSubsystem::FindStructByName(const FString& Str
     }
 
     return FoundStruct;
+}
+
+bool UCSVToDataTableToolSubsystem::ReadCSVFileWithSharedAccess(const FString& FilePath, FString& OutString)
+{
+    std::ifstream Stream(TCHAR_TO_UTF8(*FilePath));
+    if (!Stream.is_open())
+    {
+        UE_LOG(LogCSVToDataTableTool, Warning, TEXT("Failed to open file: %s"), *FilePath);
+        return false;
+    }
+
+    std::string Content((std::istreambuf_iterator<char>(Stream)), std::istreambuf_iterator<char>());
+    Stream.close();
+
+    OutString = UTF8_TO_TCHAR(Content.c_str());
+    return true;
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -6,7 +6,9 @@ public class OverClockEditor: ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PrivateDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine" });
+        //PublicIncludePaths.AddRange(new string[] { "OverClock" });
+
+        PrivateDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "OverClock" });
 
         PublicDependencyModuleNames.AddRange(
             new string[] 
@@ -30,6 +32,7 @@ public class OverClockEditor: ModuleRules
                 "ToolMenus",
                 "AssetRegistry",
                 "UMG",
+                "OverClock"
             });
     }
 }

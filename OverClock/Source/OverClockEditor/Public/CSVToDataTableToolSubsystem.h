@@ -22,5 +22,13 @@ private:
 	bool ProcessCSVFile(const FString& InFullCSVFilePath, const FString& InDataTableName, const FString& InDataTablePackagePath, const FString& InStructName);
 
 	UScriptStruct* FindStructByName(const FString& StructName);
+
+	bool ReadCSVFileWithSharedAccess(const FString& FilePath, FString& OutString);
 	
+};
+
+struct FConverter_Params
+{
+	UDataTable* DataTable;
+	FString CSVString;
 };

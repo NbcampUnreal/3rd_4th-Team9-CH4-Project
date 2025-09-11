@@ -10,7 +10,7 @@ public class OverClock : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "OverClock" });
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OverClockEditor" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
