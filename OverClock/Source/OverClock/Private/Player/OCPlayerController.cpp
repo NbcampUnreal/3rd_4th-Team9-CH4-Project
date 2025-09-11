@@ -7,7 +7,8 @@ AOCPlayerController::AOCPlayerController() :
 	LookAction(nullptr),
 	JumpAction(nullptr),
 	SprintAction(nullptr),
-	CrunchAction(nullptr)
+
+	GANormalAttackAction(nullptr)
 { }
 
 void AOCPlayerController::BeginPlay()

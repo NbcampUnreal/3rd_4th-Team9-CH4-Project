@@ -27,8 +27,7 @@ public:
 	TObjectPtr<UInputAction> JumpAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 	TObjectPtr<UInputAction> SprintAction;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> CrunchAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> ShootAction;
+	TObjectPtr<UInputAction> GANormalAttackAction;
 };

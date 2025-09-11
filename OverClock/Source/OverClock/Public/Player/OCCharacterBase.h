@@ -2,26 +2,41 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+
 #include "OCCharacterBase.generated.h"
 
 struct FInputActionValue;
 class AOCPlayerController;
-class USpringArmComponent;
 class UCameraComponent;
 
+class UAbilitySystemComponent;
+
 UCLASS()
-class OVERCLOCK_API AOCCharacterBase : public ACharacter
+class OVERCLOCK_API AOCCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	AOCCharacterBase();
+	
+    virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCameraComponent> CameraComp;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<USpringArmComponent> SpringArmComp;
+	
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS")
+	class UAbilitySystemComponent* AbilitySystemComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS")
+	//class UOCAttributeSet* OCAttributeSet;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
+	TSubclassOf<UGameplayAbility> DashAbilityClass;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -40,19 +55,16 @@ public:
 	void StartSprint();
 	UFUNCTION()
 	void StopSprint();
-	UFUNCTION()
-	void BeginCrouch();
-	UFUNCTION()
-	void EndCrouch();
-	UFUNCTION()
-	void NormalAttack();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float RunSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float AirControlSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float CrouchSpeed;
+	float JumpVelocity;
+
+	UFUNCTION()
+	virtual void GANormalAttack();
+	
 #pragma endregion
 };

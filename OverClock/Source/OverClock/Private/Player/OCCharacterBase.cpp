@@ -2,37 +2,45 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Player/OCPlayerController.h"
 #include "EnhancedInputComponent.h"
 
 AOCCharacterBase::AOCCharacterBase()
-	:WalkSpeed(300.0f),
-	RunSpeed(600.0f),
-	AirControlSpeed(0.2f),
-	CrouchSpeed(100.0f)
+	:WalkSpeed(600.0f),
+	RunSpeed(900.0f),
+	JumpVelocity(600.0f)
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = 300.0f;
-	SpringArmComp->bUsePawnControlRotation = true;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
-	CameraComp->bUsePawnControlRotation = false;
+	CameraComp->SetupAttachment(RootComponent);
+	CameraComp->bUsePawnControlRotation = true;
 	
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-	GetCharacterMovement()->AirControl = 0.2f * AirControlSpeed;
 	GetCharacterMovement()->JumpZVelocity = 600.f;
-	//GetCharacterMovement()->bCrouch = true;
+
+	AbilitySystemComponent=CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	// OCAttributeSet = CreateDefaultSubobject<UMyAttributeSet>(TEXT("AttributeSet"));
+}
+
+UAbilitySystemComponent* AOCCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void AOCCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+		for (const auto& AbilityClass: StartupAbilities)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
+		}
+	}
 }
 
 void AOCCharacterBase::Tick(float DeltaTime)
@@ -91,28 +99,13 @@ void AOCCharacterBase::SetupPlayerInputComponent(UInputComponent* EnhancedInputC
 					&AOCCharacterBase::StopSprint
 				);
 			}
-			if(PlayerController->CrunchAction)
+			if(PlayerController->GANormalAttackAction)
 			{
 				EnhancedInput->BindAction(
-					PlayerController->CrunchAction,
+					PlayerController->GANormalAttackAction,
 					ETriggerEvent::Triggered,
 					this,
-					&AOCCharacterBase::BeginCrouch
-				);
-				EnhancedInput->BindAction(
-					PlayerController->CrunchAction,
-					ETriggerEvent::Completed,
-					this,
-					&AOCCharacterBase::EndCrouch
-				);
-			}
-			if(PlayerController->ShootAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->ShootAction,
-					ETriggerEvent::Triggered,
-					this,
-					&AOCCharacterBase::NormalAttack
+					&AOCCharacterBase::GANormalAttack
 				);
 			}
 		}
@@ -169,17 +162,7 @@ void AOCCharacterBase::StopSprint()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
-void AOCCharacterBase::BeginCrouch()
+void AOCCharacterBase::GANormalAttack()
 {
-	GetCharacterMovement()->Crouch();
-}
-
-void AOCCharacterBase::EndCrouch()
-{
-	GetCharacterMovement()->UnCrouch();
-}
-
-void AOCCharacterBase::NormalAttack()
-{
-	UE_LOG(LogTemp,Warning,TEXT("Player Shootting"))
+	UE_LOG(LogTemp,Warning,TEXT("[OCCharacterBase] GAS Normal Attack"));
 }
