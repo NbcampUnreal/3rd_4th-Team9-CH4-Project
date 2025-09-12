@@ -28,7 +28,7 @@ public:
 		, Width(0.f)
 		, Height(0.f)
 	{
-
+		
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sample Data")
