@@ -7,6 +7,7 @@
 
 #include "OCCharacterBase.generated.h"
 
+class UDA_OCInputConfig;
 struct FInputActionValue;
 class AOCPlayerController;
 class UCameraComponent;
@@ -30,19 +31,22 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS")
-	class UAbilitySystemComponent* AbilitySystemComponent;
+	UAbilitySystemComponent* AbilitySystemComponent; // 리스폰 가능성이 있으면 PlayerState에 보관
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS")
 	//class UOCAttributeSet* OCAttributeSet;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
 	TSubclassOf<UGameplayAbility> DashAbilityClass;
+	
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-public:	
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	virtual void Tick(float DeltaTime) override;
 	
 #pragma region CharacterMovement
-	virtual void SetupPlayerInputComponent(class UInputComponent* EnhancedInputComp) override;
 	UFUNCTION()
 	void Move(const FInputActionValue& value);
 	UFUNCTION()
@@ -55,16 +59,20 @@ public:
 	void StartSprint();
 	UFUNCTION()
 	void StopSprint();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MovementInputData")
+	UDA_OCInputConfig* InputConfigDataAsset;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float RunSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float JumpVelocity;
 
-	UFUNCTION()
-	virtual void GANormalAttack();
+	UPROPERTY(Replicated)
+	float AimPitch;
 	
 #pragma endregion
 };

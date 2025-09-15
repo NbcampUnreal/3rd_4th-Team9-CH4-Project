@@ -1,0 +1,12 @@
+#pragma once
+
+#include "NativeGameplayTags.h"
+
+namespace OCGameplayTags
+{
+	/* Input Tags*/
+	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Move)
+	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Look)
+	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Sprint)
+	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Jump)
+};

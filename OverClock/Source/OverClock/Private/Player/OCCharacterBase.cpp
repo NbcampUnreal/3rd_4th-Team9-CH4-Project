@@ -4,6 +4,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/OCPlayerController.h"
 #include "EnhancedInputComponent.h"
+#include "Data/OCGameplayTags.h"
+#include "EnhancedInputSubsystems.h"
+#include "Input/OCInputComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AOCCharacterBase::AOCCharacterBase()
 	:WalkSpeed(600.0f),
@@ -43,73 +47,39 @@ void AOCCharacterBase::BeginPlay()
 	}
 }
 
+void AOCCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	ensure(InputConfigDataAsset || PlayerInputComponent);
+
+	if (ULocalPlayer* LocalPlayer = GetController<APlayerController>()->GetLocalPlayer())
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
+		{
+			Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
+			UOCInputComponent* OCInputComponent = CastChecked<UOCInputComponent>(PlayerInputComponent);
+			
+			OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Move);
+			OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Look);
+			OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Triggered, this, &ThisClass::StartJump);
+			OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Completed, this, &ThisClass::StopJump);
+			OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Sprint, ETriggerEvent::Triggered, this, &ThisClass::StartSprint);
+			OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Sprint, ETriggerEvent::Completed, this, &ThisClass::StopSprint);
+		}
+	}
+}
+
+void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AOCCharacterBase, AimPitch)
+}
+
 void AOCCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AOCCharacterBase::SetupPlayerInputComponent(UInputComponent* EnhancedInputComp)
-{
-	Super::SetupPlayerInputComponent(EnhancedInputComp);
-	
-	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(EnhancedInputComp))
-	{
-		if (AOCPlayerController* PlayerController = Cast<AOCPlayerController>(GetController()))
-		{
-			ensure(PlayerController->MoveAction);
-			{
-				EnhancedInput->BindAction(
-					PlayerController->MoveAction,
-					ETriggerEvent::Triggered,
-					this,
-					&AOCCharacterBase::Move
-				);
-			}
-			if(PlayerController->LookAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->LookAction,
-					ETriggerEvent::Triggered,
-					this,
-					&AOCCharacterBase::Look
-				);
-			}
-			if(PlayerController->JumpAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->JumpAction,
-					ETriggerEvent::Triggered,
-					this,
-					&AOCCharacterBase::StartJump
-				);
-			}
-			if(PlayerController->SprintAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->SprintAction,
-					ETriggerEvent::Triggered,
-					this,
-					&AOCCharacterBase::StartSprint
-				);
-				EnhancedInput->BindAction(
-					PlayerController->SprintAction,
-					ETriggerEvent::Completed,
-					this,
-					&AOCCharacterBase::StopSprint
-				);
-			}
-			if(PlayerController->GANormalAttackAction)
-			{
-				EnhancedInput->BindAction(
-					PlayerController->GANormalAttackAction,
-					ETriggerEvent::Triggered,
-					this,
-					&AOCCharacterBase::GANormalAttack
-				);
-			}
-		}
-	}
 }
 
 void AOCCharacterBase::Move(const FInputActionValue& value)
@@ -120,7 +90,6 @@ void AOCCharacterBase::Move(const FInputActionValue& value)
 	if (!FMath::IsNearlyZero(MoveInput.X))
 	{
 		AddMovementInput(GetActorForwardVector(), MoveInput.X);
-		UE_LOG(LogTemp, Warning, TEXT("Move %f"), MoveInput.X);
 	}
 	if (!FMath::IsNearlyZero(MoveInput.Y))
 	{
@@ -160,9 +129,4 @@ void AOCCharacterBase::StartSprint()
 void AOCCharacterBase::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-}
-
-void AOCCharacterBase::GANormalAttack()
-{
-	UE_LOG(LogTemp,Warning,TEXT("[OCCharacterBase] GAS Normal Attack"));
 }
