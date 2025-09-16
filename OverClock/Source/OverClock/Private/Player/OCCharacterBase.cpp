@@ -2,11 +2,10 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Player/OCPlayerController.h"
-#include "EnhancedInputComponent.h"
 #include "Data/OCGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "Input/OCInputComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 AOCCharacterBase::AOCCharacterBase()
@@ -73,13 +72,14 @@ void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AOCCharacterBase, AimPitch)
+	DOREPLIFETIME(AOCCharacterBase, AimRotation)
 }
 
 void AOCCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	ServerSetAimRotation(GetControlRotation());
 }
 
 void AOCCharacterBase::Move(const FInputActionValue& value)
@@ -129,4 +129,21 @@ void AOCCharacterBase::StartSprint()
 void AOCCharacterBase::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+FRotator AOCCharacterBase::GetAimRotation()
+{
+	if (AimRotation.Pitch > 180.f)
+	{
+		AimRotation.Pitch -= 360.f;
+	}
+
+	ensure(AimRotation.Pitch<-361.f);
+
+	return AimRotation;
+}
+
+void AOCCharacterBase::ServerSetAimRotation_Implementation(FRotator InAimRotation)
+{	
+	AimRotation=InAimRotation;
 }

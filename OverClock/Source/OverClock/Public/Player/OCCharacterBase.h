@@ -45,7 +45,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	virtual void Tick(float DeltaTime) override;
-	
+
 #pragma region CharacterMovement
 	UFUNCTION()
 	void Move(const FInputActionValue& value);
@@ -60,6 +60,12 @@ public:
 	UFUNCTION()
 	void StopSprint();
 
+	UFUNCTION()
+	FRotator GetAimRotation();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerSetAimRotation(FRotator InAimRotation);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MovementInputData")
 	UDA_OCInputConfig* InputConfigDataAsset;
@@ -72,7 +78,7 @@ protected:
 	float JumpVelocity;
 
 	UPROPERTY(Replicated)
-	float AimPitch;
+	FRotator AimRotation;
 	
 #pragma endregion
 };

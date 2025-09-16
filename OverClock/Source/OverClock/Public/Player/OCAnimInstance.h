@@ -16,7 +16,7 @@ public:
 	UOCAnimInstance(const FObjectInitializer& ObjectInitializer);
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
+	
 protected:
 	UPROPERTY()
 	TObjectPtr<AOCCharacterBase> OwnerCharacter;
@@ -24,18 +24,20 @@ protected:
 	TObjectPtr<UCharacterMovementComponent> OwnerCharacterMovementComponent;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category="Movement")
-	bool bShouldMove;
-	//void SetShouldMove(); //캐릭터에서 Current bShouldMove를 가져오기만 함
-	
+	uint8 bShouldMove : 1;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
 	FVector Velocity;
-	//void SetVelocity();
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
 	float GroundSpeed;
-	//void SetGroundSpeed();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
 	uint8 bIsFalling : 1;
-	//void SetIsFalling();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
+	uint8 bIsAccelerating:1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
+	FRotator AimRotation;
 };

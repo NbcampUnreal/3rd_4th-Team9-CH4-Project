@@ -4,7 +4,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 UOCAnimInstance::UOCAnimInstance(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	:
+	Super(ObjectInitializer),
+	bShouldMove(0),
+	Velocity(FVector::ZeroVector),
+	GroundSpeed(0.f),
+	bIsFalling(0),
+	bIsAccelerating(0),
+	AimRotation(0.f)
 {
 }
 
@@ -16,15 +23,25 @@ void UOCAnimInstance::NativeInitializeAnimation()
 	{
 		OwnerCharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
 	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("AnimInitiolize Fail"));
+	}
 }
 
 void UOCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (!OwnerCharacter || !OwnerCharacterMovementComponent) return;
-
-	//멤버변수 가져오기
+	if (OwnerCharacter && OwnerCharacterMovementComponent)
+	{
+		bShouldMove = GroundSpeed > 0.f;
+		Velocity = OwnerCharacter->GetVelocity();
+		GroundSpeed = OwnerCharacter->GetVelocity().Size();
+		bIsFalling = OwnerCharacterMovementComponent->IsFalling();
+		bIsAccelerating = OwnerCharacterMovementComponent->GetCurrentAcceleration().Size() > 0.f;
+		AimRotation = OwnerCharacter->GetAimRotation();
+	}
 }
 
 
