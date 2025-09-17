@@ -3,16 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "AbilitySystemComponent.h"
-
 #include "OCCharacterBase.generated.h"
 
-class UDA_OCInputConfig;
-struct FInputActionValue;
-class AOCPlayerController;
 class UCameraComponent;
-
 class UAbilitySystemComponent;
+class AOCPlayerState;
 
 UCLASS()
 class OVERCLOCK_API AOCCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -23,52 +18,19 @@ public:
 	AOCCharacterBase();
 	
     virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UCameraComponent> CameraComp;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
 	
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS")
-	UAbilitySystemComponent* AbilitySystemComponent; // 리스폰 가능성이 있으면 PlayerState에 보관
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GAS")
-	//class UOCAttributeSet* OCAttributeSet;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
-	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
-	TSubclassOf<UGameplayAbility> DashAbilityClass;
-	
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
+	TObjectPtr<UCameraComponent> CameraComp;
 
-public:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	virtual void Tick(float DeltaTime) override;
-
-#pragma region CharacterMovement
-	UFUNCTION()
-	void Move(const FInputActionValue& value);
-	UFUNCTION()
-	void Look(const FInputActionValue& value);
-	UFUNCTION()
-	void StartJump(const FInputActionValue& value);
-	UFUNCTION()
-	void StopJump(const FInputActionValue& value);
-	UFUNCTION()
-	void StartSprint();
-	UFUNCTION()
-	void StopSprint();
-
-	UFUNCTION()
-	FRotator GetAimRotation();
-	
-	UFUNCTION(Server, Reliable)
-	void ServerSetAimRotation(FRotator InAimRotation);
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MovementInputData")
-	UDA_OCInputConfig* InputConfigDataAsset;
+	// 아직 프로토타입 단계라 안전성을 위해 사용 X
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|State")
+	TObjectPtr<AOCPlayerState> CachedPlayerState;*/
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed;
@@ -76,9 +38,5 @@ protected:
 	float RunSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float JumpVelocity;
-
-	UPROPERTY(Replicated)
-	FRotator AimRotation;
 	
-#pragma endregion
 };
