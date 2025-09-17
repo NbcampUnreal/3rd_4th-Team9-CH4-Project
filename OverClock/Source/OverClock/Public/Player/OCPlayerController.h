@@ -4,8 +4,10 @@
 #include "GameFramework/PlayerController.h"
 #include "OCPlayerController.generated.h"
 
-class UInputMappingContext;
-class UInputAction;
+class UDA_OCInputConfig;
+class UOCInputComponent;
+class UEnhancedInputLocalPlayerSubsystem;
+struct FInputActionValue;
 
 UCLASS()
 class OVERCLOCK_API AOCPlayerController : public APlayerController
@@ -15,19 +17,20 @@ public:
 	AOCPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputMappingContext> PlayerInputMappingContext;
+private:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> MoveAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> LookAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> JumpAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> SprintAction;
+#pragma region Inputs
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<UInputAction> GANormalAttackAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerData", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UDA_OCInputConfig> InputConfigDataAsset;
+
+	void Input_Move(const FInputActionValue& Value);
+	void Input_Look(const FInputActionValue& Value);
+	void Input_Jump_Pressed(const FInputActionValue& Value);
+	void Input_Jump_Released(const FInputActionValue& Value);
+	
+	
+#pragma endregion 
 };
