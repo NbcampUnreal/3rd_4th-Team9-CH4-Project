@@ -20,10 +20,17 @@ public:
     virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION()
+	FORCEINLINE float GetAimRotation() const {return AimPitch;}
+	
+	UFUNCTION(Server, Reliable)
+	void ServerSetAimRotation(float InAimPitch);
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
@@ -39,4 +46,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float JumpVelocity;
 	
+	UPROPERTY(Replicated)
+	float AimPitch;
 };

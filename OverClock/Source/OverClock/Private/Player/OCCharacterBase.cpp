@@ -10,7 +10,8 @@
 AOCCharacterBase::AOCCharacterBase()
 	:WalkSpeed(600.0f),
 	RunSpeed(900.0f),
-	JumpVelocity(600.0f)
+	JumpVelocity(600.0f),
+	AimPitch(0.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -25,6 +26,12 @@ AOCCharacterBase::AOCCharacterBase()
 void AOCCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AOCCharacterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ServerSetAimRotation(GetControlRotation().Pitch);
 }
 
 UAbilitySystemComponent* AOCCharacterBase::GetAbilitySystemComponent() const
@@ -59,4 +66,16 @@ void AOCCharacterBase::OnRep_PlayerState()
 	{
 		PS->InitASCForAvatar(this);
 	}
+}
+
+void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AOCCharacterBase, AimPitch);
+}
+
+void AOCCharacterBase::ServerSetAimRotation_Implementation(float InAimPitch)
+{
+	AimPitch=InAimPitch;
 }

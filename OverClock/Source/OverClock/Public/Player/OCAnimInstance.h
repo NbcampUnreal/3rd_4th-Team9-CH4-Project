@@ -39,5 +39,5 @@ protected:
 	uint8 bIsAccelerating:1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Movement")
-	FRotator AimRotation;
+	float AimPitch;
 };
