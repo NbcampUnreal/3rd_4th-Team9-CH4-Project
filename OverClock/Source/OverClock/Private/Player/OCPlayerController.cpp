@@ -9,7 +9,7 @@
 
 AOCPlayerController::AOCPlayerController()
 {
-	bReplicates = true;
+	//bReplicates = true;
 }
 
 void AOCPlayerController::BeginPlay()
@@ -38,12 +38,17 @@ void AOCPlayerController::SetupInputComponent()
 	if (!ensureAlwaysMsgf(OCInputComponent, TEXT("InputComponent must be UOCInputComponent"))) return;
 	if (!ensureAlways(InputConfigDataAsset)) return;
 
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this,&ThisClass::Input_Move);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this,&ThisClass::Input_Look);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Triggered, this,&ThisClass::Input_Jump_Pressed);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Completed, this,&ThisClass::Input_Jump_Released);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Look, ETriggerEvent::Triggered, this, &ThisClass::Input_Look);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Triggered, this, &ThisClass::Input_Jump_Pressed);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Completed, this, &ThisClass::Input_Jump_Released);
 	
 	// 어빌리티 입력도 같은 방식으로 태그만 추가하면 됨 모르면 공부하셈
+}
+
+void AOCPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
 }
 
 void AOCPlayerController::Input_Move(const FInputActionValue& Value)
@@ -86,16 +91,28 @@ void AOCPlayerController::Input_Look(const FInputActionValue& Value)
 
 void AOCPlayerController::Input_Jump_Pressed(const FInputActionValue& Value)
 {
-	if (AOCCharacterBase* C = Cast<AOCCharacterBase>(GetPawn()))
+	ACharacter* Character = GetCharacter();
+	if (Character)
+	{
+		Character->Jump();
+	}
+
+	/*if (AOCCharacterBase* C = Cast<AOCCharacterBase>(GetPawn()))
 	{
 		C->Jump();
-	}
+	}*/
 }
 
 void AOCPlayerController::Input_Jump_Released(const FInputActionValue& Value)
 {
-	if (AOCCharacterBase* C = Cast<AOCCharacterBase>(GetPawn()))
+	ACharacter* Character = GetCharacter();
+	if (Character)
+	{
+		Character->StopJumping();
+	}
+
+	/*if (AOCCharacterBase* C = Cast<AOCCharacterBase>(GetPawn()))
 	{
 		C->StopJumping();
-	}
+	}*/
 }
