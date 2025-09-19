@@ -91,10 +91,10 @@ void AOCPlayerController::Input_Look(const FInputActionValue& Value)
 
 void AOCPlayerController::Input_Jump_Pressed(const FInputActionValue& Value)
 {
-	ACharacter* Character = GetCharacter();
-	if (Character)
+	ACharacter* C = GetCharacter();
+	if (C)
 	{
-		Character->Jump();
+		C->Jump();
 	}
 
 	/*if (AOCCharacterBase* C = Cast<AOCCharacterBase>(GetPawn()))
@@ -105,10 +105,10 @@ void AOCPlayerController::Input_Jump_Pressed(const FInputActionValue& Value)
 
 void AOCPlayerController::Input_Jump_Released(const FInputActionValue& Value)
 {
-	ACharacter* Character = GetCharacter();
-	if (Character)
+	ACharacter* C = GetCharacter();
+	if (C)
 	{
-		Character->StopJumping();
+		C->StopJumping();
 	}
 
 	/*if (AOCCharacterBase* C = Cast<AOCCharacterBase>(GetPawn()))
