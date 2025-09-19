@@ -22,6 +22,7 @@ void UOCAnimInstance::NativeInitializeAnimation()
 	if (OwnerCharacter)
 	{
 		OwnerCharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
+		CurrentCharacterTag=OwnerCharacter->GetCurrentTag();
 	}
 	else
 	{
@@ -41,5 +42,14 @@ void UOCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = OwnerCharacterMovementComponent->IsFalling();
 		bIsAccelerating = OwnerCharacterMovementComponent->GetCurrentAcceleration().Size() > 0.f;
 		AimPitch = OwnerCharacter->GetAimRotation();
+	}
+}
+
+void UOCAnimInstance::SetCharacterTag()
+{
+	//캐릭터 태그 가져오기
+	if(OwnerCharacter)
+	{
+		CurrentCharacterTag=OwnerCharacter->GetCurrentTag();
 	}
 }

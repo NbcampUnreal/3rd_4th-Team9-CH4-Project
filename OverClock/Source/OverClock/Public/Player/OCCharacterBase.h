@@ -3,8 +3,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "OCCharacterBase.generated.h"
 
+class UOCAnimDataAsset;
 class UCameraComponent;
 class UAbilitySystemComponent;
 class AOCPlayerState;
@@ -28,6 +30,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSetAimRotation(float InAimPitch);
 	
+	UFUNCTION()
+	FORCEINLINE FGameplayTag GetCurrentTag() const {return CharacterTag;};
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -35,6 +40,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DataAsset")
+	TObjectPtr<UOCAnimDataAsset> OCAnimDataAsset;
+
+	UPROPERTY(Replicated, EditAnywhere,BlueprintReadOnly, Category = "Character")
+	FGameplayTag CharacterTag;//network
+	
 	// 아직 프로토타입 단계라 안전성을 위해 사용 X
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|State")
 	TObjectPtr<AOCPlayerState> CachedPlayerState;*/

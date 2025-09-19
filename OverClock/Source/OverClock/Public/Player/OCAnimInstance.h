@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Animation/AnimInstance.h"
 #include "OCAnimInstance.generated.h"
 
@@ -18,6 +19,15 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 protected:
+
+	UFUNCTION()
+	void SetCharacterTag();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Data")
+	TObjectPtr<class UOCAnimDataAsset> CharacterDataAsset;
+	UPROPERTY(BlueprintReadOnly, Category = "Data")
+	FGameplayTag CurrentCharacterTag;
+	
 	UPROPERTY()
 	TObjectPtr<AOCCharacterBase> OwnerCharacter;
 	UPROPERTY()
