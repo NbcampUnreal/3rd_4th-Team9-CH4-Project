@@ -41,8 +41,13 @@ private:
 	void Input_Look(const FInputActionValue& Value);
 	void Input_Jump_Pressed(const FInputActionValue& Value);
 	void Input_Jump_Released(const FInputActionValue& Value);
+
 	void Input_Attack_Pressed(const FInputActionValue& Value);
 	void Input_Reload(const FInputActionValue& Value);
-
+	void InputTag_Attack_Alt();
+	void InputTag_Skill_Active();
+	void InputTag_Ultimate();
+	void InputTag_Interact();
+	
 #pragma endregion 
 };

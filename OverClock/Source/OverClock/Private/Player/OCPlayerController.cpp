@@ -245,3 +245,22 @@ void AOCPlayerController::Server_TryActivateByTag_Implementation(FGameplayTag Ab
 	const bool bOk = ASC->TryActivateAbilitiesByTag(TagContainer);
 	UE_LOG(LogTemp, Log, TEXT("[RPC] TryActivateByTag %s => %s"), *AbilityTag.ToString(), bOk ? TEXT("SUCCESS") : TEXT("FAIL"));
 }
+void AOCPlayerController::InputTag_Attack_Alt()
+{
+	
+}
+
+void AOCPlayerController::InputTag_Skill_Active()
+{
+	
+}
+
+void AOCPlayerController::InputTag_Ultimate()
+{
+	
+}
+
+void AOCPlayerController::InputTag_Interact()
+{
+	
+}
