@@ -10,6 +10,7 @@
 AOCPlayerController::AOCPlayerController()
 {
 	//bReplicates = true;
+	InputComponent = CreateDefaultSubobject<UOCInputComponent>(TEXT("InputComponent"));
 }
 
 void AOCPlayerController::BeginPlay()
@@ -115,4 +116,24 @@ void AOCPlayerController::Input_Jump_Released(const FInputActionValue& Value)
 	{
 		C->StopJumping();
 	}*/
+}
+
+void AOCPlayerController::InputTag_Attack_Alt()
+{
+	
+}
+
+void AOCPlayerController::InputTag_Skill_Active()
+{
+	
+}
+
+void AOCPlayerController::InputTag_Ultimate()
+{
+	
+}
+
+void AOCPlayerController::InputTag_Interact()
+{
+	
 }
