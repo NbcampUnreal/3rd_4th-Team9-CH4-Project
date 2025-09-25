@@ -11,7 +11,7 @@ AOCCharacterBase::AOCCharacterBase()
 	:WalkSpeed(600.0f),
 	RunSpeed(900.0f),
 	JumpVelocity(600.0f),
-	AimPitch(0.f)
+	AimRotation(FRotator::ZeroRotator)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -31,7 +31,10 @@ void AOCCharacterBase::BeginPlay()
 void AOCCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	ServerSetAimRotation(GetControlRotation().Pitch);
+	if (HasAuthority())
+	{
+		ServerSetAimRotation_Implementation(GetControlRotation());
+	}
 }
 
 UAbilitySystemComponent* AOCCharacterBase::GetAbilitySystemComponent() const
@@ -72,10 +75,10 @@ void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
-	DOREPLIFETIME(AOCCharacterBase, AimPitch);
+	DOREPLIFETIME(AOCCharacterBase, AimRotation);
 }
 
-void AOCCharacterBase::ServerSetAimRotation_Implementation(float InAimPitch)
+void AOCCharacterBase::ServerSetAimRotation_Implementation(FRotator InAimRotation)
 {
-	AimPitch=InAimPitch;
+	AimRotation=InAimRotation;
 }

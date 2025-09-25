@@ -2,10 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "Abilities/GameplayAbility.h"
 #include "GameFramework/PlayerState.h"
 #include "Interface/TeamInfoInterface.h"
 #include "OCPlayerState.generated.h"
 
+class UOCPawnData;
 class UAbilitySystemComponent;
 
 UCLASS()
