@@ -8,6 +8,8 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Sprint, "InputTag.Sprint")
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Jump, "InputTag.Jump")
 	
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Primary, "InputTag.Attack.Primary")
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Reload, "InputTag.Reload")
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Alt, "InputTag.Attack.Alt")    // RMB: 특수(보통 무기 보조/방벽 등)
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Skill_Active, "InputTag.Skill.Active")   // E
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ultimate, "InputTag.Ultimate")   // Q
@@ -30,4 +32,14 @@ namespace OCGameplayTags
 
 	/*Effect Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")
+	//temporary
+	UE_DEFINE_GAMEPLAY_TAG(Ability_PeaceKeeper, "Ability.PeaceKeeper")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_RevReload, "Ability.RevReload")
+	UE_DEFINE_GAMEPLAY_TAG(State_Firing, "State.Firing")
+	UE_DEFINE_GAMEPLAY_TAG(State_RevReloading, "State.RevReloading")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_PeaceKeeper, "Cooldown.PeaceKeeper")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RevReload, "Cooldown.RevReload")
+
+	//cue
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_RevMuzzleFlash, "GameplayCue.Weapon.RevMuzzleFlash")
 }
