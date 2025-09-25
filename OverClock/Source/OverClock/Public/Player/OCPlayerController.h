@@ -4,9 +4,6 @@
 #include "Abilities/GameplayAbility.h"
 #include "GameFramework/PlayerController.h"
 
-#include "GameplayTagContainer.h"
-#include "Abilities/GameplayAbility.h"
-
 #include "OCPlayerController.generated.h"
 
 struct FGameplayTagContainer;
@@ -49,10 +46,10 @@ private:
 
 	void Input_Attack_Pressed(const FInputActionValue& Value);
 	void Input_Reload(const FInputActionValue& Value);
-	void InputTag_Attack_Alt();
-	void InputTag_Skill_Active();
-	void InputTag_Ultimate();
-	void InputTag_Interact();
+	void Input_Attack_Alt();
+	void Input_Skill_Active();
+	void Input_Ultimate();
+	void Input_Interact();
 	
 #pragma endregion
 
