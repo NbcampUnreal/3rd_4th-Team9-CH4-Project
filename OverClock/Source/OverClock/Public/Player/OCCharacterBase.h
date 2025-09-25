@@ -25,10 +25,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
-	FORCEINLINE float GetAimRotation() const {return AimPitch;}
+	FORCEINLINE FRotator GetAimRotation() const {return AimRotation;}
 	
-	UFUNCTION(Server, Reliable)
-	void ServerSetAimRotation(float InAimPitch);
+	UFUNCTION(Server, Unreliable)
+	void ServerSetAimRotation(FRotator InAimRotation);
 	
 	UFUNCTION()
 	FORCEINLINE FGameplayTag GetCurrentTag() const {return CharacterTag;};
@@ -58,5 +58,5 @@ protected:
 	float JumpVelocity;
 	
 	UPROPERTY(Replicated)
-	float AimPitch;
+	FRotator AimRotation;
 };

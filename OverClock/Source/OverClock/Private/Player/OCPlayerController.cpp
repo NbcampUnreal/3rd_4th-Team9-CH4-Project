@@ -1,11 +1,17 @@
 #include "Player/OCPlayerController.h"
+
+#include "AbilitySystemComponent.h"
 #include "Input/OCInputComponent.h"
 #include "Data/DA_OCInputConfig.h"
 #include "Data/OCGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Pawn.h"
 #include "Player/OCCharacterBase.h"
+#include "AbilitySystemGlobals.h"
+#include "Abilities/GA_DeadlyBullet.h"
+#include "Player/OCPlayerState.h"
 
 AOCPlayerController::AOCPlayerController()
 {
@@ -44,6 +50,10 @@ void AOCPlayerController::SetupInputComponent()
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Triggered, this, &ThisClass::Input_Jump_Pressed);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Completed, this, &ThisClass::Input_Jump_Released);
 	
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Alt, ETriggerEvent::Started, this, &ThisClass::Input_Attack_Alt);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Skill_Active, ETriggerEvent::Started, this, &ThisClass::Input_Skill_Active);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Ultimate, ETriggerEvent::Started, this, &ThisClass::Input_Ultimate);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Interact, ETriggerEvent::Started, this, &ThisClass::Input_Interact);
 	// 어빌리티 입력도 같은 방식으로 태그만 추가하면 됨 모르면 공부하셈
 }
 
@@ -118,22 +128,41 @@ void AOCPlayerController::Input_Jump_Released(const FInputActionValue& Value)
 	}*/
 }
 
-void AOCPlayerController::InputTag_Attack_Alt()
+void AOCPlayerController::Input_Attack_Alt()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("Input_Attack_Alt"))
 }
 
-void AOCPlayerController::InputTag_Skill_Active()
+void AOCPlayerController::Input_Skill_Active()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Input_Skill_Active"))
 	
+	Server_ActivateSkill(DeadlyBulletGAClass);
 }
 
-void AOCPlayerController::InputTag_Ultimate()
+void AOCPlayerController::Input_Ultimate()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("Input_Ultimate"))
 }
 
-void AOCPlayerController::InputTag_Interact()
+void AOCPlayerController::Input_Interact()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("Input_Interact"))
+}
+
+void AOCPlayerController::Server_ActivateSkill_Implementation(TSubclassOf<UGameplayAbility> DeadlyBulletClass)
+{
+	APlayerState* PS = GetPlayerState<APlayerState>();
+	if (PS)
+	{
+		UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PS);
+
+		if (ASC)
+		{
+			FGameplayAbilitySpecHandle Handle = ASC->GiveAbility(
+				FGameplayAbilitySpec(DeadlyBulletClass, 1, INDEX_NONE, this)
+			);
+			ASC->TryActivateAbility(Handle);
+		}
+	}
 }

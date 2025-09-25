@@ -41,7 +41,7 @@ void UOCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		GroundSpeed = OwnerCharacter->GetVelocity().Size();
 		bIsFalling = OwnerCharacterMovementComponent->IsFalling();
 		bIsAccelerating = OwnerCharacterMovementComponent->GetCurrentAcceleration().Size() > 0.f;
-		AimPitch = OwnerCharacter->GetAimRotation();
+		//AimPitch = OwnerCharacter->GetAimRotation();
 	}
 }
 

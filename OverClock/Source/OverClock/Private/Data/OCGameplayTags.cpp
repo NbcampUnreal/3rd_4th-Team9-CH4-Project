@@ -20,4 +20,14 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Terra, "Character.Type.Terra")
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Serath, "Character.Type.Serath")
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Fey, "Character.Type.Fey")
+
+	/*Skill Tags*/
+	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet, "Ability.DeadlyBullet")
+
+	/*State Tags*/
+	UE_DEFINE_GAMEPLAY_TAG(State_Alive, "State.Alive")
+	UE_DEFINE_GAMEPLAY_TAG(State_Marked, "State.Marked")
+
+	/*Effect Tags*/
+	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")
 }
