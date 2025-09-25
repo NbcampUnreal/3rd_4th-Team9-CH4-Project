@@ -2,6 +2,8 @@
 
 #include "AbilitySystemComponent.h"
 
+#include "Util/UtilTeam.h"
+
 AOCPlayerState::AOCPlayerState()
 {
 	NetUpdateFrequency = 100.f;
@@ -38,5 +40,20 @@ void AOCPlayerState::InitASCForAvatar(AActor* NewAvatar)
 			bGrantedOnce = true;
 		}
 	}
+}
+
+void AOCPlayerState::SetInfo(int32 InTeamId)
+{
+	if (nullptr == UtilTeamInfo)
+	{
+		UtilTeamInfo = NewObject<UUtilTeam>(this);
+	}
+
+	UtilTeamInfo->Initialize(InTeamId);
+}
+
+UUtilTeam* AOCPlayerState::GetInfo() const
+{
+	return UtilTeamInfo;
 }
 

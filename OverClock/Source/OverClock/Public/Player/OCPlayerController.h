@@ -16,6 +16,7 @@ class OVERCLOCK_API AOCPlayerController : public APlayerController
 public:
 	AOCPlayerController();
 
+	virtual void PostNetInit() override;
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;

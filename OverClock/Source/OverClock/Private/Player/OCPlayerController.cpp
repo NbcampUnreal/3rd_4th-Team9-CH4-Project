@@ -6,10 +6,20 @@
 #include "InputActionValue.h"
 #include "GameFramework/Pawn.h"
 #include "Player/OCCharacterBase.h"
+#include "OverClock.h"
 
 AOCPlayerController::AOCPlayerController()
 {
 	//bReplicates = true;
+}
+
+void AOCPlayerController::PostNetInit()
+{
+	OC_LOG(LogOCNetwork, Log, TEXT("Begin"));
+
+	Super::PostNetInit();
+
+	OC_LOG(LogOCNetwork, Log, TEXT("End"));
 }
 
 void AOCPlayerController::BeginPlay()
