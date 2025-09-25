@@ -33,5 +33,10 @@ struct FOCAnimStruct
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequenceBase> JumpPreLandAnim;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequenceBase> PrimaryAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequenceBase> Reload;
 	// 필요한 다른 애니메이션들도 추가
 };

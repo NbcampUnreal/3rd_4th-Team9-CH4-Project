@@ -2,6 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+
+#include "GameplayTagContainer.h"
+#include "Abilities/GameplayAbility.h"
+
 #include "OCPlayerController.generated.h"
 
 class UDA_OCInputConfig;
@@ -27,11 +31,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerData", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDA_OCInputConfig> InputConfigDataAsset;
 
+	UFUNCTION(Server, Reliable)
+	void Server_EnsureAbilityGivenByTag(FGameplayTag AbilityTag);
+
+	UFUNCTION(Server, Reliable)
+	void Server_TryActivateByTag(FGameplayTag AbilityTag);
+
 	void Input_Move(const FInputActionValue& Value);
 	void Input_Look(const FInputActionValue& Value);
 	void Input_Jump_Pressed(const FInputActionValue& Value);
 	void Input_Jump_Released(const FInputActionValue& Value);
-	
-	
+	void Input_Attack_Pressed(const FInputActionValue& Value);
+	void Input_Reload(const FInputActionValue& Value);
+
 #pragma endregion 
 };
