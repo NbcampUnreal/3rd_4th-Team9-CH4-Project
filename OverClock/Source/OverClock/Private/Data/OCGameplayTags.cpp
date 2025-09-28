@@ -2,7 +2,9 @@
 
 namespace OCGameplayTags
 {
-	// ───── Input
+#pragma region Input
+	
+	/* Input */
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Move,            "InputTag.Move");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Look,            "InputTag.Look");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Sprint,          "InputTag.Sprint");
@@ -14,7 +16,11 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Skill_Active,    "InputTag.Skill.Active");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ultimate,        "InputTag.Ultimate");
 
-	// ───── Character
+#pragma endregion
+
+#pragma region Character
+	
+	/* Character */
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Revenant,  "Character.Type.Revenant");
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Twinblast, "Character.Type.Twinblast");
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Crunch,    "Character.Type.Crunch");
@@ -22,20 +28,24 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Serath,    "Character.Type.Serath");
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Fey,       "Character.Type.Fey");
 
-	// ───── Abilities (Weapon / Attack)
+#pragma endregion
+	
+#pragma region Abilities
+
+	/* Weapon / Attack */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Fire_Melee,      "Ability.Weapon.Fire.Melee");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Fire_Hitscan,    "Ability.Weapon.Fire.Hitscan");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Fire_Projectile, "Ability.Weapon.Fire.Projectile");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Reload,          "Ability.Weapon.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Overdrive,       "Ability.Weapon.Overdrive");
 
-	// ───── Abilities (Skill)
+	/* Skill */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Defense_Barrier,        "Ability.Defense.Barrier");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Defense_Block_Hold,     "Ability.Defense.Block.Hold");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Mobility_Dash,          "Ability.Mobility.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet,           "Ability.DeadlyBullet"); // (임시/특수기 명시)
 
-	// ───── Abilities (Ult)
+	/* Ultimate */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_Earthshatter,  "Ability.Ult.Earthshatter");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_GuardianOath,  "Ability.Ult.GuardianOath");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_JudgmentSoul,  "Ability.Ult.JudgmentSoul");
@@ -43,14 +53,18 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_NatureTempest, "Ability.Ult.NatureTempest");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_DivineAdvent,  "Ability.Ult.DivineAdvent");
 
-	// ───── State
+#pragma endregion
+	
+#pragma region State
+	
+	/* State */
 	UE_DEFINE_GAMEPLAY_TAG(State_Alive,             "State.Alive");
 	UE_DEFINE_GAMEPLAY_TAG(State_Marked,            "State.Marked");
 	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Firing,     "State.Weapon.Firing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Mobility_Dashing,  "State.Mobility.Dashing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Defense_Blocking,  "State.Defense.Blocking");
 
-	// ───── Cooldown
+	/* Cooldown */
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Weapon_Reload,  "Cooldown.Weapon.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Defense_Barrier,"Cooldown.Defense.Barrier");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Mobility_Dash,  "Cooldown.Mobility.Dash");
@@ -59,7 +73,11 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Area_Zone,      "Cooldown.Area.Zone");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Ult,            "Cooldown.Ult");
 
-	// ───── Effect
+#pragma endregion
+	
+#pragma region Effect
+
+	/* Effect */
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Buff_Shield,      "Effect.Buff.Shield");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Buff_Overdrive,   "Effect.Buff.Overdrive");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Debuff_Mark,      "Effect.Debuff.Mark");
@@ -69,7 +87,11 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Heal_Instant,     "Effect.Heal.Instant");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Heal_HoT,         "Effect.Heal.HoT");
 
-	// ───── GameplayCue
+#pragma endregion
+	
+#pragma region GameplayCue
+
+	/* GameplayCue */
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Melee_Swing,             "GameplayCue.Melee.Swing");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Impact_Heavy,            "GameplayCue.Impact.Heavy");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_MuzzleFlash,      "GameplayCue.Weapon.MuzzleFlash");
@@ -80,7 +102,9 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Ult_Earthshatter_Jump,   "GameplayCue.Ult.Earthshatter.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Ult_Earthshatter_Impact, "GameplayCue.Ult.Earthshatter.Impact");
 
-	// ───── Legacy / Temporary
+#pragma endregion
+
+	// Temporary
 	UE_DEFINE_GAMEPLAY_TAG(Ability_PeaceKeeper,     "Ability.PeaceKeeper");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_RevReload,       "Ability.RevReload");
 	UE_DEFINE_GAMEPLAY_TAG(State_Firing,            "State.Firing");

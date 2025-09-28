@@ -5,6 +5,7 @@
 namespace OCGameplayTags
 {
 #pragma region Input
+	
 	/* Input */
 	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Move)
 	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Look)
@@ -107,7 +108,7 @@ namespace OCGameplayTags
 #pragma endregion 
 	
 
-	//temporary tag
+	// Temporary
 	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_PeaceKeeper)
 	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_RevReload)
 	OVERCLOCK_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Firing)
