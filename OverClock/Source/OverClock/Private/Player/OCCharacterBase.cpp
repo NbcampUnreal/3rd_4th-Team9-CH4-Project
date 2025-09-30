@@ -4,6 +4,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "OverClockDebugHelper.h"
+#include "Abilities/OCMarkComponent.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -11,13 +12,16 @@ AOCCharacterBase::AOCCharacterBase()
 	:WalkSpeed(600.0f),
 	RunSpeed(900.0f),
 	JumpVelocity(600.0f),
-	AimRotation(FRotator::ZeroRotator)
+	AimPitch(0.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(RootComponent);
 	CameraComp->bUsePawnControlRotation = true;
+
+	//MarkComp = CreateDefaultSubobject<UOCMarkComponent>(TEXT("StatusMark"));
+	//MarkComp->SetupAttachment(RootComponent);
 	
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = 600.f;
@@ -31,9 +35,9 @@ void AOCCharacterBase::BeginPlay()
 void AOCCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (HasAuthority())
+	if (!HasAuthority())
 	{
-		ServerSetAimRotation_Implementation(GetControlRotation());
+		UpdateRotation();
 	}
 }
 
@@ -75,10 +79,28 @@ void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
-	DOREPLIFETIME(AOCCharacterBase, AimRotation);
+	DOREPLIFETIME(AOCCharacterBase, AimPitch);
 }
 
-void AOCCharacterBase::ServerSetAimRotation_Implementation(FRotator InAimRotation)
+float AOCCharacterBase::GetAimPitch() const//AnimInstance Tick
 {
-	AimRotation=InAimRotation;
+	if (GetNetMode()==ROLE_AutonomousProxy)
+	{
+		return GetControlRotation().Pitch;
+	}
+	return AimPitch;
+}
+
+void AOCCharacterBase::UpdateRotation()//Tick
+{
+	if (FMath::Abs(RotationTemp - GetControlRotation().Pitch) > 1.f)
+	{
+		RotationTemp=GetControlRotation().Pitch;
+		ServerSetAimPitch(RotationTemp);
+	}
+}
+
+void AOCCharacterBase::ServerSetAimPitch_Implementation(float InAimPitch)
+{
+	AimPitch=InAimPitch;
 }

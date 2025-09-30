@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "OCCharacterBase.generated.h"
 
+class UOCMarkComponent;
 class UOCAnimDataAsset;
 class UCameraComponent;
 class UAbilitySystemComponent;
@@ -25,10 +26,10 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
-	FORCEINLINE FRotator GetAimRotation() const {return AimRotation;}
+	float GetAimPitch() const;
 	
 	UFUNCTION(Server, Unreliable)
-	void ServerSetAimRotation(FRotator InAimRotation);
+	void ServerSetAimPitch(float InAimPitch);
 	
 	UFUNCTION()
 	FORCEINLINE FGameplayTag GetCurrentTag() const {return CharacterTag;};
@@ -36,6 +37,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	void UpdateRotation();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
@@ -45,6 +48,9 @@ protected:
 
 	UPROPERTY(Replicated, EditAnywhere,BlueprintReadOnly, Category = "Character")
 	FGameplayTag CharacterTag;//network
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	//TObjectPtr<UOCMarkComponent> MarkComp;
 	
 	// 아직 프로토타입 단계라 안전성을 위해 사용 X
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|State")
@@ -58,5 +64,6 @@ protected:
 	float JumpVelocity;
 	
 	UPROPERTY(Replicated)
-	FRotator AimRotation;
+	float AimPitch;
+	float RotationTemp=0.f;
 };
