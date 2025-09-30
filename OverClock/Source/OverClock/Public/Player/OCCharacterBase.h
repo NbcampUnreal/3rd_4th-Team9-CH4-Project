@@ -9,6 +9,8 @@
 class UOCAnimDataAsset;
 class UCameraComponent;
 class UAbilitySystemComponent;
+class UOCAbilitySystemComponent;
+class UDA_OCHeroStartUpData;
 class AOCPlayerState;
 
 UCLASS()
@@ -43,6 +45,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DataAsset")
 	TObjectPtr<UOCAnimDataAsset> OCAnimDataAsset;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StartUp")
+	TSoftObjectPtr<UDA_OCHeroStartUpData> HeroStartUpData;
+	
 	UPROPERTY(Replicated, EditAnywhere,BlueprintReadOnly, Category = "Character")
 	FGameplayTag CharacterTag;//network
 	
@@ -59,4 +64,6 @@ protected:
 	
 	UPROPERTY(Replicated)
 	FRotator AimRotation;
+
+	void GiveStartupIfServer();
 };

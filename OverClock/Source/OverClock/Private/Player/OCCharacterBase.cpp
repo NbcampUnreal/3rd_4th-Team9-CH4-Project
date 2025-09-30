@@ -4,6 +4,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "OverClockDebugHelper.h"
+#include "Abilities/OCAbilitySystemComponent.h"
+#include "Data/DA_OCHeroStartUpData.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -37,6 +39,25 @@ void AOCCharacterBase::Tick(float DeltaTime)
 	}
 }
 
+void AOCCharacterBase::GiveStartupIfServer()
+{
+	if (!HasAuthority()) return;
+
+	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+	if (!PS) return;
+
+	if (UOCAbilitySystemComponent* ASC = Cast<UOCAbilitySystemComponent>(PS->GetAbilitySystemComponent()))
+	{
+		if (!HeroStartUpData.IsNull())
+		{
+			if (UDA_OCHeroStartUpData* Data = HeroStartUpData.LoadSynchronous())
+			{
+				Data->GiveToAbilitySystemComponent(ASC, 1);
+			}
+		}
+	}
+}
+
 UAbilitySystemComponent* AOCCharacterBase::GetAbilitySystemComponent() const
 {
 	if (const AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
@@ -54,10 +75,10 @@ void AOCCharacterBase::PossessedBy(AController* NewController)
 	if (AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
 	{
 		PS->InitASCForAvatar(this);
+		GiveStartupIfServer();
 		
 		const FString ASCText = FString::Printf(TEXT("Owner Actor : %s, AvatarActor : %s"), *GetAbilitySystemComponent()->GetOwnerActor()->GetActorLabel(), *GetAbilitySystemComponent()->GetAvatarActor()->GetActorLabel());
 		Debug::Print(TEXT("Ability system component valid") + ASCText, FColor::Green);
-		
 	}
 }
 
