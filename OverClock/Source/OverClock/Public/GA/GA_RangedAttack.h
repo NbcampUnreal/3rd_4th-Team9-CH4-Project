@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
-#include "GA_Peacekeeper.generated.h"
+#include "GA_RangedAttack.generated.h"
 
 class UOCAnimDataAsset;
 class UAnimMontage;
@@ -16,12 +16,32 @@ class UGameplayEffect;
  * - 쿨타임은 몽타주 길이/PlayRate 만큼 런타임에서 Duration을 오버라이드하여 부여
  */
 UCLASS()
-class OVERCLOCK_API UGA_Peacekeeper : public UGameplayAbility
+class OVERCLOCK_API UGA_RangedAttack : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UGA_Peacekeeper();
+	UGA_RangedAttack();
+
+	// GAS overrides
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags,
+		const FGameplayTagContainer* TargetTags,
+		FGameplayTagContainer* OptionalRelevantTags) const override;
+
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData) override;
+
+protected:
+	/** 데이터에셋 PrimaryAttack → UAnimMontage(필요 시 동적 생성) */
+	UAnimMontage* ResolveMontage(const FGameplayAbilityActorInfo* ActorInfo) const;
+
+	/** 쿨타임 스펙 생성 (Duration은 호출부에서 SetDuration) */
+	FGameplayEffectSpecHandle MakeOutgoingCooldownSpec(
+		const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo) const;
 
 	/** (선택) GA에서 데이터에셋을 오버라이드하고 싶을 때 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
@@ -47,23 +67,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cooldown")
 	TSubclassOf<UGameplayEffect> CooldownGE;
 
-	// GAS overrides
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayTagContainer* SourceTags,
-		const FGameplayTagContainer* TargetTags,
-		FGameplayTagContainer* OptionalRelevantTags) const override;
-
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData) override;
-
-protected:
-	/** 데이터에셋 PrimaryAttack → UAnimMontage(필요 시 동적 생성) */
-	UAnimMontage* ResolveMontage(const FGameplayAbilityActorInfo* ActorInfo) const;
-
-	/** 쿨타임 스펙 생성 (Duration은 호출부에서 SetDuration) */
-	FGameplayEffectSpecHandle MakeOutgoingCooldownSpec(
-		const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo) const;
+	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
+	FScalableFloat CooldownSec = 0.0f;
 };

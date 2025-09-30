@@ -25,21 +25,22 @@ namespace OCGameplayTags
 
 	/*Skill Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet, "Ability.DeadlyBullet")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack, "Ability.RangedAttack")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload, "Ability.Reload")
 
 	/*State Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(State_Alive, "State.Alive")
 	UE_DEFINE_GAMEPLAY_TAG(State_Marked, "State.Marked")
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock, "State.ActionLock")
 
 	/*Effect Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")
-	//temporary
-	UE_DEFINE_GAMEPLAY_TAG(Ability_PeaceKeeper, "Ability.PeaceKeeper")
-	UE_DEFINE_GAMEPLAY_TAG(Ability_RevReload, "Ability.RevReload")
-	UE_DEFINE_GAMEPLAY_TAG(State_Firing, "State.Firing")
-	UE_DEFINE_GAMEPLAY_TAG(State_RevReloading, "State.RevReloading")
-	UE_DEFINE_GAMEPLAY_TAG(Cooldown_PeaceKeeper, "Cooldown.PeaceKeeper")
-	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RevReload, "Cooldown.RevReload")
 
-	//cue
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_RevMuzzleFlash, "GameplayCue.Weapon.RevMuzzleFlash")
+	//temporary
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Reload, "Cooldown.Reload")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RangedAttack, "Cooldown.RangedAttack")
+
+	//cue Tags
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_MuzzleFlash, "GameplayCue.Weapon.MuzzleFlash")
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Reload, "GameplayCue.Weapon.Reload")
 }

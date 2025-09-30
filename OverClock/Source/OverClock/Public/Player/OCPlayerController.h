@@ -58,4 +58,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> DeadlyBulletGAClass;
+
+	FORCEINLINE class IAbilitySystemInterface* GetAbilitySystemInterface() const
+	{
+		IAbilitySystemInterface* ASI = Cast<class IAbilitySystemInterface>(PlayerState);
+		if (ensure(ASI))
+		{
+			return ASI;
+		}
+		return nullptr;
+	}
 };

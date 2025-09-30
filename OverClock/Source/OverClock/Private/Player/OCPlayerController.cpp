@@ -14,7 +14,7 @@
 #include "Player/OCPlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "Player/OCPlayerState.h"
-#include "GA/GA_PeaceKeeper.h"
+#include "GA/GA_RangedAttack.h"
 #include "GameplayTagContainer.h"
 #include "Player/OCRevenant.h"
 #include "OverClock.h"
@@ -69,8 +69,8 @@ void AOCPlayerController::SetupInputComponent()
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Skill_Active, ETriggerEvent::Started, this, &ThisClass::Input_Skill_Active);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Ultimate, ETriggerEvent::Started, this, &ThisClass::Input_Ultimate);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Interact, ETriggerEvent::Started, this, &ThisClass::Input_Interact);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_Attack_Pressed);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Reload, ETriggerEvent::Triggered, this, &ThisClass::Input_Reload);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Primary, ETriggerEvent::Started, this, &ThisClass::Input_Attack_Pressed);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Reload, ETriggerEvent::Started, this, &ThisClass::Input_Reload);
 	// 어빌리티 입력도 같은 방식으로 태그만 추가하면 됨 모르면 공부하셈
 }
 
@@ -185,11 +185,8 @@ void AOCPlayerController::Server_ActivateSkill_Implementation(TSubclassOf<UGamep
 }
 void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*/)
 {
-	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] PS NULL")); return; }
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	const FGameplayTag AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.PeaceKeeper"));
+	UAbilitySystemComponent* ASC = GetAbilitySystemInterface()->GetAbilitySystemComponent();
+	const FGameplayTag AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.RangedAttack"));
 
 	if (!ASC) {
 		UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] ASC NULL -> server fallback (tag)"));
@@ -197,13 +194,11 @@ void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*
 		Server_TryActivateByTag(AttackTag);
 		return;
 	}
-
+	//
 	// 상태 로그 그대로
 	FGameplayTagContainer Owned; ASC->GetOwnedGameplayTags(Owned);
 	UE_LOG(LogTemp, Log, TEXT("[Input_Attack] ASC OwnedTags: %s"), *Owned.ToStringSimple());
-	const bool bHasFiring = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Firing"));
-	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.PeaceKeeper"));
-	UE_LOG(LogTemp, Log, TEXT("[Input_Attack] Has State.Firing=%d, Cooldown.PeaceKeeper=%d"), bHasFiring, bHasCD);
+	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.RangedAttack"));
 
 	// 태그 활성화 (기본)
 	bool bActivated = ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AttackTag));
@@ -221,25 +216,22 @@ void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*
 // ─────────────── Reload (R) ───────────────
 void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
 {
-	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] PS NULL")); return; }
+	UAbilitySystemComponent* ASC = GetAbilitySystemInterface()->GetAbilitySystemComponent();
+	const FGameplayTag ReloadTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.Reload"));
 
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	const FGameplayTag ReloadTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.RevReload"));
-
-	if (!ASC) {
-		UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] ASC NULL -> server fallback (tag)"));
+	if (!ASC) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Input_Reload] ASC NULL -> server fallback (tag)"));
 		Server_EnsureAbilityGivenByTag(ReloadTag);
 		Server_TryActivateByTag(ReloadTag);
 		return;
 	}
 
 	// 상태 로그 그대로
-	FGameplayTagContainer Owned; ASC->GetOwnedGameplayTags(Owned);
-	UE_LOG(LogTemp, Log, TEXT("[Input_RevReload] ASC OwnedTags: %s"), *Owned.ToStringSimple());
-	const bool bHasRevReloading = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.RevReloading"));
-	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.RevReload"));
-	UE_LOG(LogTemp, Log, TEXT("[Input_RevReload] Has State.RevReloading=%d, Cooldown.RevReload=%d"), bHasRevReloading, bHasCD);
+	FGameplayTagContainer Owned;
+	ASC->GetOwnedGameplayTags(Owned);
+	UE_LOG(LogTemp, Log, TEXT("[Input_Reload] ASC OwnedTags: %s"), *Owned.ToStringSimple());
+	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.Reload"));
 
 	// 태그 활성화 (기본)
 	bool bActivated = ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(ReloadTag));
@@ -248,7 +240,7 @@ void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
 	// 실패 시 서버가 태그로 지급/활성
 	if (!bActivated)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] Fallback to server give/activate (tag)"));
+		UE_LOG(LogTemp, Warning, TEXT("[Input_Reload] Fallback to server give/activate (tag)"));
 		Server_EnsureAbilityGivenByTag(ReloadTag);
 		Server_TryActivateByTag(ReloadTag);
 	}
