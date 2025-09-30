@@ -1,24 +1,22 @@
 #include "Abilities/GA_DeadlyBullet.h"
 
-#include "GameplayEffect.h"
 #include "Engine/World.h"
 #include "AbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "AbilitySystemBlueprintLibrary.h"
+//#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
-#include "Abilities/OCMarkComponent.h"
 #include "Abilities/OCRBMissile.h"
 #include "Data/OCGameplayTags.h"
-#include "GameEffects/GE_MarkEffect.h"
 
 UGA_DeadlyBullet::UGA_DeadlyBullet()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;//server만
 
-	bServerRespectsRemoteAbilityCancellation = false;
+	bServerRespectsRemoteAbilityCancellation = false;//클라 취소 불가
 
-	AbilityTags.AddTag(OCGameplayTags::Ability_DeadlyBullet);
+	AbilityTags.AddTag(OCGameplayTags::Ability_DeadlyBullet);//ASC에 GA부여
 }
 
 void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -26,6 +24,14 @@ void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	//network 확인용
+	if (ActorInfo && ActorInfo->AvatarActor.IsValid())
+	{
+		ENetMode NetMode = ActorInfo->AvatarActor->GetNetMode();
+		UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] DedicatedServer : 1 | Client : 3 | Now : %d"), NetMode)
+	}
+	
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
@@ -43,7 +49,16 @@ void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			return;
 		}
 		
-		LaunchHomingProjectile(Target);
+		if (HasAuthority(&ActivationInfo))
+		{
+			//network 확인용
+			if (ActorInfo && ActorInfo->AvatarActor.IsValid())
+			{
+				ENetMode NetMode = ActorInfo->AvatarActor->GetNetMode();
+				UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] DedicatedServer : 1 | Client : 3 | Now : %d"), NetMode)
+			}
+			LaunchHomingProjectile(Target);
+		}
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }
@@ -67,20 +82,26 @@ AActor* UGA_DeadlyBullet::FindNearestEnemy()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), FoundActors);
 
 	AActor* NearestEnemy = nullptr;
-	float NearestDistance = TargetRange;
+	float NearestDistance = FLT_MAX;
 	FVector MyLocation = Avatar->GetActorLocation();
 
 	for (AActor* Actor : FoundActors)
 	{
 		if (Actor == Avatar) continue;
-		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Actor);
+		IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(Actor);
+		if (!ASI) continue;
+		UAbilitySystemComponent* TargetASC = ASI->GetAbilitySystemComponent();
 		if (!TargetASC) continue;
-        
-		// 적 태그 확인
-		//if (!TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Enemy"))))
-		//	continue;
+		
+		//같은 태그인지 확인
+		//Tag1 = AvatarASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red"))
+		//Tag2 = TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red"))
+		//if(Tag1 = Tag2) 
+		//{
+		//continue;
+		//}
 
-		float Distance = FVector::Dist(MyLocation, Actor->GetActorLocation());
+		float Distance = FVector::DistSquared(MyLocation, Actor->GetActorLocation());
 		if (Distance < NearestDistance)
 		{
 			NearestDistance = Distance;
@@ -95,7 +116,7 @@ void UGA_DeadlyBullet::LaunchHomingProjectile(AActor* Target)
 {
 	if (!MissileClass || !Target)
 	{
-		UE_LOG(LogTemp, Error, TEXT("MissileClass is null! Check if the C++ class is being used directly instead of the Blueprint."));
+		UE_LOG(LogTemp, Error, TEXT("[UGA_DeadlyBullet] MissileClass or Target Is Null"));
 		return;
 	}
 
@@ -103,7 +124,7 @@ void UGA_DeadlyBullet::LaunchHomingProjectile(AActor* Target)
 	if (!Avatar) return;
 
 	FVector SpawnLocation = Avatar->GetActorLocation() + Avatar->GetActorForwardVector() * 200.0f;
-	SpawnLocation.Z=300.f;
+	SpawnLocation.Z+=150.f;
 	FVector DirectionToTarget = (Target->GetActorLocation() - SpawnLocation).GetSafeNormal();
 
 	FActorSpawnParameters SpawnParams;
@@ -111,16 +132,14 @@ void UGA_DeadlyBullet::LaunchHomingProjectile(AActor* Target)
 	SpawnParams.Instigator = Cast<APawn>(Avatar);
 	SpawnParams.SpawnCollisionHandlingOverride=ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AOCRBMissile* Projectile = GetWorld()->SpawnActor<AOCRBMissile>(
+	if (AOCRBMissile* Projectile = GetWorld()->SpawnActor<AOCRBMissile>(
 		MissileClass, 
 		SpawnLocation, 
 		DirectionToTarget.Rotation(),
 		SpawnParams
-	);
-
-	if (Projectile)
+	))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MissileClass Name : %s"),*MissileClass->GetName());
 		Projectile->SetTarget(Target);
+		UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] Missile Spawned"));
 	}
 }

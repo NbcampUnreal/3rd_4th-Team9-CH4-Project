@@ -25,6 +25,10 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Serath, "Character.Type.Serath")
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Fey, "Character.Type.Fey")
 
+	/*Team Tags*/
+	UE_DEFINE_GAMEPLAY_TAG(Team_Red, "Team.Red")
+	UE_DEFINE_GAMEPLAY_TAG(Team_Blue, "Team.Blue")
+
 	/*Skill Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet, "Ability.DeadlyBullet")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack, "Ability.RangedAttack")
