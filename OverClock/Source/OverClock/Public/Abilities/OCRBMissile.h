@@ -1,84 +1,42 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "AbilitySystemComponent.h"
+#include "OCMissileBase.h"
 #include "OCRBMissile.generated.h"
 
-class UNiagaraSystem;
-class UGE_MarkEffect;
-class USphereComponent;
-class UProjectileMovementComponent;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnProjectileHit, AActor*, HitTarget, const FHitResult&, HitResult);
-
 UCLASS()
-class OVERCLOCK_API AOCRBMissile : public AActor
+class OVERCLOCK_API AOCRBMissile : public AOCMissileBase
 {
 	GENERATED_BODY()
 	
 public:	
 	AOCRBMissile();
 
-	 void SetTarget(AActor* NewTarget);
+	void SetTarget(AActor* NewTarget);
 
 	UPROPERTY()
 	TWeakObjectPtr<AActor> NewTargetInTick;
 
-	// 적중 브로드캐스트 이벤트
-	//UPROPERTY(BlueprintAssignable, Category = "Events")
-	//FOnProjectileHit FOnProHit;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Mark")
-	TSubclassOf<UGE_MarkEffect> MarkEffectClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	float LifeSpan = 30.0f;
+	virtual void PostInitializeComponents() override;
 
 protected:
 
-	virtual void BeginPlay() override;
-
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
-			   FVector NormalImpulse, const FHitResult& Hit);
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+			   FVector NormalImpulse, const FHitResult& Hit) override;
 
-	void ApplyMarkToTarget(AActor* Target);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<USphereComponent> CollisionComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UStaticMeshComponent> MeshComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+	void ApplyMarkToTarget(UAbilitySystemComponent* InOwnerASC, UAbilitySystemComponent* InTargetASC);
 
 	// 타겟 > BP편집X
 	UPROPERTY(BlueprintReadWrite, Category = "Targeting")
 	TWeakObjectPtr<AActor> HomingTarget;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	float InitialSpeed = 100.0f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	float MaxSpeed = 500.0f;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	float HomingAcceleration = 3000.0f;
-
 
 	// 이펙트들
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UNiagaraSystem> TrailEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	TObjectPtr<USoundBase> LaunchSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	TObjectPtr<USoundBase> HitSound;
-	
-
-public:	
-	virtual void Tick(float DeltaTime) override;
 
 };
