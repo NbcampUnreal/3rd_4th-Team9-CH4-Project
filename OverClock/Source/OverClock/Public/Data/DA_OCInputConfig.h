@@ -9,21 +9,18 @@ class UInputMappingContext;
 class UInputAction;
 
 USTRUCT(BlueprintType)
-struct FInputActionConfig
+struct FOCInputActionConfig
 {
 	GENERATED_BODY()
 
 public:
-	FInputActionConfig()
-		: InputAction(nullptr)
-	{}
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories = "InputTag"))
 	FGameplayTag InputTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* InputAction;
-	
+	TObjectPtr<UInputAction> InputAction = nullptr;
+
+	bool IsValid() const;
 	
 };
 
@@ -34,10 +31,13 @@ class OVERCLOCK_API UDA_OCInputConfig : public UDataAsset
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputMappingContext* DefaultMappingContext;
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
-	TArray<FInputActionConfig> NativeInputActions;
+	TArray<FOCInputActionConfig> NativeInputActions;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
+	TArray<FOCInputActionConfig> AbilityInputActions;
+	
 	UInputAction* FindNativeInputActionByTag(const FGameplayTag& InInputTag) const;
 };

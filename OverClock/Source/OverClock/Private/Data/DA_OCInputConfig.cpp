@@ -1,8 +1,13 @@
 #include "Data/DA_OCInputConfig.h"
 
+bool FOCInputActionConfig::IsValid() const
+{
+	return InputTag.IsValid() && InputAction != nullptr;
+}
+
 UInputAction* UDA_OCInputConfig::FindNativeInputActionByTag(const FGameplayTag& InInputTag) const
 {
-	for (const FInputActionConfig& InputActionConfig : NativeInputActions)
+	for (const FOCInputActionConfig& InputActionConfig : NativeInputActions)
 	{
 		if (InputActionConfig.InputTag == InInputTag && InputActionConfig.InputAction)
 		{
