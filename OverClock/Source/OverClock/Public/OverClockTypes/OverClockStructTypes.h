@@ -18,5 +18,4 @@ struct FOCAbilitySet
 	TSubclassOf<UOCGameplayAbility> AbilityClass;
 
 	bool IsValid() const;
-	
 };
