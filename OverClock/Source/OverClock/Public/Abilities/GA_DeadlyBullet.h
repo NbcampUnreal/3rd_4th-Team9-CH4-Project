@@ -24,10 +24,6 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo, 
 		bool bReplicateEndAbility, bool bWasCancelled) override;
 
-	// 타겟 탐지 범위
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	float TargetRange = 1500.0f;
-
 	// 유도탄 발사체 클래스
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<AOCRBMissile> MissileClass;
