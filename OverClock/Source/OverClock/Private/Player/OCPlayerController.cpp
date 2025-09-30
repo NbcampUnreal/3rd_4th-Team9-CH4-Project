@@ -5,17 +5,14 @@
 #include "Data/DA_OCInputConfig.h"
 #include "Data/OCGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
+
 #include "InputActionValue.h"
 #include "GameplayTagContainer.h"
 #include "GameFramework/Pawn.h"
+#include "Abilities/OCAbilityDataAsset.h"
+#include "GameFramework/InputSettings.h"
 #include "Player/OCCharacterBase.h"
-#include "AbilitySystemGlobals.h"
-#include "Abilities/GA_DeadlyBullet.h"
 #include "Player/OCPlayerState.h"
-#include "AbilitySystemComponent.h"
-#include "Player/OCPlayerState.h"
-#include "GA/GA_PeaceKeeper.h"
-#include "GameplayTagContainer.h"
 #include "Player/OCRevenant.h"
 
 AOCPlayerController::AOCPlayerController()
@@ -67,6 +64,26 @@ void AOCPlayerController::SetupInputComponent()
 void AOCPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	// 캐릭터의 GA Tag를 AbilityStruct에 대입
+	if (AOCCharacterBase* C = Cast<AOCCharacterBase>(InPawn))
+	{
+		if (AbilityDataAsset)
+		{
+			AbilityStruct = AbilityDataAsset->CharacterAbilityTags[C->GetCurrentTag()];
+
+			return;
+		}
+
+		//확인용 Log
+		UE_LOG(LogTemp, Warning, TEXT("Character Ability Skill_Active : %s"), *AbilityStruct.InputTag_Skill_Active.ToString());
+	}
+}
+
+void AOCPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AOCPlayerController,AbilityStruct);
 }
 
 void AOCPlayerController::Input_Move(const FInputActionValue& Value)
@@ -142,9 +159,7 @@ void AOCPlayerController::Input_Attack_Alt()
 
 void AOCPlayerController::Input_Skill_Active()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Input_Skill_Active"))
-	
-	Server_ActivateSkill(DeadlyBulletGAClass);
+	Server_ActivateSkill(AbilityStruct.InputTag_Skill_Active);
 }
 
 void AOCPlayerController::Input_Ultimate()
@@ -157,19 +172,17 @@ void AOCPlayerController::Input_Interact()
 	UE_LOG(LogTemp, Warning, TEXT("Input_Interact"))
 }
 
-void AOCPlayerController::Server_ActivateSkill_Implementation(TSubclassOf<UGameplayAbility> DeadlyBulletClass)
+void AOCPlayerController::Server_ActivateSkill_Implementation(FGameplayTag AbilityTag)
 {
-	APlayerState* PS = GetPlayerState<APlayerState>();
-	if (PS)
+	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(GetPawn()))
 	{
-		UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(PS);
+		UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent();
 
 		if (ASC)
 		{
-			FGameplayAbilitySpecHandle Handle = ASC->GiveAbility(
-				FGameplayAbilitySpec(DeadlyBulletClass, 1, INDEX_NONE, this)
-			);
-			ASC->TryActivateAbility(Handle);
+			FGameplayTagContainer TagContainer;
+			TagContainer.AddTag(AbilityTag);
+			ASC->TryActivateAbilitiesByTag(TagContainer);
 		}
 	}
 }

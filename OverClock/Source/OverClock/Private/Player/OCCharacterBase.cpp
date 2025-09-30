@@ -20,8 +20,8 @@ AOCCharacterBase::AOCCharacterBase()
 	CameraComp->SetupAttachment(RootComponent);
 	CameraComp->bUsePawnControlRotation = true;
 
-	//MarkComp = CreateDefaultSubobject<UOCMarkComponent>(TEXT("StatusMark"));
-	//MarkComp->SetupAttachment(RootComponent);
+	MarkComp = CreateDefaultSubobject<UOCMarkComponent>(TEXT("StatusMark"));
+	MarkComp->SetupAttachment(RootComponent);
 	
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = 600.f;
@@ -63,6 +63,7 @@ void AOCCharacterBase::PossessedBy(AController* NewController)
 		Debug::Print(TEXT("Ability system component valid") + ASCText, FColor::Green);
 		
 	}
+	MarkComp->ASCBind();
 }
 
 void AOCCharacterBase::OnRep_PlayerState()

@@ -8,15 +8,17 @@
 #include "GameplayTagContainer.h"
 #include "Abilities/OCRBMissile.h"
 #include "Data/OCGameplayTags.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
 
 UGA_DeadlyBullet::UGA_DeadlyBullet()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;//server만
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;//server만 실행
 
 	bServerRespectsRemoteAbilityCancellation = false;//클라 취소 불가
 
-	AbilityTags.AddTag(OCGameplayTags::Ability_DeadlyBullet);//ASC에 GA부여
+	AbilityTags.AddTag(OCGameplayTags::Ability_DeadlyBullet);
 }
 
 void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -28,18 +30,27 @@ void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	//network 확인용
 	if (ActorInfo && ActorInfo->AvatarActor.IsValid())
 	{
-		ENetMode NetMode = ActorInfo->AvatarActor->GetNetMode();
-		UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] DedicatedServer : 1 | Client : 3 | Now : %d"), NetMode)
+		ENetRole LocalRole = ActorInfo->AvatarActor->GetLocalRole();
+		UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] Local Role : %d (None 0 | Simulated Proxy 1 | Autonomous Proxy 2 | Authority 3)"), LocalRole)
+	}
+
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		return;
+	}
+
+	// Task 실행으로 변경
+	if (MarkMontage)
+	{
+		if(UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance())
+		{
+			AnimInstance->Montage_Play(MarkMontage);
+		}
 	}
 	
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
-		if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
-		{
-			EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-			return;
-		}
-
 		// 가장 가까운 적
 		AActor* Target = FindNearestEnemy();
 		if (!Target)
@@ -51,12 +62,6 @@ void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		
 		if (HasAuthority(&ActivationInfo))
 		{
-			//network 확인용
-			if (ActorInfo && ActorInfo->AvatarActor.IsValid())
-			{
-				ENetMode NetMode = ActorInfo->AvatarActor->GetNetMode();
-				UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] DedicatedServer : 1 | Client : 3 | Now : %d"), NetMode)
-			}
 			LaunchHomingProjectile(Target);
 		}
 	}
@@ -93,10 +98,8 @@ AActor* UGA_DeadlyBullet::FindNearestEnemy()
 		UAbilitySystemComponent* TargetASC = ASI->GetAbilitySystemComponent();
 		if (!TargetASC) continue;
 		
-		//같은 태그인지 확인
-		//Tag1 = AvatarASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red"))
-		//Tag2 = TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red"))
-		//if(Tag1 = Tag2) 
+		//같은 태그인지 확인 필요
+		//if(AvatarASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red") == TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red")) 
 		//{
 		//continue;
 		//}
@@ -140,6 +143,6 @@ void UGA_DeadlyBullet::LaunchHomingProjectile(AActor* Target)
 	))
 	{
 		Projectile->SetTarget(Target);
-		UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] Missile Spawned"));
+		//UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] Missile Spawned"));
 	}
 }

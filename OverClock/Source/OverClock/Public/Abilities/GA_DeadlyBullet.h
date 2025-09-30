@@ -6,6 +6,7 @@
 
 class UGE_MarkEffect;
 class AOCRBMissile;
+class UAnimMontage;
 
 UCLASS()
 class OVERCLOCK_API UGA_DeadlyBullet : public UGameplayAbility
@@ -30,6 +31,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Mark")
 	float MarkDuration = 10.0f;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Mark")
+	UAnimMontage* MarkMontage;
 	
 private:
 	// 가장 가까운 적 찾기

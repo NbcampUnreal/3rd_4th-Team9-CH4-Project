@@ -17,27 +17,30 @@ class OVERCLOCK_API AOCRevenant : public AOCCharacterBase
 public:
 	AOCRevenant();
 
-	/** ÁÂÅ¬¸¯ GA Å¬·¡½º (BP_Peacekeeper µî) */
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> DeadlyBulletAbilityClass;
+
+	/** ï¿½ï¿½Å¬ï¿½ï¿½ GA Å¬ï¿½ï¿½ï¿½ï¿½ (BP_Peacekeeper ï¿½ï¿½) */
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> PeacekeeperAbilityClass;
 
-	/** ÅÂ±×¡æ¾Ö´Ô ¸ÅÇÎ µ¥ÀÌÅÍ¿¡¼Â */
+	/** ï¿½Â±×¡ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UOCAnimDataAsset> AnimDataAsset = nullptr;
 
-	/** ÀÌ Ä³¸¯ÅÍÀÇ Å¸ÀÔ ÅÂ±× (¿¹: Character.Type.Revenant) */
+	/** ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½Â±ï¿½ (ï¿½ï¿½: Character.Type.Revenant) */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
 	FGameplayTag CharacterTypeTag;
 
-    /** Ä³¸¯ÅÍº°·Î ¾îºô¸®Æ¼¸¦ ÅÂ±×·Î ¼±¾ð: ÄÁÆ®·Ñ·¯´Â ÀÌ ¸Ê¸¸ ÂüÁ¶ */
+    /** Ä³ï¿½ï¿½ï¿½Íºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½Â±×·ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê¸ï¿½ ï¿½ï¿½ï¿½ï¿½ */
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
     TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> AbilityMapByTag;
 
-    /** ÅÂ±×·Î GA Å¬·¡½º¸¦ Ã£´Â´Ù(¾øÀ¸¸é nullptr) */
+    /** ï¿½Â±×·ï¿½ GA Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½Â´ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ nullptr) */
     UFUNCTION(BlueprintCallable, Category = "Abilities")
     TSubclassOf<UGameplayAbility> GetAbilityClassByTag(FGameplayTag AbilityTag) const;
 
-	// GA¿¡¼­ Á¢±Ù
+	// GAï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION(BlueprintCallable) FORCEINLINE UOCAnimDataAsset* GetAnimDataAsset() const { return AnimDataAsset; }
 	UFUNCTION(BlueprintCallable) FORCEINLINE FGameplayTag GetCharacterTypeTag() const { return CharacterTypeTag; }
 
@@ -65,11 +68,11 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
     bool IsAmmoEmpty() const { return CurrentAmmo <= 0; }
 
-    // ÇÑ ¹ß ¼Ò¸ð(¼º°ø ½Ã true)
+    // ï¿½ï¿½ ï¿½ï¿½ ï¿½Ò¸ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ true)
     UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
     bool ConsumeAmmo(int32 Amount = 1);
 
-    // ÀåÀü(°¡µæ Ã¤¿ò)
+    // ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½)
     UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
     void RefillAmmo();
 

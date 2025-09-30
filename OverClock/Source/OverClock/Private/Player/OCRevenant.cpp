@@ -63,6 +63,11 @@ void AOCRevenant::GiveRevenantStartupAbilities()
 
 	if (UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent())
 	{
+		if (DeadlyBulletAbilityClass && !ASC->FindAbilitySpecFromClass(DeadlyBulletAbilityClass))
+		{
+			ASC->GiveAbility(FGameplayAbilitySpec(DeadlyBulletAbilityClass, 1, 0, this));
+		}
+		
 		if (PeacekeeperAbilityClass && !ASC->FindAbilitySpecFromClass(PeacekeeperAbilityClass))
 		{
 			ASC->GiveAbility(FGameplayAbilitySpec(PeacekeeperAbilityClass, 1, 0, this));
@@ -78,7 +83,7 @@ void AOCRevenant::OnRep_CurrentAmmo()
 
 bool AOCRevenant::ConsumeAmmo(int32 Amount /*=1*/)
 {
-	if (!HasAuthority()) return false;         // ¼­¹ö¿¡¼­¸¸ º¯°æ
+	if (!HasAuthority()) return false;         // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (Amount <= 0) return true;
 	if (CurrentAmmo < Amount) return false;
 
