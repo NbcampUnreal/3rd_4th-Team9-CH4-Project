@@ -37,7 +37,4 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category = "SFX")
     TObjectPtr<USoundConcurrency> ConcurrencySettings = nullptr;
-
-private:
-    USkeletalMeshComponent* ResolveAttachMesh(AActor* Target, const FGameplayCueParameters& Parameters) const;
 };

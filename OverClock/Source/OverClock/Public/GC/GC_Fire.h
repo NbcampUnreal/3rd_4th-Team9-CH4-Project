@@ -16,18 +16,17 @@ class OVERCLOCK_API UGC_Fire : public UGameplayCueNotify_Burst
 	GENERATED_BODY()
 	
 public:
-	/** ���� Niagara �ý��� (BP �Ļ����� �����ص� ��) */
+	// niagarasystem
 	UPROPERTY(EditDefaultsOnly, Category = "MuzzleFX")
 	TObjectPtr<UNiagaraSystem> NiagaraSystem = nullptr;
 
-	/** ���� ���ϸ� (ĳ����/���� Mesh�� �����ؾ� ��) */
 	UPROPERTY(EditDefaultsOnly, Category = "MuzzleFX")
 	FName MuzzleSocket = FName(TEXT("Muzzle"));
 
+	// Sound
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TObjectPtr<USoundBase> FireSound = nullptr;
 
-	// ����: ����/��ġ, ���״����̼�/������� ��Ģ
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	float VolumeMultiplier = 1.0f;
 
@@ -41,10 +40,7 @@ public:
 	TObjectPtr<USoundConcurrency> ConcurrencySettings = nullptr;
 
 protected:
-	/** SourceObject�� ���� ����, ������ Target���� �ڵ� Ž�� */
-	virtual bool OnExecute_Implementation(
-		AActor* Target,
-		const FGameplayCueParameters& Parameters) const override;
+	virtual bool OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const override;
 
 private:
 	USkeletalMeshComponent* ResolveAttachMesh(AActor* Target, const FGameplayCueParameters& Parameters) const;
