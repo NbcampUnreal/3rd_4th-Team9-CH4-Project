@@ -45,6 +45,9 @@ private:
     UFUNCTION() 
     void OnMontageInterrupted();
 
+  /*  UFUNCTION()
+    void FinishReload(bool bWasCancelled);*/
+
     UPROPERTY(EditDefaultsOnly, Category = "Anim")
     FName DynamicMontageSlotName = FName(TEXT("UpperBody"));
 

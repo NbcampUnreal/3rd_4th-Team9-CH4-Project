@@ -17,10 +17,6 @@ class OVERCLOCK_API AOCRevenant : public AOCCharacterBase
 public:
 	AOCRevenant();
 
-	/** 좌클릭 GA 클래스 (BP_Peacekeeper 등) */
-	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<UGameplayAbility> PeacekeeperAbilityClass;
-
 	/** 태그→애님 매핑 데이터에셋 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anim")
 	TObjectPtr<UOCAnimDataAsset> AnimDataAsset = nullptr;
@@ -53,35 +49,9 @@ protected:
 	virtual void OnRep_PlayerState() override;
 
 private:
-	void GiveRevenantStartupAbilities();
-
-public:
-    // 탄창
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Ammo")
-    int32 MaxAmmo = 6;
-
-    UPROPERTY(ReplicatedUsing = OnRep_CurrentAmmo, VisibleAnywhere, BlueprintReadOnly, Category = "Weapon|Ammo")
-    int32 CurrentAmmo = 0;
-
-    UFUNCTION()
-    void OnRep_CurrentAmmo();
-
-    UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
-    int32 GetAmmo() const { return CurrentAmmo; }
-
-    UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
-    bool IsAmmoEmpty() const { return CurrentAmmo <= 0; }
-
-    // 한 발 소모(성공 시 true)
-    UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
-    bool ConsumeAmmo(int32 Amount = 1);
-
-    // 장전(가득 채움)
-    UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
-    void RefillAmmo();
+	void GiveStartupAbilities();
 
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-    // ============================================================================ 
 };
