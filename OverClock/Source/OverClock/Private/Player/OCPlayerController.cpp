@@ -10,7 +10,6 @@
 #include "GameplayTagContainer.h"
 #include "GameFramework/Pawn.h"
 #include "Abilities/OCAbilityDataAsset.h"
-#include "GameFramework/InputSettings.h"
 #include "Player/OCCharacterBase.h"
 #include "Player/OCPlayerState.h"
 #include "Player/OCRevenant.h"
