@@ -8,6 +8,7 @@
 #include "Player/OCRevenant.h"
 #include "Player/Anim/OCAnimStruct.h"
 #include "Player/Anim/OCAnimDataAsset.h"
+#include "Component/WeaponAmmoComponent.h"
 
 UGA_Reload::UGA_Reload()
 {
@@ -21,18 +22,22 @@ void UGA_Reload::ActivateAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo, 
 	const FGameplayEventData* TriggerEventData)
 {
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo)) 
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
 	ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.Weapon.Reload")));
 	//Animation
 	const AOCRevenant* Rev = CastChecked<AOCRevenant>(ActorInfo->AvatarActor.Get());
 
-	const FOCAnimStruct* S = Rev->GetAnimDataAsset()->CharacterAnimations.Find(Rev->GetCharacterTypeTag());
+	const FOCAnimStruct* AS = Rev->GetAnimDataAsset()->CharacterAnimations.Find(Rev->GetCharacterTypeTag());
 
-	UAnimMontage* Montage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(S->Reload, DynamicMontageSlotName, 0.2f, 0.2f, PlayRate, 1, 0.f, 0.f);
+	UAnimMontage* Montage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(AS->Reload, DynamicMontageSlotName, 0.2f, 0.2f, PlayRate, 1, 0.f, 0.f);
 
 	// 애니 끝날 때까지 능력은 "활성(active)" 상태로 유지 → BlockAbilitiesWithTag/ActivationOwnedTags가 살아있음
-	UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Montage, PlayRate, DynamicMontageSlotName, /*bStopWhenAbilityEnds=*/true, 1.f, 0.f);
+	UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Montage, PlayRate, NAME_None, /*bStopWhenAbilityEnds=*/true, 1.f, 0.f);
 
 	Task->OnCompleted.AddDynamic(this, &UGA_Reload::OnMontageCompleted);
 
@@ -43,22 +48,52 @@ void UGA_Reload::ActivateAbility(
 	Task->ReadyForActivation();
 }
 
-void UGA_Reload::EndAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	bool bReplicateEndAbility, 
-	bool bWasCancelled)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
 void UGA_Reload::OnMontageCompleted()
 {
+	if (CurrentActorInfo->IsNetAuthority())
+	{
+		if (AActor* Avatar = CurrentActorInfo->AvatarActor.Get())
+		{
+			if (UWeaponAmmoComponent* Ammo = Avatar->FindComponentByClass<UWeaponAmmoComponent>())
+			{
+				Ammo->RefillAmmo();
+				UE_LOG(LogTemp, Log, TEXT("Reload %d"), Ammo->CurrentAmmo);
+			}
+		}
+	}
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, /*bReplicateEndAbility=*/true, /*bWasCancelled=*/false);
 }
 
 void UGA_Reload::OnMontageInterrupted()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, /*bReplicateEndAbility=*/true, /*bWasCancelled=*/false);
+}
+
+//void UGA_Reload::FinishReload(bool bWasCancelled)
+//{
+//	if (CurrentActorInfo->IsNetAuthority())
+//	{
+//		if (AActor* Avatar = CurrentActorInfo->AvatarActor.Get())
+//		{
+//			if (UWeaponAmmoComponent* Ammo = Avatar->FindComponentByClass<UWeaponAmmoComponent>())
+//			{
+//				{
+//					Ammo->RefillAmmo();
+//				}
+//			}
+//		}
+//	}
+//
+//	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, bWasCancelled);
+//}
+
+
+void UGA_Reload::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
