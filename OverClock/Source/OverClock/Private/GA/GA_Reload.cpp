@@ -52,13 +52,15 @@ void UGA_Reload::OnMontageCompleted()
 {
 	if (CurrentActorInfo->IsNetAuthority())
 	{
-		if (AActor* Avatar = CurrentActorInfo->AvatarActor.Get())
+		if (AOCRevenant* Rev = Cast<AOCRevenant>(CurrentActorInfo->AvatarActor.Get()))
 		{
-			if (UWeaponAmmoComponent* Ammo = Avatar->FindComponentByClass<UWeaponAmmoComponent>())
+			if (UWeaponAmmoComponent* Ammo = Rev->WeaponAmmoComp)  // ← 캐시 포인터만 사용
 			{
-				Ammo->RefillAmmo();
-				UE_LOG(LogTemp, Log, TEXT("Reload %d"), Ammo->CurrentAmmo);
+				int32 Before = Ammo->CurrentAmmo;
+				Ammo->RefillAmmo(); // 내부에서 Max(=6)로 클램프
+				UE_LOG(LogTemp, Log, TEXT("[Reload] %d -> %d / Max=%d"), Before, Ammo->CurrentAmmo, Ammo->MaxAmmo);
 			}
+			else { UE_LOG(LogTemp, Warning, TEXT("[Reload] WeaponAmmo null from Character cache")); }
 		}
 	}
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, /*bReplicateEndAbility=*/true, /*bWasCancelled=*/false);
@@ -68,25 +70,6 @@ void UGA_Reload::OnMontageInterrupted()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, /*bReplicateEndAbility=*/true, /*bWasCancelled=*/false);
 }
-
-//void UGA_Reload::FinishReload(bool bWasCancelled)
-//{
-//	if (CurrentActorInfo->IsNetAuthority())
-//	{
-//		if (AActor* Avatar = CurrentActorInfo->AvatarActor.Get())
-//		{
-//			if (UWeaponAmmoComponent* Ammo = Avatar->FindComponentByClass<UWeaponAmmoComponent>())
-//			{
-//				{
-//					Ammo->RefillAmmo();
-//				}
-//			}
-//		}
-//	}
-//
-//	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, bWasCancelled);
-//}
-
 
 void UGA_Reload::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,

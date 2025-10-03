@@ -1,80 +1,58 @@
 #include "GA/GA_DeathBullet.h"
 
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystemComponent.h"
-#include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
-#include "Abilities/Tasks/AbilityTask_WaitDelay.h"
-#include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimSequenceBase.h"
-#include "GameFramework/Character.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "AbilitySystemComponent.h"
+#include "Component/WeaponAmmoComponent.h"
 
+// 캐릭터별 장전 모션 데이터(예시)
 #include "Player/OCRevenant.h"
 #include "Player/Anim/OCAnimDataAsset.h"
 #include "Player/Anim/OCAnimStruct.h"
-#include "GE/GE_RangedAttackCooldown.h"
 
 UGA_DeathBullet::UGA_DeathBullet()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	CooldownGE = UGE_RangedAttackCooldown::StaticClass();
-
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 }
 
-bool UGA_DeathBullet::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, 
+void UGA_DeathBullet::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayTagContainer* SourceTags, 
-	const FGameplayTagContainer* TargetTags, 
-	FGameplayTagContainer* OptionalRelevantTags) const
+	const FGameplayAbilityActivationInfo ActivationInfo, 
+	const FGameplayEventData* TriggerEventData)
 {
-	if (!ActorInfo) return false;
-
-	if (ActorInfo->AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Cooldown.DeathBullet"))))
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		return false;
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
 	}
 
-	if (!ReloadAnim || !FireBAnim || !FireCAnim) return false;
+	const AOCRevenant* Rev = CastChecked<AOCRevenant>(ActorInfo->AvatarActor.Get());
 
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+	const FOCAnimStruct* AS = Rev->GetAnimDataAsset()->CharacterAnimations.Find(Rev->GetCharacterTypeTag());
+
+	UAnimMontage* Montage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(AS->Skill1, DynamicMontageSlotName, 0.2f, 0.2f, PlayRate, 1, 0.f, 0.f);
+
+	auto* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Montage, PlayRate, NAME_None, true);
+
+	Task->OnBlendOut.AddDynamic(this, &UGA_DeathBullet::OnMontageCompleted);
+	Task->OnCompleted.AddDynamic(this, &UGA_DeathBullet::OnMontageCompleted);
+	Task->OnInterrupted.AddDynamic(this, &UGA_DeathBullet::OnMontageInterrupted);
+	Task->OnCancelled.AddDynamic(this, &UGA_DeathBullet::OnMontageInterrupted);
+	Task->ReadyForActivation();
 }
 
-void UGA_DeathBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGA_DeathBullet::OnMontageCompleted()
 {
-	UAbilitySystemComponent* ASC = ActorInfo ? ActorInfo->AbilitySystemComponent.Get() : nullptr;
-	if (!ASC) { EndAbility(Handle, ActorInfo, ActivationInfo, true, true); }
-
-	ApplyCooldownWithTags(Handle, ActorInfo, CooldownSeconds);
-
-	PlayAnim_ServerMulticast(ReloadAnim);
-
-	bTriggered = false;
+	UE_LOG(LogTemp, Warning, TEXT("[DeathBullet] Montage Completed -> EndAbility"));
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
-void UGA_DeathBullet::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UGA_DeathBullet::OnMontageInterrupted()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[DeathBullet] Montage Interrupted -> EndAbility"));
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
 
-UAnimMontage* UGA_DeathBullet::MakeDynamicMontage(const UAnimSequenceBase* Seq) const
-{
-	return nullptr;
-}
-
-void UGA_DeathBullet::PlayAnim_ServerMulticast(const UAnimSequenceBase* Seq) const
-{
-}
-
-void UGA_DeathBullet::PlaymuzzleCue(const FGameplayAbilityActorInfo* ActorInfo) const
-{
-}
-
-void UGA_DeathBullet::OnPressedCallback(float TimeWaited)
-{
-}
-
-void UGA_DeathBullet::ApplyCooldownWithTags(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, float DurationSec) const
-{
-}

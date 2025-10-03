@@ -9,6 +9,7 @@
 #include "OCRevenant.generated.h"
 
 class UOCAnimDataAsset;
+class UWeaponAmmoComponent;
 
 UCLASS()
 class OVERCLOCK_API AOCRevenant : public AOCCharacterBase
@@ -32,6 +33,9 @@ public:
     /** 태그로 GA 클래스를 찾는다(없으면 nullptr) */
     UFUNCTION(BlueprintCallable, Category = "Abilities")
     TSubclassOf<UGameplayAbility> GetAbilityClassByTag(FGameplayTag AbilityTag) const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UWeaponAmmoComponent* WeaponAmmoComp = nullptr;
 
 	// GA에서 접근
 	UFUNCTION(BlueprintCallable) FORCEINLINE UOCAnimDataAsset* GetAnimDataAsset() const { return AnimDataAsset; }
