@@ -3,6 +3,7 @@
 #include "Player/OCPlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "Component/WeaponAmmoComponent.h"
 #include "Net/UnrealNetwork.h"
 
 AOCRevenant::AOCRevenant()
@@ -14,6 +15,8 @@ AOCRevenant::AOCRevenant()
 void AOCRevenant::BeginPlay()
 {
 	Super::BeginPlay();
+	WeaponAmmoComp = FindComponentByClass<UWeaponAmmoComponent>();
+	ensureAlwaysMsgf(WeaponAmmoComp, TEXT("WeaponAmmo comp missing!"));
 }
 
 void AOCRevenant::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

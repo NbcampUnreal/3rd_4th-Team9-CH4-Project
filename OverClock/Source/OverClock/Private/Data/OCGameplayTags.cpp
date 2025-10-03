@@ -14,6 +14,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Skill_Active, "InputTag.Skill.Active")   // E
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ultimate, "InputTag.Ultimate")   // Q
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Interact, "InputTag.Interact")   // F/V 등
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Skill1, "InputTag.Attack.Skill1")
 
 	/* Character Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Character_Type_Revenant, "Character.Type.Revenant")
@@ -27,11 +28,13 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet, "Ability.DeadlyBullet")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack, "Ability.RangedAttack")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload, "Ability.Reload")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Rev_DeathBullet, "Ability.Rev.DeathBullet")
 
 	/*State Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(State_Alive, "State.Alive")
 	UE_DEFINE_GAMEPLAY_TAG(State_Marked, "State.Marked")
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock, "State.ActionLock")
+	UE_DEFINE_GAMEPLAY_TAG(State_Rev_SpecialAmmo, "State.Rev.SpecialAmmo")
 
 	/*Effect Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")
@@ -39,8 +42,11 @@ namespace OCGameplayTags
 	//temporary
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Reload, "Cooldown.Reload")
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RangedAttack, "Cooldown.RangedAttack")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Rev_DeathBullet, "Cooldown.Rev.DeathBullet")
 
 	//cue Tags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_MuzzleFlash, "GameplayCue.Weapon.MuzzleFlash")
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Reload, "GameplayCue.Weapon.Reload")
+
+	UE_DEFINE_GAMEPLAY_TAG(Data_Cooldown_Duration, "Data.Cooldown.Duration")
 }

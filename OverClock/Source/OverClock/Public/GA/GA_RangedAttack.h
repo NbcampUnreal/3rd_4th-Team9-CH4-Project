@@ -54,4 +54,21 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Anim")
     float PlayRate = 1.f;
+
+    UPROPERTY(EditAnywhere, Category = "Anim")
+    TObjectPtr<UAnimSequenceBase> EmpoweredShotAnim = nullptr;
+
+    UPROPERTY(EditAnywhere, Category = "Cooldown")
+    TSubclassOf<UGameplayEffect> SharedCooldownGE = nullptr;
+
+    /** 창 소진 시 줄 쿨다운(초) — 기본 6 */
+    UPROPERTY(EditAnywhere, Category = "Cooldown")
+    float CooldownSeconds = 6.f;
+
+
+    UPROPERTY(EditDefaultsOnly, Category = "Tags")
+    FGameplayTag WindowTag = FGameplayTag::RequestGameplayTag(TEXT("State.Rev.SpecialAmmo")); // 기본값
+
+    UPROPERTY(EditDefaultsOnly, Category = "Tags")
+    FGameplayTag CooldownSetByCallerTag = FGameplayTag::RequestGameplayTag(TEXT("Data.CooldownSeconds"));
 };

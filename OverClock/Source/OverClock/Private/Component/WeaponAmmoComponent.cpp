@@ -1,8 +1,6 @@
 #include "Component/WeaponAmmoComponent.h"
-
-#include "Gameframework/Actor.h"
-#include "Engine/World.h"
-#include <Net/UnrealNetwork.h>
+#include "Net/UnrealNetwork.h"
+#include "GameFramework/Actor.h"
 
 UWeaponAmmoComponent::UWeaponAmmoComponent()
 {
@@ -14,43 +12,11 @@ void UWeaponAmmoComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (AActor* Owner = GetOwner(); Owner && Owner->HasAuthority())
 	{
-		if (CurrentAmmo <= 0)
-		{
-			CurrentAmmo = MaxAmmo;
-		}
+		if (CurrentAmmo <= 0) CurrentAmmo = MaxAmmo;
 	}
 }
-
-bool UWeaponAmmoComponent::ConsumeAmmo(int32 Amount)
-{
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return false;
-
-	if (Amount <= 0) return true;
-
-	if (CurrentAmmo < Amount) return false;
-
-	const int32 Before = CurrentAmmo;
-
-	CurrentAmmo -= Amount;
-
-	UE_LOG(LogTemp, Log, TEXT("[AmmoComp] Consume %d -> %d -> %d"), Amount, Before, CurrentAmmo);
-
-	return true;
-}
-
-void UWeaponAmmoComponent::RefillAmmo()
-{
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
-
-	const int32 Before = CurrentAmmo;
-
-	CurrentAmmo = MaxAmmo;
-
-	UE_LOG(LogTemp, Log, TEXT("[AmmoComp] Refill -> %d -> %d"), Before, CurrentAmmo);
-}
-
 
 void UWeaponAmmoComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -60,6 +26,21 @@ void UWeaponAmmoComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void UWeaponAmmoComponent::OnRep_CurrentAmmo()
 {
-	UE_LOG(LogTemp, Log, TEXT("[AmmoComp] OnRep: %d / %d"), CurrentAmmo, MaxAmmo);
+	// TODO: HUD °»½Å µî
 }
 
+bool UWeaponAmmoComponent::ConsumeAmmo(int32 Amount)
+{
+	if (!GetOwner()->HasAuthority()) return false;
+	if (Amount <= 0) return true;
+	if (CurrentAmmo < Amount) return false;
+
+	CurrentAmmo -= Amount;
+	return true;
+}
+
+void UWeaponAmmoComponent::RefillAmmo()
+{
+	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
+	CurrentAmmo = MaxAmmo;
+}
