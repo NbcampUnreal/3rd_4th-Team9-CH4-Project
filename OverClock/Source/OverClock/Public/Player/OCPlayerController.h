@@ -1,14 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
 #include "GameFramework/PlayerController.h"
 #include "OCPlayerController.generated.h"
 
 class UDA_OCInputConfig;
 class UOCInputComponent;
+class UAbilitySystemComponent;
 class UEnhancedInputLocalPlayerSubsystem;
 struct FInputActionValue;
+struct FGameplayTag;
 
 UCLASS()
 class OVERCLOCK_API AOCPlayerController : public APlayerController
@@ -33,15 +34,15 @@ private:
 
 	void Input_Ability_Pressed(FGameplayTag InInputTag);
 	void Input_Ability_Released(FGameplayTag InInputTag);
-
-	UOCAbilitySystemComponent* GetOCASC() const;
-
+	
 	UFUNCTION(Server, Reliable)
-	void Server_Ability_Pressed(FGameplayTag InInputTag);
+	void Server_TryActivateByTag(FGameplayTag InInputTag);
 
-	UFUNCTION(Server, Reliable)
-	void Server_Ability_Released(FGameplayTag InInputTag);
+	UFUNCTION(Client, Reliable)
+	void Server_InputReleased_ByTag(FGameplayTag InInputTag);
 
+	
+	UAbilitySystemComponent* GetOCASC() const;
 #pragma endregion
 	
 };

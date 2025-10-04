@@ -9,7 +9,6 @@
 #include "Player/OCCharacterBase.h"
 #include "Player/OCPlayerState.h"
 #include "AbilitySystemComponent.h"
-#include "Abilities/OCAbilitySystemComponent.h"
 
 
 AOCPlayerController::AOCPlayerController()
@@ -50,7 +49,7 @@ void AOCPlayerController::SetupInputComponent()
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Triggered, this, &ThisClass::Input_Jump_Pressed);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Jump, ETriggerEvent::Completed, this, &ThisClass::Input_Jump_Released);
 
-	OCInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_Ability_Pressed, &ThisClass::Input_Ability_Released);
+	OCInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_Ability_Pressed, &ThisClass::Input_Ability_Pressed);
 }
 
 
@@ -124,45 +123,43 @@ void AOCPlayerController::Input_Ability_Pressed(FGameplayTag InInputTag)
 {
 	if (!InInputTag.IsValid()) return;
 
-	if (UOCAbilitySystemComponent* ASC = GetOCASC())
+	if (UAbilitySystemComponent* ASC = GetOCASC())
 	{
-		ASC->OnAbilityInputPressed(InInputTag);
+		FGameplayTagContainer TagContainer;
+		TagContainer.AddTag(InInputTag);
+		ASC->TryActivateAbilitiesByTag(TagContainer);
 	}
-	Server_Ability_Pressed(InInputTag);
+	Server_TryActivateByTag(InInputTag);
 }
 
 void AOCPlayerController::Input_Ability_Released(FGameplayTag InInputTag)
 {
 	if (!InInputTag.IsValid()) return;
-
-	if (UOCAbilitySystemComponent* ASC = GetOCASC())
-	{
-		ASC->OnAbilityInputReleased(InInputTag);
-	}
-	Server_Ability_Released(InInputTag);
+	Server_InputReleased_ByTag(InInputTag);
 }
 
-UOCAbilitySystemComponent* AOCPlayerController::GetOCASC() const
+void AOCPlayerController::Server_InputReleased_ByTag_Implementation(FGameplayTag InInputTag)
+{
+	
+}
+
+void AOCPlayerController::Server_TryActivateByTag_Implementation(FGameplayTag InInputTag)
+{
+	if (!InInputTag.IsValid()) return;
+
+	if (UAbilitySystemComponent* ASC = GetOCASC())
+	{
+		FGameplayTagContainer TagContainer;
+		TagContainer.AddTag(InInputTag);
+		ASC->TryActivateAbilitiesByTag(TagContainer);
+	}
+}
+
+UAbilitySystemComponent* AOCPlayerController::GetOCASC() const
 {
 	if (const AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
 	{
-		return Cast<UOCAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+		return PS->GetAbilitySystemComponent();
 	}
 	return nullptr;
-}
-
-void AOCPlayerController::Server_Ability_Pressed_Implementation(FGameplayTag InInputTag)
-{
-	if (UOCAbilitySystemComponent* ASC = GetOCASC())
-	{
-		ASC->OnAbilityInputPressed(InInputTag);
-	}
-}
-
-void AOCPlayerController::Server_Ability_Released_Implementation(FGameplayTag InInputTag)
-{
-	if (UOCAbilitySystemComponent* ASC = GetOCASC())
-	{
-		ASC->OnAbilityInputReleased(InInputTag);
-	}
 }
