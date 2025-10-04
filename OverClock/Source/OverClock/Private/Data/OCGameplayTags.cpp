@@ -11,10 +11,10 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Jump,            "InputTag.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Interact,        "InputTag.Interact");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Primary,  "InputTag.Attack.Primary");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Reload,          "InputTag.Reload");
-	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Alt,      "InputTag.Attack.Alt");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack_Special,  "InputTag.Attack.Special");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Skill_Active,    "InputTag.Skill.Active");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Ultimate,        "InputTag.Ultimate");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Reload,          "InputTag.Reload");
 
 #pragma endregion
 
