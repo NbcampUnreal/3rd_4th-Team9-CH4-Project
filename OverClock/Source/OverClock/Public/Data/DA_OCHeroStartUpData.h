@@ -18,7 +18,7 @@ class OVERCLOCK_API UDA_OCHeroStartUpData : public UDataAsset
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "OC|StartUpData")
-	void GiveToAbilitySystemComponent(UOCAbilitySystemComponent* ASC, int32 ApplyLevel = 1) const;
+	void GiveToAbilitySystemComponent(UAbilitySystemComponent* ASC, int32 ApplyLevel = 1) const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="StartUp|Abilities")
@@ -34,17 +34,7 @@ protected:
 	TArray<FOCAbilitySet> HeroStartUpAbilitySets;
 
 private:
-	template<typename TGA>
-	static void GrantList(const TArray<TSubclassOf<TGA>>& List, UOCAbilitySystemComponent* ASC, int32 ApplyLevel)
-	{
-    	if (!ASC) return;
-    
-    	for (const TSubclassOf<TGA>& Cls : List)
-    	{
-    		if (!Cls) continue;
-    		FGameplayAbilitySpec Spec(Cls, ApplyLevel);
-    		Spec.SourceObject = ASC->GetAvatarActor();
-    		ASC->GiveAbility(Spec);
-    	}
-    }
+	void GrantAbilities(const TArray<TSubclassOf<UGameplayAbility>>& List, UAbilitySystemComponent* ASC, int32 ApplyLevel) const;
+	void GrantTaggedAbilities(const TArray<TSubclassOf<FOCAbilitySet>>& Sets, UAbilitySystemComponent* ASC, int32 ApplyLevel) const;
+	void ApplyEffects(const TArray<TSubclassOf<UGameplayEffect>>& List, UAbilitySystemComponent* ASC, int32 ApplyLevel) const;
 };
