@@ -5,7 +5,7 @@
 #include "OCGameplayAbility.generated.h"
 
 
-class UOCAbilitySystemComponent;
+class UAbilitySystemComponent;
 
 UENUM(BlueprintType)
 enum class EOCAbilityActivationPolicy : uint8
@@ -30,5 +30,5 @@ protected:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 	UFUNCTION(BlueprintPure, Category = "OC|Ability")
-	UOCAbilitySystemComponent* GetOCASC() const;
+	UAbilitySystemComponent* GetOCASC() const;
 };
