@@ -3,15 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "GameplayTagContainer.h"
 #include "OCCharacterBase.generated.h"
 
-class UOCAnimDataAsset;
-class UCameraComponent;
-class UAbilitySystemComponent;
-class UOCAbilitySystemComponent;
+struct FInputActionValue;
+struct FGameplayTag;
+class UDA_OCInputConfig;
 class UDA_OCHeroStartUpData;
-class AOCPlayerState;
 
 UCLASS()
 class OVERCLOCK_API AOCCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -20,50 +17,51 @@ class OVERCLOCK_API AOCCharacterBase : public ACharacter, public IAbilitySystemI
 
 public:
 	AOCCharacterBase();
-	
-    virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION()
-	FORCEINLINE FRotator GetAimRotation() const {return AimRotation;}
-	
-	UFUNCTION(Server, Unreliable)
-	void ServerSetAimRotation(FRotator InAimRotation);
-	
-	UFUNCTION()
-	FORCEINLINE FGameplayTag GetCurrentTag() const {return CharacterTag;};
-	
 protected:
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TSoftObjectPtr<UDA_OCInputConfig> InputConfigAsset;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
-	TObjectPtr<UCameraComponent> CameraComp;
+	UPROPERTY(Transient)
+	TObjectPtr<UDA_OCInputConfig> InputConfig = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="DataAsset")
-	TObjectPtr<UOCAnimDataAsset> OCAnimDataAsset;
+	UPROPERTY(EditDefaultsOnly, Category="Hero")
+	TSoftObjectPtr<UDA_OCHeroStartUpData> HeroStartUpDataAsset;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "StartUp")
-	TSoftObjectPtr<UDA_OCHeroStartUpData> HeroStartUpData;
-	
-	UPROPERTY(Replicated, EditAnywhere,BlueprintReadOnly, Category = "Character")
-	FGameplayTag CharacterTag;//network
-	
-	// 아직 프로토타입 단계라 안전성을 위해 사용 X
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|State")
-	TObjectPtr<AOCPlayerState> CachedPlayerState;*/
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float WalkSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float RunSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float JumpVelocity;
-	
-	UPROPERTY(Replicated)
-	FRotator AimRotation;
+	UPROPERTY(Transient)
+	TObjectPtr<UDA_OCHeroStartUpData> HeroStartUpData = nullptr;
 
-	void GiveStartupIfServer();
+	TWeakObjectPtr<UAbilitySystemComponent> ASCWeak;
+
+
+#pragma region Input_Function
+	void Input_Move(const FInputActionValue& Value);
+	void Input_Look(const FInputActionValue& Value);
+	void Input_Jump_Pressed(const FInputActionValue& Value);
+	void Input_Jump_Released(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void Input_Ability_Pressed(const FGameplayTag& InInputTag);
+
+	UFUNCTION()
+	void Input_Ability_Released(const FGameplayTag& InInputTag);
+
+	UFUNCTION(Server, Reliable)
+	void Server_Ability_Pressed(const FGameplayTag& InInputTag);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_Ability_Released(const FGameplayTag& InInputTag);
+#pragma endregion
+
+	void InitASCFromPalyerState();
+	void ResolveData();
+	void AutoBindAbilityInputs(UEnhancedInputComponent* EnhancedInputComponent);
+
+	UAbilitySystemComponent* GetASC() const;
+	
 };
