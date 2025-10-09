@@ -40,4 +40,5 @@ public:
 	TArray<FOCInputActionConfig> AbilityInputActions;
 	
 	UInputAction* FindNativeInputActionByTag(const FGameplayTag& InInputTag) const;
+	UInputAction* FindAbilityInputActionByTag(const FGameplayTag& InInputTag) const;
 };

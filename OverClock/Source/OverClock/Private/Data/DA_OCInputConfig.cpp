@@ -16,3 +16,15 @@ UInputAction* UDA_OCInputConfig::FindNativeInputActionByTag(const FGameplayTag& 
 	}
 	return nullptr;
 }
+
+UInputAction* UDA_OCInputConfig::FindAbilityInputActionByTag(const FGameplayTag& InInputTag) const
+{
+	for (const FOCInputActionConfig& InputActionConfig : AbilityInputActions)
+	{
+		if (InputActionConfig.InputTag == InInputTag && InputActionConfig.InputAction)
+		{
+			return InputActionConfig.InputAction;
+		}
+	}
+	return nullptr;
+}
