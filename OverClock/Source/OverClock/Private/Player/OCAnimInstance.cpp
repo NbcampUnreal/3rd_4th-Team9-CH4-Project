@@ -22,7 +22,7 @@ void UOCAnimInstance::NativeInitializeAnimation()
 	if (OwnerCharacter)
 	{
 		OwnerCharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
-		CurrentCharacterTag=OwnerCharacter->GetCurrentTag();
+		//CurrentCharacterTag=OwnerCharacter->GetCurrentTag();
 	}
 	else
 	{
@@ -50,6 +50,6 @@ void UOCAnimInstance::SetCharacterTag()
 	//캐릭터 태그 가져오기
 	if(OwnerCharacter)
 	{
-		CurrentCharacterTag=OwnerCharacter->GetCurrentTag();
+		//CurrentCharacterTag=OwnerCharacter->GetCurrentTag();
 	}
 }
