@@ -43,6 +43,11 @@
 			"SupportedTargetPlatforms": [
 				"Win64"
 			]
+		},
+		{
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
 		}
+		
 	]
 }
