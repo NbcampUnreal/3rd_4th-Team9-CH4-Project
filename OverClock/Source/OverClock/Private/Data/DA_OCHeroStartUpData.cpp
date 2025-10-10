@@ -1,59 +1,56 @@
 #include "Data/DA_OCHeroStartUpData.h"
-#include "AbilitySystemComponent.h"
 #include "Abilities/OCGameplayAbility.h"
-#include "GameplayEffect.h"
+#include "Abilities/OCAbilitySystemComponent.h"
 
-void UDA_OCHeroStartUpData::GiveToAbilitySystemComponent(UAbilitySystemComponent* ASC, int32 ApplyLevel) const
+void UDA_OCHeroStartUpData::GiveToAbilitySystemComponent(UOCAbilitySystemComponent* ASC, int32 ApplyLevel) const
 {
 	check(ASC);
 
-	const AActor* Owner = ASC->GetOwner();
-	if (!Owner || !Owner->HasAuthority()) { return; }
+	GrantAbilities(ActivateOnGivenAbilities, ASC, ApplyLevel);
+	GrantAbilities(ReactiveAbilities, ASC, ApplyLevel);
 
-	
-
-	for (const FOCAbilitySet& Set : HeroStartUpAbilitySets)
+	if (!StartUpGameplayEffects.IsEmpty())
 	{
-		if (!Set.IsValid()) continue;
+		for (const TSubclassOf<UGameplayEffect>& EffectClass : StartUpGameplayEffects)
+		{
+			if (!EffectClass) continue;
 
-		FGameplayAbilitySpec Spec(Set.AbilityClass, ApplyLevel);
-		Spec.SourceObject = ASC->GetAvatarActor();
-		Spec.GetDynamicSpecSourceTags().AddTag(Set.InputTag);
-		ASC->GiveAbility(Spec);
+			UGameplayEffect* EffectCDO = EffectClass->GetDefaultObject<UGameplayEffect>();
+
+			ASC->ApplyGameplayEffectToSelf(EffectCDO, ApplyLevel, ASC->MakeEffectContext());
+		}
 	}
 
-	for (const TSubclassOf<UGameplayEffect>& EffectClass : StartUpGameplayEffects)
+	for (const FOCAbilitySet& AbilitySet : HeroStartUpAbilitySets)
 	{
-		if (!EffectClass) continue;
+		if (!AbilitySet.IsValid()) continue;
 
-		UGameplayEffect* CDO = EffectClass->GetDefaultObject<UGameplayEffect>();
-		ASC->ApplyGameplayEffectToSelf(CDO, ApplyLevel, ASC->MakeEffectContext());
+		FGameplayAbilitySpec AbilitySpec(AbilitySet.AbilityToGrant);
+		AbilitySpec.SourceObject = ASC->GetAvatarActor();
+		AbilitySpec.Level = ApplyLevel;
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.InputTag);
+
+		ASC->GiveAbility(AbilitySpec);
 	}
-	
-}
-
-void UDA_OCHeroStartUpData::GrantAbilities(const TArray<TSubclassOf<UGameplayAbility>>& List,
-	UAbilitySystemComponent* ASC, int32 ApplyLevel) const
-{
-	if (!ASC || List.IsEmpty()) return;
-
-	for (const TSubclassOf<UGameplayAbility>& Cls : List)
-	{
-		if (!IsValid(Cls)) continue;
-
-		FGameplayAbilitySpec Spec(Cls, ApplyLevel);
-		Spec.SourceObject = ASC->GetAvatarActor();
-		ASC->GiveAbility(Spec);
-	}
-}
-
-void UDA_OCHeroStartUpData::GrantTaggedAbilities(const TArray<TSubclassOf<FOCAbilitySet>>& Sets,
-	UAbilitySystemComponent* ASC, int32 ApplyLevel) const
-{
 	
 }
 
-void UDA_OCHeroStartUpData::ApplyEffects(const TArray<TSubclassOf<UGameplayEffect>>& List, UAbilitySystemComponent* ASC,
-	int32 ApplyLevel) const
+
+void UDA_OCHeroStartUpData::GrantAbilities(const TArray<TSubclassOf<UOCGameplayAbility>>& InAbilitiesToGive,
+	UOCAbilitySystemComponent* ASC, int32 ApplyLevel) const
 {
+	if (!ASC || InAbilitiesToGive.IsEmpty()) return;
+
+	for (const TSubclassOf<UOCGameplayAbility>& Ability : InAbilitiesToGive)
+	{
+		if (!IsValid(Ability)) continue;
+
+		FGameplayAbilitySpec AbilitySpec(Ability);
+		AbilitySpec.SourceObject = ASC->GetAvatarActor();
+		AbilitySpec.Level = ApplyLevel;
+		
+		ASC->GiveAbility(AbilitySpec);
+	}
 }
+
+
