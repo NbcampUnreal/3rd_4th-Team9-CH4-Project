@@ -63,6 +63,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Firing,     "State.Weapon.Firing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Mobility_Dashing,  "State.Mobility.Dashing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Defense_Blocking,  "State.Defense.Blocking");
+	UE_DEFINE_GAMEPLAY_TAG(State_Ultimate_Active,  "State.Ultimate.Active");
 
 	/* Cooldown */
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Weapon_Reload,  "Cooldown.Weapon.Reload");
