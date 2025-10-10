@@ -1,14 +1,12 @@
 #include "Player/OCPlayerState.h"
-
-#include "AbilitySystemComponent.h"
-
+#include "Abilities/OCAbilitySystemComponent.h"
 #include "Util/UtilTeam.h"
 
 AOCPlayerState::AOCPlayerState()
 {
 	SetNetUpdateFrequency(100.f);
 
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	AbilitySystemComponent = CreateDefaultSubobject<UOCAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }

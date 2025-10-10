@@ -8,7 +8,7 @@
 #include "OCPlayerState.generated.h"
 
 class UOCPawnData;
-class UAbilitySystemComponent;
+class UOCAbilitySystemComponent;
 
 UCLASS()
 class OVERCLOCK_API AOCPlayerState : public APlayerState, public IAbilitySystemInterface, public ITeamInfoInterface
@@ -32,7 +32,7 @@ protected:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UOCAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(VisibleAnywhere, Transient, Category = Team)
 	TObjectPtr<class UUtilTeam> UtilTeamInfo;
