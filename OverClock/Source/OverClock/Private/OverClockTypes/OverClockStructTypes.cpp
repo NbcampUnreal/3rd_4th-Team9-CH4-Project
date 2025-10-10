@@ -3,5 +3,5 @@
 
 bool FOCAbilitySet::IsValid() const
 {
-	return InputTag.IsValid() && AbilityClass != nullptr;
+	return InputTag.IsValid() && AbilityToGrant != nullptr;
 }

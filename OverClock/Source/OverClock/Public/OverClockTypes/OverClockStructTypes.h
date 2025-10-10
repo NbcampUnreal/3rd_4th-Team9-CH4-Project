@@ -15,7 +15,7 @@ struct FOCAbilitySet
 	FGameplayTag InputTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UOCGameplayAbility> AbilityClass;
+	TSubclassOf<UOCGameplayAbility> AbilityToGrant;
 
 	bool IsValid() const;
 };
