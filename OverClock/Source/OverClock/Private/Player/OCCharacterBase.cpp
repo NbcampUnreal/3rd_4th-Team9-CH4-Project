@@ -61,7 +61,7 @@ void AOCCharacterBase::PossessedBy(AController* NewController)
 		{
 			if (HeroStartUpData)
 			{
-				HeroStartUpData->GiveToAbilitySystemComponent(ASC, 1);
+				
 			}
 		}
 	}
@@ -216,8 +216,7 @@ void AOCCharacterBase::AutoBindAbilityInputs(UEnhancedInputComponent* EnhancedIn
 
 			if (UInputAction* InputAction = InputConfig->FindAbilityInputActionByTag(Tag))
 			{
-				EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &AOCCharacterBase::Input_Ability_Pressed, Tag);
-				EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &AOCCharacterBase::Input_Ability_Released, Tag);
+				
 			}
 		}
 	}
