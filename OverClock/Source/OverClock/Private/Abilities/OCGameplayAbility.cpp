@@ -1,5 +1,5 @@
 #include "Abilities/OCGameplayAbility.h"
-#include "AbilitySystemComponent.h"
+#include "Abilities/OCAbilitySystemComponent.h"
 
 UOCGameplayAbility::UOCGameplayAbility()
 {
@@ -32,9 +32,9 @@ void UOCGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, con
 	}
 }
 
-UAbilitySystemComponent* UOCGameplayAbility::GetOCASC() const
+UOCAbilitySystemComponent* UOCGameplayAbility::GetOCASC() const
 {
-	return Cast<UAbilitySystemComponent>(CurrentActorInfo ? CurrentActorInfo->AbilitySystemComponent : nullptr);
+	return Cast<UOCAbilitySystemComponent>(CurrentActorInfo ? CurrentActorInfo->AbilitySystemComponent : nullptr);
 }
 
 
