@@ -37,6 +37,7 @@ protected:
     
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     TObjectPtr<UCameraComponent> Camera;
+
     
     
 #pragma endregion
@@ -57,16 +58,29 @@ protected:
     
     TWeakObjectPtr<UOCAbilitySystemComponent> ASCWeak;
     
-    UFUNCTION() void Input_Move(const FInputActionValue& Value);
-    UFUNCTION() void Input_Look(const FInputActionValue& Value);
-    UFUNCTION() void Input_Jump_Pressed(const FInputActionValue& Value);
-    UFUNCTION() void Input_Jump_Released(const FInputActionValue& Value);
-    
-    UFUNCTION() void Input_Ability_Pressed(FGameplayTag InInputTag);
-    UFUNCTION() void Input_Ability_Released(FGameplayTag InInputTag);
+    UFUNCTION()
+    void Input_Move(const FInputActionValue& Value);
 
-    UFUNCTION(Server, Reliable) void Server_Ability_Pressed(FGameplayTag InInputTag);
-    UFUNCTION(Server, Reliable) void Server_Ability_Released(FGameplayTag InInputTag);
+    UFUNCTION()
+    void Input_Look(const FInputActionValue& Value);
+
+    UFUNCTION()
+    void Input_Jump_Pressed(const FInputActionValue& Value);
+
+    UFUNCTION()
+    void Input_Jump_Released(const FInputActionValue& Value);
+    
+    UFUNCTION()
+    void Input_Ability_Pressed(FGameplayTag InInputTag);
+    
+    UFUNCTION()
+    void Input_Ability_Released(FGameplayTag InInputTag);
+
+    UFUNCTION(Server, Reliable)
+    void Server_Ability_Pressed(FGameplayTag InInputTag);
+
+    UFUNCTION(Server, Reliable)
+    void Server_Ability_Released(FGameplayTag InInputTag);
 
 #pragma endregion 
     
