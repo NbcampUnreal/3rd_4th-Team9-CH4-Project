@@ -44,3 +44,8 @@ void UWeaponAmmoComponent::RefillAmmo()
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
 	CurrentAmmo = MaxAmmo;
 }
+
+void UWeaponAmmoComponent::SetCurrentAmmo()
+{
+	CurrentAmmo = MaxAmmo;
+}

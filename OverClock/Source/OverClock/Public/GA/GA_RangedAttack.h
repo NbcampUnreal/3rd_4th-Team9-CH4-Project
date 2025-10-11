@@ -58,17 +58,14 @@ private:
     UPROPERTY(EditAnywhere, Category = "Anim")
     TObjectPtr<UAnimSequenceBase> EmpoweredShotAnim = nullptr;
 
-    UPROPERTY(EditAnywhere, Category = "Cooldown")
-    TSubclassOf<UGameplayEffect> SharedCooldownGE = nullptr;
+    
+    //line trace
+protected:
+    void PerformCameraTraceAndFire(const FGameplayAbilityActorInfo* ActorInfo);
 
-    /** 창 소진 시 줄 쿨다운(초) — 기본 6 */
-    UPROPERTY(EditAnywhere, Category = "Cooldown")
-    float CooldownSeconds = 6.f;
+    UPROPERTY(BlueprintReadOnly, Category = "Ability|Trace")
+    FVector FinalTargetLocation;
 
-
-    UPROPERTY(EditDefaultsOnly, Category = "Tags")
-    FGameplayTag WindowTag = FGameplayTag::RequestGameplayTag(TEXT("State.Rev.SpecialAmmo")); // 기본값
-
-    UPROPERTY(EditDefaultsOnly, Category = "Tags")
-    FGameplayTag CooldownSetByCallerTag = FGameplayTag::RequestGameplayTag(TEXT("Data.CooldownSeconds"));
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ability|Trace")
+    bool bHitTargetActor = false;
 };

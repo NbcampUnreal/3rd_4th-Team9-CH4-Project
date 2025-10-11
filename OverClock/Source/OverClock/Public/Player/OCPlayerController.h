@@ -27,14 +27,7 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 	/** PlayerState에 있는 ASC를 바로 반환하는 헬퍼 (핫패스용, 조용히 nullptr 허용) */
-	FORCEINLINE UAbilitySystemComponent* GetASC() const
-	{
-		if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(PlayerState))
-		{
-			return ASI->GetAbilitySystemComponent();
-		}
-		return nullptr;
-	}
+	FORCEINLINE UAbilitySystemComponent* GetASC() const;
 
 private:
 	// ───── Input Bindings ─────
@@ -53,6 +46,7 @@ private:
 	void Input_Ultimate();
 	void Input_Interact();
 	void Input_Skill1();
+	void Input_Skill2();
 
 	// ───── Ability Trigger (공용) ─────
 	void TriggerAbilityByTag(const FGameplayTag& AbilityTag);

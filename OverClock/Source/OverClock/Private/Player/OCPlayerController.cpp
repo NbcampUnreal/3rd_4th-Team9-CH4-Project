@@ -70,6 +70,7 @@ void AOCPlayerController::SetupInputComponent()
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Primary, ETriggerEvent::Started, this, &ThisClass::Input_Attack_Pressed);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Reload, ETriggerEvent::Started, this, &ThisClass::Input_Reload);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Skill1, ETriggerEvent::Started, this, &ThisClass::Input_Skill1);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Skill2, ETriggerEvent::Started, this, &ThisClass::Input_Skill2);
 	// 어빌리티 입력도 같은 방식으로 태그만 추가하면 됨 모르면 공부하셈
 }
 
@@ -82,6 +83,15 @@ void AOCPlayerController::OnPossess(APawn* InPawn)
 	{
 		 GetASC()->InitAbilityActorInfo(PS, InPawn);
 	}
+}
+
+UAbilitySystemComponent* AOCPlayerController::GetASC() const
+{
+	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(PlayerState))
+	{
+		return ASI->GetAbilitySystemComponent();
+	}
+	return nullptr;
 }
 
 void AOCPlayerController::OnRep_PlayerState()
@@ -186,16 +196,14 @@ void AOCPlayerController::Input_Interact()
 
 void AOCPlayerController::TriggerAbilityByTag(const FGameplayTag& AbilityTag)
 {
-	// 1) 로컬에서 ASC 가져와 태그로 활성 시도
 	if (UAbilitySystemComponent* ASC = GetASC())
 	{
 		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag)))
 		{
-			return; // 로컬에서 성공
+			return;
 		}
 	}
 
-	// 2) 실패 또는 ASC 없음 → 서버가 보유 보장 + 태그로 활성
 	Server_EnsureAbilityGivenByTag(AbilityTag);
 	Server_TryActivateByTag(AbilityTag);
 }
@@ -212,9 +220,13 @@ void AOCPlayerController::Input_Reload()
 
 void AOCPlayerController::Input_Skill1()
 {
-	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("Ability.Rev.DeathBullet")));
+	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("InputTag.Attack.Skill1")));
 }
 
+void AOCPlayerController::Input_Skill2()
+{
+	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("InputTag.Attack.Skill2")));
+}
 // ─────────────── Server RPC 구현 ───────────────
 
 void AOCPlayerController::Server_ActivateSkill_Implementation(TSubclassOf<UGameplayAbility> DeadlyBulletClass)
@@ -237,32 +249,22 @@ void AOCPlayerController::Server_ActivateSkill_Implementation(TSubclassOf<UGamep
 void AOCPlayerController::Server_EnsureAbilityGivenByTag_Implementation(FGameplayTag AbilityTag)
 {
 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: PS null")); return; }
 
 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	if (!ASC) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: ASC null")); return; }
 
-	APawn* MyPawn = GetPawn();
-	AOCRevenant* Rev = MyPawn ? Cast<AOCRevenant>(MyPawn) : nullptr; // 다른 캐릭터여도 동일 패턴으로 확장 가능
-	if (!Rev) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: Pawn not Revenant")); return; }
+	AOCCharacterBase* Char = Cast<AOCCharacterBase>(GetPawn());
 
-	// 캐릭터의 맵에서 클래스 조회
-	TSubclassOf<UGameplayAbility> AbilityClass = Rev->GetAbilityClassByTag(AbilityTag);
-	if (!AbilityClass)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: No class mapped for tag %s"), *AbilityTag.ToString());
-		return;
-	}
+	TSubclassOf<UGameplayAbility> AbilityClass = Char->GetAbilityClassByTag(AbilityTag);
+	if (!AbilityClass) return;
 
-	// 이미 있나?
+	// 이미 있지 않으면 부여
 	if (!ASC->FindAbilitySpecFromClass(AbilityClass))
 	{
-		ASC->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, Rev));
-		UE_LOG(LogTemp, Log, TEXT("[RPC] EnsureByTag: Gave %s for tag %s"), *AbilityClass->GetName(), *AbilityTag.ToString());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Verbose, TEXT("[RPC] EnsureByTag: Already has %s"), *AbilityClass->GetName());
+		ASC->GiveAbility(FGameplayAbilitySpec(AbilityClass, /*Level*/1, /*InputID*/0, Char));
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
+		UE_LOG(LogTemp, Log, TEXT("[RPC] EnsureByTag: Gave %s for tag %s"),
+			*AbilityClass->GetName(), *AbilityTag.ToString());
+#endif
 	}
 }
 
@@ -274,7 +276,8 @@ void AOCPlayerController::Server_TryActivateByTag_Implementation(FGameplayTag Ab
 	if (!ASC) return;
 
 	FGameplayTagContainer TagContainer;
+
 	TagContainer.AddTag(AbilityTag);
+
 	const bool bOk = ASC->TryActivateAbilitiesByTag(TagContainer);
-	UE_LOG(LogTemp, Log, TEXT("[RPC] TryActivateByTag %s => %s"), *AbilityTag.ToString(), bOk ? TEXT("SUCCESS") : TEXT("FAIL"));
 }
