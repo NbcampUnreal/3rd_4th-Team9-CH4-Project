@@ -44,4 +44,7 @@ struct FOCAnimStruct
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequenceBase> Skill2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequenceBase> Ult;
 };
