@@ -1,6 +1,5 @@
-#include "Abilities/OCRBMissile.h"
+#include "Weapons/OCRBMissile.h"
 
-//#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Components/SphereComponent.h"
@@ -58,39 +57,36 @@ void AOCRBMissile::SetTarget(AActor* NewTarget)//외부에서 호출
 void AOCRBMissile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                          FVector NormalImpulse, const FHitResult& Hit)
 {
-	//if (HasAuthority())
+	if (!HasAuthority() || !GameEffectClass || !OtherActor) return;
+
+	// 자기 자신이나 발사자는 제외
+	if (OtherActor && OtherActor->IsA(APawn::StaticClass()) && OtherActor != GetOwner())
 	{
-		if (!HasAuthority() || !GameEffectClass || !OtherActor) return;
-
-		// 자기 자신이나 발사자는 제외
-		if (OtherActor && OtherActor->IsA(APawn::StaticClass()) && OtherActor != GetOwner())
-		{
-			//같은 태그인지 확인
-			IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(OtherActor);
-			if (!TargetASI) return;
-			IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(GetOwner());
-			if (!OwnerASI) return;
-	    
-			UAbilitySystemComponent* OwnerASC = OwnerASI->GetAbilitySystemComponent();
-			if (!OwnerASC) return;
-			UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
-			if (!TargetASC) return;
-			
-			bool Team1 = OwnerASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red")));
-			bool Team2 = TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red")));
-			if(Team1 && Team2) return;
+		//같은 태그인지 확인
+		IAbilitySystemInterface* TargetASI = Cast<IAbilitySystemInterface>(OtherActor);
+		if (!TargetASI) return;
+		IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(GetOwner());
+		if (!OwnerASI) return;
+    
+		UAbilitySystemComponent* OwnerASC = OwnerASI->GetAbilitySystemComponent();
+		if (!OwnerASC) return;
+		UAbilitySystemComponent* TargetASC = TargetASI->GetAbilitySystemComponent();
+		if (!TargetASC) return;
 		
-			// 히트 사운드 재생
-			if (HitSound)
-			{
-				UGameplayStatics::PlaySoundAtLocation(this, HitSound, Hit.Location);
-			}
-
-			// 표식 적용
-			ApplyMarkToTarget(OwnerASC, TargetASC);
-	        
-			Destroy();
+		bool Team1 = OwnerASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red")));
+		bool Team2 = TargetASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Team.Red")));
+		if(Team1 && Team2) return;
+	
+		// 히트 사운드 재생
+		if (HitSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, HitSound, Hit.Location);
 		}
+
+		// 표식 적용
+		ApplyMarkToTarget(OwnerASC, TargetASC);
+        
+		Destroy();
 	}
 }
 
