@@ -2,15 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "OCMissileBase.h"
-#include "OCFeyMissile.generated.h"
+#include "OCWhipMissile.generated.h"
 
 UCLASS()
-class OVERCLOCK_API AOCFeyMissile : public AOCMissileBase
+class OVERCLOCK_API AOCWhipMissile : public AOCMissileBase
 {
 	GENERATED_BODY()
 	
 public:	
-	AOCFeyMissile();
+	AOCWhipMissile();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	float Damage = 20.0f;
@@ -25,6 +25,5 @@ protected:
 		FVector NormalImpulse, const FHitResult& Hit) override;
 
 public:	
-	virtual void Tick(float DeltaTime) override;
-
+	void SetVelocity(const FVector& NewVelocity);
 };
