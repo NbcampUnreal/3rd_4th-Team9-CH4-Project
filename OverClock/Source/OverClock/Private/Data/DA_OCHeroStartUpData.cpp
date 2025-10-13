@@ -8,7 +8,8 @@ void UDA_OCHeroStartUpData::GiveToAbilitySystemComponent(UOCAbilitySystemCompone
 
 	GrantAbilities(ActivateOnGivenAbilities, ASC, ApplyLevel);
 	GrantAbilities(ReactiveAbilities, ASC, ApplyLevel);
-
+	
+	
 	if (!StartUpGameplayEffects.IsEmpty())
 	{
 		for (const TSubclassOf<UGameplayEffect>& EffectClass : StartUpGameplayEffects)
