@@ -9,6 +9,7 @@
 
 class UAnimMontage;
 class UAnimSequenceBase;
+class AVoltexGrenadeProjectile;
 
 UCLASS()
 class OVERCLOCK_API UGA_VoltexGrenade : public UGA_SharedCooldownBase
@@ -39,7 +40,21 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Anim")
     float PlayRate = 1.f;
 
-    UFUNCTION() void OnMontageCompleted();
+    UFUNCTION() 
+    void OnMontageCompleted();
 
-    UFUNCTION() void OnMontageInterrupted();
+    UFUNCTION() 
+    void OnMontageInterrupted();
+
+    UPROPERTY(EditDefaultsOnly, Category = "Grenade")
+    TSubclassOf<AVoltexGrenadeProjectile> ProjectileClass;
+
+    UPROPERTY(EditAnywhere, Category = "Grenade")
+    FName SpawnSocket = TEXT("");
+
+    UFUNCTION(Server, Reliable)
+    void Server_SpawnGrenade(FVector_NetQuantize Start, FVector_NetQuantizeNormal Dir);
+
+    UFUNCTION()
+    void OnGrenadeSpawnEvent(FGameplayEventData Payload);
 };

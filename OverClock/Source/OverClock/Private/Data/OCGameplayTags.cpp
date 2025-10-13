@@ -36,6 +36,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Alive, "State.Alive")
 	UE_DEFINE_GAMEPLAY_TAG(State_Marked, "State.Marked")
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock, "State.ActionLock")
+	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead")
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_QuickStep, "State.ActionLock.QuickStep")
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_RangedAttack, "State.ActionLock.RangedAttack")
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_Reload, "State.ActionLock.Reload")
@@ -57,5 +58,8 @@ namespace OCGameplayTags
 
 
 	UE_DEFINE_GAMEPLAY_TAG(Data_Cooldown_Duration, "Data.Duration.Cooldown")// 쿨타임 set by caller 키
-	UE_DEFINE_GAMEPLAY_TAG(Data_Cooldown_Window, "Data.Duration.Window")//윈도우 지속 setbycaller
+	UE_DEFINE_GAMEPLAY_TAG(Data_Damage, "Data.Damage")
+
+	UE_DEFINE_GAMEPLAY_TAG(Event_Spawn_Grenade, "Event.Spawn.Grenade")
+	UE_DEFINE_GAMEPLAY_TAG(Event_Character_Died, "Event.Character.Died")
 }

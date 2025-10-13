@@ -55,17 +55,30 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Anim")
     float PlayRate = 1.f;
 
-    UPROPERTY(EditAnywhere, Category = "Anim")
-    TObjectPtr<UAnimSequenceBase> EmpoweredShotAnim = nullptr;
-
-    
     //line trace
 protected:
-    void PerformCameraTraceAndFire(const FGameplayAbilityActorInfo* ActorInfo);
+    void PerformCameraTraceAndFire(
+        const FGameplayAbilitySpecHandle Handle,
+        const FGameplayAbilityActorInfo* ActorInfo,
+        const FGameplayAbilityActivationInfo ActivationInfo);
 
     UPROPERTY(BlueprintReadOnly, Category = "Ability|Trace")
     FVector FinalTargetLocation;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ability|Trace")
     bool bHitTargetActor = false;
+
+    UFUNCTION(Server, Reliable)
+    void Server_ApplyDamage(const FHitResult& HitResult);
+
+    void ApplyDamage_ServerSide(const FHitResult& Hit, const FGameplayAbilityActorInfo& Info);
+
+    UFUNCTION(Client, Reliable)
+    void Client_OnDamageConfirmed(AActor* Target, float NewHealth, float AppliedDamage);
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+    TSubclassOf<UGameplayEffect> DamageEffect;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+    float BaseDamage = 10.0f;
 };

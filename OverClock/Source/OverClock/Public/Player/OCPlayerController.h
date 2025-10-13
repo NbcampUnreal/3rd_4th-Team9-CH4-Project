@@ -26,11 +26,9 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnRep_PlayerState() override;
 
-	/** PlayerState에 있는 ASC를 바로 반환하는 헬퍼 (핫패스용, 조용히 nullptr 허용) */
 	FORCEINLINE UAbilitySystemComponent* GetASC() const;
 
 private:
-	// ───── Input Bindings ─────
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerData", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UDA_OCInputConfig> InputConfigDataAsset;
 
@@ -48,10 +46,8 @@ private:
 	void Input_Skill1();
 	void Input_Skill2();
 
-	// ───── Ability Trigger (공용) ─────
 	void TriggerAbilityByTag(const FGameplayTag& AbilityTag);
 
-	// ───── Server fallbacks (기존 유지) ─────
 	UFUNCTION(Server, Reliable) void Server_EnsureAbilityGivenByTag(FGameplayTag AbilityTag);
 	UFUNCTION(Server, Reliable) void Server_TryActivateByTag(FGameplayTag AbilityTag);
 
