@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "OCCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UOCMarkComponent;
 class UOCAnimDataAsset;
 class UCameraComponent;
@@ -37,6 +38,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	void OnStunTagChanged(const FGameplayTag GameplayTag, int32 NewCount);
 
 	void UpdateRotation();
 

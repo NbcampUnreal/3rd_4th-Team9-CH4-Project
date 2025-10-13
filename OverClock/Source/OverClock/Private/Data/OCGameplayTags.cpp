@@ -29,10 +29,17 @@ namespace OCGameplayTags
 
 	/*Skill Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet, "Ability.DeadlyBullet")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_HealWhip, "Ability.HealWhip")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_HealGem, "Ability.HealGem")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_PoisonSeed, "Ability.PoisonSeed")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_WildStorm, "Ability.WildStorm")
 
 	/*State Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(State_Alive, "State.Alive")
 	UE_DEFINE_GAMEPLAY_TAG(State_Marked, "State.Marked")
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Hidden, "State.Weapon.Hidden")
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Scaling, "State.Weapon.Scaling")
+	UE_DEFINE_GAMEPLAY_TAG(State_Stun, "State.Stun")
 
 	/*Effect Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")

@@ -25,20 +25,18 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo, 
 		bool bReplicateEndAbility, bool bWasCancelled) override;
 
-	// 유도탄 발사체 클래스
+	void OnMontageCompleted();
+
+	void OnMontageCancelled();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<AOCRBMissile> MissileClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Mark")
-	float MarkDuration = 10.0f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Mark")
 	UAnimMontage* MarkMontage;
 	
 private:
-	// 가장 가까운 적 찾기
 	AActor* FindNearestEnemy();
     
-	// 유도탄 발사
 	void LaunchHomingProjectile(AActor* Target);
 };

@@ -3,10 +3,9 @@
 #include "Engine/World.h"
 #include "AbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
-//#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemInterface.h"
-#include "GameplayTagContainer.h"
-#include "Abilities/OCRBMissile.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Weapons/OCRBMissile.h"
 #include "Data/OCGameplayTags.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
@@ -14,9 +13,9 @@
 UGA_DeadlyBullet::UGA_DeadlyBullet()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;//server만 실행
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 
-	bServerRespectsRemoteAbilityCancellation = false;//클라 취소 불가
+	bServerRespectsRemoteAbilityCancellation = false;
 
 	AbilityTags.AddTag(OCGameplayTags::Ability_DeadlyBullet);
 }
@@ -27,26 +26,22 @@ void UGA_DeadlyBullet::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	//network 확인용
-	if (ActorInfo && ActorInfo->AvatarActor.IsValid())
-	{
-		ENetRole LocalRole = ActorInfo->AvatarActor->GetLocalRole();
-		UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] Local Role : %d (None 0 | Simulated Proxy 1 | Autonomous Proxy 2 | Authority 3)"), LocalRole)
-	}
-
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 		return;
 	}
-
-	// Task 실행으로 변경
+	
 	if (MarkMontage)
 	{
-		if(UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance())
-		{
-			AnimInstance->Montage_Play(MarkMontage);
-		}
+		UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+			this, NAME_None, MarkMontage);
+
+		Task->OnCompleted.AddDynamic(this, &UGA_DeadlyBullet::OnMontageCompleted);
+		Task->OnInterrupted.AddDynamic(this, &UGA_DeadlyBullet::OnMontageCancelled);
+		Task->OnCancelled.AddDynamic(this, &UGA_DeadlyBullet::OnMontageCancelled);
+		
+		Task->ReadyForActivation();
 	}
 	
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
@@ -145,4 +140,14 @@ void UGA_DeadlyBullet::LaunchHomingProjectile(AActor* Target)
 		Projectile->SetTarget(Target);
 		//UE_LOG(LogTemp, Warning, TEXT("[UGA_DeadlyBullet] Missile Spawned"));
 	}
+}
+
+void UGA_DeadlyBullet::OnMontageCompleted()
+{
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+}
+
+void UGA_DeadlyBullet::OnMontageCancelled()
+{
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

@@ -163,7 +163,7 @@ void AOCPlayerController::Input_Jump_Released(const FInputActionValue& Value)
 
 void AOCPlayerController::Input_Attack_Alt()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Input_Attack_Alt"))
+	Server_ActivateSkill(AbilityStruct.InputTag_Attack_Alt);
 }
 
 void AOCPlayerController::Input_Skill_Active()
@@ -174,143 +174,145 @@ void AOCPlayerController::Input_Skill_Active()
 void AOCPlayerController::Input_Ultimate()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Input_Ultimate"))
+	Server_ActivateSkill(AbilityStruct.InputTag_Ultimate);
 }
 
 void AOCPlayerController::Input_Interact()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Input_Interact"))
+	Server_ActivateSkill(AbilityStruct.InputTag_Interact);
 }
 
 void AOCPlayerController::Server_ActivateSkill_Implementation(FGameplayTag AbilityTag)
 {
 	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(GetPawn()))
 	{
-		UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent();
-
-		if (ASC)
+		if (UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent())
 		{
 			FGameplayTagContainer TagContainer;
 			TagContainer.AddTag(AbilityTag);
+			UE_LOG(LogTemp, Warning, TEXT("Tag : %s"), *AbilityTag.ToString())
 			ASC->TryActivateAbilitiesByTag(TagContainer);
 		}
 	}
 }
+
 void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*/)
 {
-	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] PS NULL")); return; }
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	const FGameplayTag AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.PeaceKeeper"));
-
-	if (!ASC) {
-		UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] ASC NULL -> server fallback (tag)"));
-		Server_EnsureAbilityGivenByTag(AttackTag);
-		Server_TryActivateByTag(AttackTag);
-		return;
-	}
-
-	// 상태 로그 그대로
-	FGameplayTagContainer Owned; ASC->GetOwnedGameplayTags(Owned);
-	UE_LOG(LogTemp, Log, TEXT("[Input_Attack] ASC OwnedTags: %s"), *Owned.ToStringSimple());
-	const bool bHasFiring = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Firing"));
-	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.PeaceKeeper"));
-	UE_LOG(LogTemp, Log, TEXT("[Input_Attack] Has State.Firing=%d, Cooldown.PeaceKeeper=%d"), bHasFiring, bHasCD);
-
-	// 태그 활성화 (기본)
-	bool bActivated = ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AttackTag));
-	UE_LOG(LogTemp, Warning, TEXT("[Attack] Activate %s => %s"), *AttackTag.ToString(), bActivated ? TEXT("SUCCESS") : TEXT("FAIL"));
-
-	// 실패 시 서버가 태그로 지급/활성
-	if (!bActivated)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] Fallback to server give/activate (tag)"));
-		Server_EnsureAbilityGivenByTag(AttackTag);
-		Server_TryActivateByTag(AttackTag);
-	}
+// }
+// AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+// if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] PS NULL")); return; }
+//
+// UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+// const FGameplayTag AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.PeaceKeeper"));
+//
+// if (!ASC) {
+// 	UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] ASC NULL -> server fallback (tag)"));
+// 	Server_EnsureAbilityGivenByTag(AttackTag);
+// 	Server_TryActivateByTag(AttackTag);
+// 	return;
+// }
+//
+// 	// 상태 로그 그대로
+// 	FGameplayTagContainer Owned; ASC->GetOwnedGameplayTags(Owned);
+// 	UE_LOG(LogTemp, Log, TEXT("[Input_Attack] ASC OwnedTags: %s"), *Owned.ToStringSimple());
+// 	const bool bHasFiring = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.Firing"));
+// 	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.PeaceKeeper"));
+// 	UE_LOG(LogTemp, Log, TEXT("[Input_Attack] Has State.Firing=%d, Cooldown.PeaceKeeper=%d"), bHasFiring, bHasCD);
+//
+// 	// 태그 활성화 (기본)
+// 	bool bActivated = ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AttackTag));
+// 	UE_LOG(LogTemp, Warning, TEXT("[Attack] Activate %s => %s"), *AttackTag.ToString(), bActivated ? TEXT("SUCCESS") : TEXT("FAIL"));
+//
+// 	// 실패 시 서버가 태그로 지급/활성
+// 	if (!bActivated)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] Fallback to server give/activate (tag)"));
+// 		Server_EnsureAbilityGivenByTag(AttackTag);
+// 		Server_TryActivateByTag(AttackTag);
+// 	}
 }
 
 // ─────────────── Reload (R) ───────────────
 void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
 {
-	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] PS NULL")); return; }
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	const FGameplayTag ReloadTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.RevReload"));
-
-	if (!ASC) {
-		UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] ASC NULL -> server fallback (tag)"));
-		Server_EnsureAbilityGivenByTag(ReloadTag);
-		Server_TryActivateByTag(ReloadTag);
-		return;
-	}
-
-	// 상태 로그 그대로
-	FGameplayTagContainer Owned; ASC->GetOwnedGameplayTags(Owned);
-	UE_LOG(LogTemp, Log, TEXT("[Input_RevReload] ASC OwnedTags: %s"), *Owned.ToStringSimple());
-	const bool bHasRevReloading = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.RevReloading"));
-	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.RevReload"));
-	UE_LOG(LogTemp, Log, TEXT("[Input_RevReload] Has State.RevReloading=%d, Cooldown.RevReload=%d"), bHasRevReloading, bHasCD);
-
-	// 태그 활성화 (기본)
-	bool bActivated = ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(ReloadTag));
-	UE_LOG(LogTemp, Warning, TEXT("[Input] Activate %s => %s"), *ReloadTag.ToString(), bActivated ? TEXT("SUCCESS") : TEXT("FAIL"));
-
-	// 실패 시 서버가 태그로 지급/활성
-	if (!bActivated)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] Fallback to server give/activate (tag)"));
-		Server_EnsureAbilityGivenByTag(ReloadTag);
-		Server_TryActivateByTag(ReloadTag);
-	}
+// 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+// 	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] PS NULL")); return; }
+//
+// 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+// 	const FGameplayTag ReloadTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.RevReload"));
+//
+// 	if (!ASC) {
+// 		UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] ASC NULL -> server fallback (tag)"));
+// 		Server_EnsureAbilityGivenByTag(ReloadTag);
+// 		Server_TryActivateByTag(ReloadTag);
+// 		return;
+// }
+//
+// 	// 상태 로그 그대로
+// 	FGameplayTagContainer Owned; ASC->GetOwnedGameplayTags(Owned);
+// 	UE_LOG(LogTemp, Log, TEXT("[Input_RevReload] ASC OwnedTags: %s"), *Owned.ToStringSimple());
+// 	const bool bHasRevReloading = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("State.RevReloading"));
+// 	const bool bHasCD = ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Cooldown.RevReload"));
+// 	UE_LOG(LogTemp, Log, TEXT("[Input_RevReload] Has State.RevReloading=%d, Cooldown.RevReload=%d"), bHasRevReloading, bHasCD);
+//
+// 	// 태그 활성화 (기본)
+// 	bool bActivated = ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(ReloadTag));
+// 	UE_LOG(LogTemp, Warning, TEXT("[Input] Activate %s => %s"), *ReloadTag.ToString(), bActivated ? TEXT("SUCCESS") : TEXT("FAIL"));
+//
+// 	// 실패 시 서버가 태그로 지급/활성
+// 	if (!bActivated)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] Fallback to server give/activate (tag)"));
+// 		Server_EnsureAbilityGivenByTag(ReloadTag);
+// 		Server_TryActivateByTag(ReloadTag);
+// 	}
 }
-
-
-
-// ─────────────── Server RPC 구현 ───────────────
-
+//
+//
+//
+// // ─────────────── Server RPC 구현 ───────────────
+//
 void AOCPlayerController::Server_EnsureAbilityGivenByTag_Implementation(FGameplayTag AbilityTag)
 {
-	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: PS null")); return; }
-
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	if (!ASC) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: ASC null")); return; }
-
-	APawn* MyPawn = GetPawn();
-	AOCRevenant* Rev = MyPawn ? Cast<AOCRevenant>(MyPawn) : nullptr; // 다른 캐릭터여도 동일 패턴으로 확장 가능
-	if (!Rev) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: Pawn not Revenant")); return; }
-
-	// 캐릭터의 맵에서 클래스 조회
-	TSubclassOf<UGameplayAbility> AbilityClass = Rev->GetAbilityClassByTag(AbilityTag);
-	if (!AbilityClass)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: No class mapped for tag %s"), *AbilityTag.ToString());
-		return;
-	}
-
-	// 이미 있나?
-	if (!ASC->FindAbilitySpecFromClass(AbilityClass))
-	{
-		ASC->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, Rev));
-		UE_LOG(LogTemp, Log, TEXT("[RPC] EnsureByTag: Gave %s for tag %s"), *AbilityClass->GetName(), *AbilityTag.ToString());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Verbose, TEXT("[RPC] EnsureByTag: Already has %s"), *AbilityClass->GetName());
-	}
+// 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+// 	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: PS null")); return; }
+//
+// 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+// 	if (!ASC) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: ASC null")); return; }
+//
+// 	APawn* MyPawn = GetPawn();
+// 	AOCRevenant* Rev = MyPawn ? Cast<AOCRevenant>(MyPawn) : nullptr; // 다른 캐릭터여도 동일 패턴으로 확장 가능
+// 	if (!Rev) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: Pawn not Revenant")); return; }
+//
+// 	// 캐릭터의 맵에서 클래스 조회
+// 	TSubclassOf<UGameplayAbility> AbilityClass = Rev->GetAbilityClassByTag(AbilityTag);
+// 	if (!AbilityClass)
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: No class mapped for tag %s"), *AbilityTag.ToString());
+// 		return;
+// 	}
+//
+// 	// 이미 있나?
+// 	if (!ASC->FindAbilitySpecFromClass(AbilityClass))
+// 	{
+// 		ASC->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, Rev));
+// 		UE_LOG(LogTemp, Log, TEXT("[RPC] EnsureByTag: Gave %s for tag %s"), *AbilityClass->GetName(), *AbilityTag.ToString());
+// 	}
+// 	else
+// 	{
+// 		UE_LOG(LogTemp, Verbose, TEXT("[RPC] EnsureByTag: Already has %s"), *AbilityClass->GetName());
+// 	}
 }
-
+//
 void AOCPlayerController::Server_TryActivateByTag_Implementation(FGameplayTag AbilityTag)
 {
-	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-	if (!PS) return;
-	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-	if (!ASC) return;
-
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(AbilityTag);
-	const bool bOk = ASC->TryActivateAbilitiesByTag(TagContainer);
-	UE_LOG(LogTemp, Log, TEXT("[RPC] TryActivateByTag %s => %s"), *AbilityTag.ToString(), bOk ? TEXT("SUCCESS") : TEXT("FAIL"));
+// 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+// 	if (!PS) return;
+// 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+// 	if (!ASC) return;
+//
+// 	FGameplayTagContainer TagContainer;
+// 	TagContainer.AddTag(AbilityTag);
+// 	const bool bOk = ASC->TryActivateAbilitiesByTag(TagContainer);
+// 	UE_LOG(LogTemp, Log, TEXT("[RPC] TryActivateByTag %s => %s"), *AbilityTag.ToString(), bOk ? TEXT("SUCCESS") : TEXT("FAIL"));
 }
