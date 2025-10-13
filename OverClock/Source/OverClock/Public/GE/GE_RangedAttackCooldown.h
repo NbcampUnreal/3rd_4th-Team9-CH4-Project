@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffect.h"
-#include "PeacekeeperCooldown.generated.h"
+#include "GE_RangedAttackCooldown.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class OVERCLOCK_API UPeacekeeperCooldown : public UGameplayEffect
+class OVERCLOCK_API UGE_RangedAttackCooldown : public UGameplayEffect
 {
 	GENERATED_BODY()
 	
 public:
-	UPeacekeeperCooldown();
+	UGE_RangedAttackCooldown();
 };

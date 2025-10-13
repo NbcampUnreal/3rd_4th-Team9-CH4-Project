@@ -1,6 +1,7 @@
 #include "Player/OCPlayerController.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "Input/OCInputComponent.h"
 #include "Data/DA_OCInputConfig.h"
 #include "Data/OCGameplayTags.h"
@@ -10,8 +11,10 @@
 #include "GameplayTagContainer.h"
 #include "GameFramework/Pawn.h"
 #include "Abilities/OCAbilityDataAsset.h"
+#include "GameFramework/Character.h"
 #include "Player/OCCharacterBase.h"
 #include "Player/OCPlayerState.h"
+#include "GA/GA_RangedAttack.h"
 #include "Player/OCRevenant.h"
 #include "OverClock.h"
 
@@ -65,8 +68,11 @@ void AOCPlayerController::SetupInputComponent()
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Skill_Active, ETriggerEvent::Started, this, &ThisClass::Input_Skill_Active);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Ultimate, ETriggerEvent::Started, this, &ThisClass::Input_Ultimate);
 	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Interact, ETriggerEvent::Started, this, &ThisClass::Input_Interact);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Primary, ETriggerEvent::Triggered, this, &ThisClass::Input_Attack_Pressed);
-	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Reload, ETriggerEvent::Triggered, this, &ThisClass::Input_Reload);
+
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Primary, ETriggerEvent::Started, this, &ThisClass::Input_Attack_Pressed);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Reload, ETriggerEvent::Started, this, &ThisClass::Input_Reload);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Skill1, ETriggerEvent::Started, this, &ThisClass::Input_Skill1);
+	OCInputComponent->BindNativeInputAction(InputConfigDataAsset, OCGameplayTags::InputTag_Attack_Skill2, ETriggerEvent::Started, this, &ThisClass::Input_Skill2);
 	// 어빌리티 입력도 같은 방식으로 태그만 추가하면 됨 모르면 공부하셈
 }
 
@@ -87,12 +93,38 @@ void AOCPlayerController::OnPossess(APawn* InPawn)
 		//확인용 Log
 		UE_LOG(LogTemp, Warning, TEXT("Character Ability Skill_Active : %s"), *AbilityStruct.InputTag_Skill_Active.ToString());
 	}
+
+	// PS(Owner)에 ASC가 붙어있다는 가정 → Avatar를 현재 Pawn으로 초기화
+	if (APlayerState* PS = GetPlayerState<APlayerState>())
+	{
+		 GetASC()->InitAbilityActorInfo(PS, InPawn);
+	}
 }
 
 void AOCPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AOCPlayerController,AbilityStruct);
+
+}
+
+UAbilitySystemComponent* AOCPlayerController::GetASC() const
+{
+	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(PlayerState))
+	{
+		return ASI->GetAbilitySystemComponent();
+	}
+	return nullptr;
+}
+
+void AOCPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	//if (APlayerState* PS = GetPlayerState<APlayerState>())
+	// {
+	// 	GetASC()->InitAbilityActorInfo(PS, GetPawn());
+	// }
 }
 
 void AOCPlayerController::Input_Move(const FInputActionValue& Value)
@@ -181,6 +213,43 @@ void AOCPlayerController::Input_Interact()
 {
 	Server_ActivateSkill(AbilityStruct.InputTag_Interact);
 }
+
+// ─────────────── Ability Inputs (간결화) ───────────────
+
+void AOCPlayerController::TriggerAbilityByTag(const FGameplayTag& AbilityTag)
+{
+	if (UAbilitySystemComponent* ASC = GetASC())
+	{
+		if (ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag)))
+		{
+			return;
+		}
+	}
+
+	Server_EnsureAbilityGivenByTag(AbilityTag);
+	Server_TryActivateByTag(AbilityTag);
+}
+
+void AOCPlayerController::Input_Attack_Pressed()
+{
+	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("Ability.RangedAttack")));
+}
+
+void AOCPlayerController::Input_Reload()
+{
+	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("Ability.Reload")));
+}
+
+void AOCPlayerController::Input_Skill1()
+{
+	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("InputTag.Attack.Skill1")));
+}
+
+void AOCPlayerController::Input_Skill2()
+{
+	TriggerAbilityByTag(FGameplayTag::RequestGameplayTag(TEXT("InputTag.Attack.Skill2")));
+}
+// ─────────────── Server RPC 구현 ───────────────
 
 void AOCPlayerController::Server_ActivateSkill_Implementation(FGameplayTag AbilityTag)
 {
@@ -274,45 +343,36 @@ void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
 //
 void AOCPlayerController::Server_EnsureAbilityGivenByTag_Implementation(FGameplayTag AbilityTag)
 {
-// 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-// 	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: PS null")); return; }
-//
-// 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-// 	if (!ASC) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: ASC null")); return; }
-//
-// 	APawn* MyPawn = GetPawn();
-// 	AOCRevenant* Rev = MyPawn ? Cast<AOCRevenant>(MyPawn) : nullptr; // 다른 캐릭터여도 동일 패턴으로 확장 가능
-// 	if (!Rev) { UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: Pawn not Revenant")); return; }
-//
-// 	// 캐릭터의 맵에서 클래스 조회
-// 	TSubclassOf<UGameplayAbility> AbilityClass = Rev->GetAbilityClassByTag(AbilityTag);
-// 	if (!AbilityClass)
-// 	{
-// 		UE_LOG(LogTemp, Warning, TEXT("[RPC] EnsureByTag: No class mapped for tag %s"), *AbilityTag.ToString());
-// 		return;
-// 	}
-//
-// 	// 이미 있나?
-// 	if (!ASC->FindAbilitySpecFromClass(AbilityClass))
-// 	{
-// 		ASC->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, Rev));
-// 		UE_LOG(LogTemp, Log, TEXT("[RPC] EnsureByTag: Gave %s for tag %s"), *AbilityClass->GetName(), *AbilityTag.ToString());
-// 	}
-// 	else
-// 	{
-// 		UE_LOG(LogTemp, Verbose, TEXT("[RPC] EnsureByTag: Already has %s"), *AbilityClass->GetName());
-// 	}
+	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+
+	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+
+	AOCCharacterBase* Char = Cast<AOCCharacterBase>(GetPawn());
+
+	TSubclassOf<UGameplayAbility> AbilityClass = Char->GetAbilityClassByTag(AbilityTag);
+	if (!AbilityClass) return;
+
+	// 이미 있지 않으면 부여
+	if (!ASC->FindAbilitySpecFromClass(AbilityClass))
+	{
+		ASC->GiveAbility(FGameplayAbilitySpec(AbilityClass, /*Level*/1, /*InputID*/0, Char));
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
+		UE_LOG(LogTemp, Log, TEXT("[RPC] EnsureByTag: Gave %s for tag %s"),
+			*AbilityClass->GetName(), *AbilityTag.ToString());
+#endif
+	}
 }
-//
+
 void AOCPlayerController::Server_TryActivateByTag_Implementation(FGameplayTag AbilityTag)
 {
-// 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
-// 	if (!PS) return;
-// 	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-// 	if (!ASC) return;
-//
-// 	FGameplayTagContainer TagContainer;
-// 	TagContainer.AddTag(AbilityTag);
-// 	const bool bOk = ASC->TryActivateAbilitiesByTag(TagContainer);
-// 	UE_LOG(LogTemp, Log, TEXT("[RPC] TryActivateByTag %s => %s"), *AbilityTag.ToString(), bOk ? TEXT("SUCCESS") : TEXT("FAIL"));
+	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+	if (!PS) return;
+	UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+	if (!ASC) return;
+
+	FGameplayTagContainer TagContainer;
+
+	TagContainer.AddTag(AbilityTag);
+
+	const bool bOk = ASC->TryActivateAbilitiesByTag(TagContainer);
 }

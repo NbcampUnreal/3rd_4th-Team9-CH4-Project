@@ -8,7 +8,7 @@
 #include "Net/UnrealNetwork.h"
 #include "OCRevenant.generated.h"
 
-class UOCAnimDataAsset;
+class UWeaponAmmoComponent;
 
 UCLASS()
 class OVERCLOCK_API AOCRevenant : public AOCCharacterBase
@@ -17,6 +17,7 @@ class OVERCLOCK_API AOCRevenant : public AOCCharacterBase
 public:
 	AOCRevenant();
 
+//
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> DeadlyBulletAbilityClass;
 
@@ -80,4 +81,11 @@ protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
     // ============================================================================ 
+	// ������Ʈ ����: ����źâ
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UWeaponAmmoComponent* WeaponAmmoComp = nullptr;
+
+	// ���ε� ���� ó��(������Ʈ ����)
+	UFUNCTION(Server, Reliable)
+	void Server_RequestReloadRefill();
 };
