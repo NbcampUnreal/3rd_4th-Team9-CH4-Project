@@ -38,6 +38,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Fire_Projectile, "Ability.Weapon.Fire.Projectile");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Reload,          "Ability.Weapon.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Overdrive,       "Ability.Weapon.Overdrive");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack,	  	   "Ability.RangedAttack")
 
 	/* Skill */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Defense_Barrier,        "Ability.Defense.Barrier");
@@ -64,6 +65,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Mobility_Dashing,  "State.Mobility.Dashing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Defense_Blocking,  "State.Defense.Blocking");
 	UE_DEFINE_GAMEPLAY_TAG(State_Ultimate_Active,  "State.Ultimate.Active");
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock,		"State.ActionLock")
 
 	/* Cooldown */
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Weapon_Reload,  "Cooldown.Weapon.Reload");
@@ -87,6 +89,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Effect_CC_Stun,          "Effect.CC.Stun");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Heal_Instant,     "Effect.Heal.Instant");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Heal_HoT,         "Effect.Heal.HoT");
+	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark,				"Effect.Mark");
 
 #pragma endregion
 	
@@ -102,14 +105,8 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Mobility_Dash_End,       "GameplayCue.Mobility.Dash.End");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Ult_Earthshatter_Jump,   "GameplayCue.Ult.Earthshatter.Jump");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Ult_Earthshatter_Impact, "GameplayCue.Ult.Earthshatter.Impact");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Weapon_Reload,			"GameplayCue.Weapon.Reload")
 
 #pragma endregion
 
-	// Temporary
-	UE_DEFINE_GAMEPLAY_TAG(Ability_PeaceKeeper,     "Ability.PeaceKeeper");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_RevReload,       "Ability.RevReload");
-	UE_DEFINE_GAMEPLAY_TAG(State_Firing,            "State.Firing");
-	UE_DEFINE_GAMEPLAY_TAG(State_RevReloading,      "State.RevReloading");
-	UE_DEFINE_GAMEPLAY_TAG(Cooldown_PeaceKeeper,    "Cooldown.PeaceKeeper");
-	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RevReload,      "Cooldown.RevReload");
 }

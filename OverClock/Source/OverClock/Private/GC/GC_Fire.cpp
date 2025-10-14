@@ -1,25 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GC/GC_RevFire.h"
+#include "GC/GC_Fire.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Actor.h"
 
-bool UGC_RevFire::OnExecute_Implementation(
+bool UGC_Fire::OnExecute_Implementation(
 	AActor* Target, const FGameplayCueParameters& Parameters) const
 {
 	if (!NiagaraSystem)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[GC_RevFire] NiagaraSystem is null"));
 		return false;
 	}
 
 	USkeletalMeshComponent* AttachComp = ResolveAttachMesh(Target, Parameters);
 	if (!AttachComp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[GC_RevFire] No mesh to attach (Target=%s)"), *GetNameSafe(Target));
 		return false;
 	}
 
@@ -32,26 +30,44 @@ bool UGC_RevFire::OnExecute_Implementation(
 		EAttachLocation::SnapToTarget,
 		/*bAutoDestroy*/ true);
 
-	return true; // ¼º°ø
+    if (FireSound)
+    {
+        UGameplayStatics::SpawnSoundAttached(
+            FireSound,
+            AttachComp,
+            MuzzleSocket,                      // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            FVector::ZeroVector,
+            FRotator::ZeroRotator,
+            EAttachLocation::SnapToTarget,
+            /*bStopWhenAttachedToDestroyed*/ true,
+            VolumeMultiplier,
+            PitchMultiplier,
+            0.0f,                               // StartTime
+            AttenuationSettings,
+            ConcurrencySettings
+        );
+    }
+
+	return true; // ï¿½ï¿½ï¿½ï¿½
 }
 
-// GC_RevFire.cpp (¶Ç´Â ³ÊÀÇ GCN cpp) ¾È
-USkeletalMeshComponent* UGC_RevFire::ResolveAttachMesh(
+// GC_Fire.cpp (ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ GCN cpp) ï¿½ï¿½
+USkeletalMeshComponent* UGC_Fire::ResolveAttachMesh(
     AActor* Target, const FGameplayCueParameters& Parameters) const
 {
-    // 1) GA¿¡¼­ ³Ñ±ä SourceObject ¿ì¼±
+    // 1) GAï¿½ï¿½ï¿½ï¿½ ï¿½Ñ±ï¿½ SourceObject ï¿½ì¼±
     if (const UObject* SO = Parameters.SourceObject.Get())
     {
         if (const USkeletalMeshComponent* FromSourceConst = Cast<const USkeletalMeshComponent>(SO))
         {
             if (MuzzleSocket.IsNone() || FromSourceConst->DoesSocketExist(MuzzleSocket))
             {
-                return const_cast<USkeletalMeshComponent*>(FromSourceConst); // ¡Ú ÇÙ½É
+                return const_cast<USkeletalMeshComponent*>(FromSourceConst); // ï¿½ï¿½ ï¿½Ù½ï¿½
             }
         }
     }
 
-    // 2) Target¿¡¼­ ¼ÒÄÏ ÀÖ´Â SkeletalMeshComponent ÀÚµ¿ Å½»ö
+    // 2) Targetï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ SkeletalMeshComponent ï¿½Úµï¿½ Å½ï¿½ï¿½
     if (Target)
     {
         TArray<USkeletalMeshComponent*> Skels;

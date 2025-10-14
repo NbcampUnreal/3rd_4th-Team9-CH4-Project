@@ -41,6 +41,13 @@ public:
 	UFUNCTION(BlueprintCallable) FORCEINLINE UOCAnimDataAsset* GetAnimDataAsset() const { return AnimDataAsset; }
 	UFUNCTION(BlueprintCallable) FORCEINLINE FGameplayTag GetCharacterTypeTag() const { return CharacterTypeTag; }
 
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_PlayMontage(class UAnimMontage* Montage, float InPlayRate, FName InSection);
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_PlayReloadByAsset(class UAnimSequenceBase* ReloadSource, FName SlotName, float InPlayRate, FName Section);
+    UFUNCTION(Server, Reliable)
+    void Server_RequestReload();
+
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
