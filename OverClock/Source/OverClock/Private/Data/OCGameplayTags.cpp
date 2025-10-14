@@ -122,4 +122,8 @@ namespace OCGameplayTags
 
 	UE_DEFINE_GAMEPLAY_TAG(Event_Spawn_Grenade, "Event.Spawn.Grenade")
 	UE_DEFINE_GAMEPLAY_TAG(Event_Character_Died, "Event.Character.Died")
+
+	/*Team Tags*/
+	UE_DEFINE_GAMEPLAY_TAG(Team_Red, "Team.Red")
+	UE_DEFINE_GAMEPLAY_TAG(Team_Blue, "Team.Blue")
 }

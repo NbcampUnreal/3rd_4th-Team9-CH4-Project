@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "OCRBMissile.generated.h"
 
+class UNiagaraSystem;
 class UGE_MarkEffect;
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -24,8 +25,8 @@ public:
 	TWeakObjectPtr<AActor> NewTargetInTick;
 
 	// 적중 브로드캐스트 이벤트
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnProjectileHit FOnProHit;
+	//UPROPERTY(BlueprintAssignable, Category = "Events")
+	//FOnProjectileHit FOnProHit;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Mark")
 	TSubclassOf<UGE_MarkEffect> MarkEffectClass;
@@ -44,13 +45,13 @@ protected:
 	void ApplyMarkToTarget(AActor* Target);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USphereComponent* CollisionComponent;
+	TObjectPtr<USphereComponent> CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* MeshComponent;
+	TObjectPtr<UStaticMeshComponent> MeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UProjectileMovementComponent* ProjectileMovement;
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
 	// 타겟 > BP편집X
 	UPROPERTY(BlueprintReadWrite, Category = "Targeting")
@@ -67,17 +68,14 @@ protected:
 
 
 	// 이펙트들
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
-	UParticleSystemComponent* TrailEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	TObjectPtr<UNiagaraSystem> TrailEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UParticleSystem* HitEffect;
+	TObjectPtr<USoundBase> LaunchSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	USoundBase* LaunchSound;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	USoundBase* HitSound;
+	TObjectPtr<USoundBase> HitSound;
 	
 
 public:	

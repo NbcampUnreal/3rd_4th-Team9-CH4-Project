@@ -4,33 +4,61 @@
 #include "Components/ActorComponent.h"
 #include "OCMarkComponent.generated.h"
 
+class UNiagaraSystem;
 struct FGameplayTag;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class OVERCLOCK_API UOCMarkComponent : public UActorComponent
+class OVERCLOCK_API UOCMarkComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
 public:
 	UOCMarkComponent();
 
-protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mark System")
-	TSubclassOf<class AMarkVisualActor> MarkVisualActorClass;
+	// 태그 변화 콜백
+	UFUNCTION()
+	void OnTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	void SetupGlobalASCEvents();
+	// 상태별 표시 컴포넌트들
+	//UPROPERTY(VisibleAnywhere, Category = "Status Effects")
+	//TObjectPtr<UStaticMeshComponent> MarkStaticMesh;
     
-	UFUNCTION()
-	void OnActorSpawned(AActor* SpawnedActor);
+	//UPROPERTY(VisibleAnywhere, Category = "Status Effects")
+	//TObjectPtr<UNiagaraSystem> MarkEffect;
     
-	void OnMarkTagChanged(const FGameplayTag CallbackTag, int32 NewCount, AActor* Actor);
+	// 애니메이션용
+	float VerTime = 0.0f;
     
-	UPROPERTY()
-	TMap<TWeakObjectPtr<AActor>, TWeakObjectPtr<class AMarkVisualActor>> ActiveMarks;
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	float BobSpeed = 2.0f;
     
-	FDelegateHandle ActorSpawnedHandle;
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	float BobAmplitude = 10.0f;
+    
+	UPROPERTY(EditAnywhere, Category = "Positioning")
+	FVector MarkOffset = FVector(0, 0, 120);
+	
+// protected:
+// 	virtual void BeginPlay() override;
+// 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+//
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mark System")
+// 	TSubclassOf<class AMarkVisualActor> MarkVisualActorClass;
+//
+// private:
+// 	void SetupGlobalASCEvents();
+//     
+// 	UFUNCTION()
+// 	void OnActorSpawned(AActor* SpawnedActor);
+//     
+// 	void OnMarkTagChanged(const FGameplayTag CallbackTag, int32 NewCount, AActor* Actor);
+//     
+// 	UPROPERTY()
+// 	TMap<TWeakObjectPtr<AActor>, TWeakObjectPtr<class AMarkVisualActor>> ActiveMarks;
+//     
+// 	FDelegateHandle ActorSpawnedHandle;
 };

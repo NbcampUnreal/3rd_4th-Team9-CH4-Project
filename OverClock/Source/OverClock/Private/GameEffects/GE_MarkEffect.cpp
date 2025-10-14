@@ -7,13 +7,11 @@ UGE_MarkEffect::UGE_MarkEffect()
 {
 	GrantedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("State.Marked")));
 	
-	// 지속시간 설정
 	DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	DurationMagnitude = FScalableFloat(10.0f); // 10초 지속
 
-	// 스태킹 설정 (중복 적용 방지)
-	StackingType = EGameplayEffectStackingType::AggregateBySource;
-	StackLimitCount = 1; // 최대 1개만
+	StackingType = EGameplayEffectStackingType::AggregateBySource; //덮어쓰기
+	StackLimitCount = 1;
 }
 	
 	// GrantedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Effect.Mark")));
@@ -22,3 +20,6 @@ UGE_MarkEffect::UGE_MarkEffect()
 	// 표식 태그 부여
 	// FGameplayTag MarkTag = FGameplayTag::RequestGameplayTag(FName("State.Marked"));
 	// FGameplayTag EffectTag = FGameplayTag::RequestGameplayTag(FName("Effect.Mark"));
+
+
+//마크 태그가 들어오면 ? 컴포넌트가 캐릭터의 머리 위에 딱!
