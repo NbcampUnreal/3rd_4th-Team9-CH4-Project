@@ -1,6 +1,8 @@
 #include "Player/OCPlayerState.h"
 #include "Abilities/OCAbilitySystemComponent.h"
 #include "Util/UtilTeam.h"
+#include "Abilities/Attributes/OCAttributeSet_Health.h"
+#include "Abilities/Attributes/OCAttributeSet_Resources.h"
 
 AOCPlayerState::AOCPlayerState()
 {
@@ -9,6 +11,12 @@ AOCPlayerState::AOCPlayerState()
 	AbilitySystemComponent = CreateDefaultSubobject<UOCAbilitySystemComponent>(TEXT("ASC"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	HealthAttributeSet = CreateDefaultSubobject<UOCAttributeSet_Health>(TEXT("Health AttributeSet"));
+	ResourcesAttributeSet =	CreateDefaultSubobject<UOCAttributeSet_Resources>(TEXT("Resources AttributeSet"));
+
+	AbilitySystemComponent->AddAttributeSetSubobject(HealthAttributeSet.Get());
+	AbilitySystemComponent->AddAttributeSetSubobject(ResourcesAttributeSet.Get());
 }
 
 void AOCPlayerState::BeginPlay()
@@ -19,7 +27,7 @@ void AOCPlayerState::BeginPlay()
 
 UAbilitySystemComponent* AOCPlayerState::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return GetOCASC();
 }
 
 void AOCPlayerState::InitASCForAvatar(AActor* NewAvatar)
