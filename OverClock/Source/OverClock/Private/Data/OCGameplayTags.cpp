@@ -38,13 +38,14 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Fire_Projectile, "Ability.Weapon.Fire.Projectile");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Reload,          "Ability.Weapon.Reload");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Weapon_Overdrive,       "Ability.Weapon.Overdrive");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack,	  	   "Ability.RangedAttack")
 
 	/* Skill */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Defense_Barrier,        "Ability.Defense.Barrier");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Defense_Block_Hold,     "Ability.Defense.Block.Hold");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Mobility_Dash,          "Ability.Mobility.Dash");
-	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet,           "Ability.DeadlyBullet"); // (임시/특수기 명시)
+	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet,           "Ability.DeadlyBullet");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack,	  	   "Ability.RangedAttack"); // (임시/특수기 명시)
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload,	  	   		   "Ability.Reload");
 
 	/* Ultimate */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_Earthshatter,  "Ability.Ult.Earthshatter");
@@ -66,6 +67,13 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Defense_Blocking,  "State.Defense.Blocking");
 	UE_DEFINE_GAMEPLAY_TAG(State_Ultimate_Active,  "State.Ultimate.Active");
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock,		"State.ActionLock")
+
+	
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_QuickStep, "State.ActionLock.QuickStep")
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_RangedAttack, "State.ActionLock.RangedAttack")
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_Reload, "State.ActionLock.Reload")
+	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead")
+	UE_DEFINE_GAMEPLAY_TAG(State_Twin_SpecialAmmo, "State.Twin.SpecialAmmo") // 윈도우 태그
 
 	/* Cooldown */
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Weapon_Reload,  "Cooldown.Weapon.Reload");
@@ -109,4 +117,9 @@ namespace OCGameplayTags
 
 #pragma endregion
 
+	UE_DEFINE_GAMEPLAY_TAG(Data_Cooldown_Duration, "Data.Duration.Cooldown")// 쿨타임 set by caller 키
+	UE_DEFINE_GAMEPLAY_TAG(Data_Damage, "Data.Damage")
+
+	UE_DEFINE_GAMEPLAY_TAG(Event_Spawn_Grenade, "Event.Spawn.Grenade")
+	UE_DEFINE_GAMEPLAY_TAG(Event_Character_Died, "Event.Character.Died")
 }

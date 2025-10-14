@@ -1,11 +1,11 @@
 #include "GA/GA_RangedAttack.h"
-#include "GA/GA_Reload.h"
 
 #include "Player/OCCharacterBase.h"  
 #include "Player/Anim/OCAnimStruct.h"
 #include "Player/Anim/OCAnimDataAsset.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimMontage.h"
@@ -15,6 +15,10 @@
 #include "CollisionQueryParams.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+
+#include "GameplayEffectTypes.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Data/CharacterAttributeSet.h"
 
 UGA_RangedAttack::UGA_RangedAttack()
 {
@@ -76,7 +80,7 @@ void UGA_RangedAttack::ActivateAbility(
 
     ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.Weapon.MuzzleFlash")), Params);
    
-    PerformCameraTraceAndFire(ActorInfo);
+    PerformCameraTraceAndFire(Handle, ActorInfo, ActivationInfo);
     //Animation
     const AOCCharacterBase* Char = Cast<AOCCharacterBase>(Avatar);
 
@@ -105,75 +109,103 @@ void UGA_RangedAttack::OnMontageInterrupted()
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, /*bReplicateEndAbility=*/true, /*bWasCancelled=*/true);
 }
 
-void UGA_RangedAttack::PerformCameraTraceAndFire(const FGameplayAbilityActorInfo* ActorInfo)
+void UGA_RangedAttack::PerformCameraTraceAndFire(
+    const FGameplayAbilitySpecHandle Handle,
+    const FGameplayAbilityActorInfo* ActorInfo,
+    const FGameplayAbilityActivationInfo ActivationInfo)
 {
-    AActor* Avatar = GetAvatarActorFromActorInfo();
-    UWorld* World = GetWorld();
-    if (!World || !Avatar)
-    {
-        FinalTargetLocation = FVector::ZeroVector;
-        return;
-    }
+    AActor* Avatar = ActorInfo->AvatarActor.Get();
 
-    FVector CameraLoc;
-    FRotator CameraRot;
+    FVector CamLoc; 
+    FRotator CamRot;
 
-    APlayerController* PC = Cast<APlayerController>(ActorInfo->PlayerController.Get());
-    if (PC)
+    if (const APlayerController* PC = Cast<APlayerController>(ActorInfo->PlayerController.Get()))
     {
-        PC->GetPlayerViewPoint(CameraLoc, CameraRot);
+        PC->GetPlayerViewPoint(CamLoc, CamRot);
     }
     else
     {
-        CameraLoc = Avatar->GetActorLocation();
-        CameraRot = Avatar->GetActorRotation();
+        CamLoc = Avatar->GetActorLocation();
+        CamRot = Avatar->GetActorRotation();
     }
 
-    FVector TraceStart = CameraLoc;
-    FVector TraceDirection = CameraRot.Vector();
-    float MaxDistance = 10000.0f;
-    FVector TraceEnd = TraceStart + (TraceDirection * MaxDistance);
+    const FVector TraceStart = CamLoc;
+    const FVector TraceEnd = TraceStart + CamRot.Vector() * 20000.f;
 
-    FCollisionQueryParams Params;
+    FCollisionQueryParams Params(SCENE_QUERY_STAT(GA_RangedAttack), true);
     Params.AddIgnoredActor(Avatar);
-    Params.bTraceComplex = false;
     Params.bReturnPhysicalMaterial = false;
 
-    FHitResult HitResult;
-    bool bBlockingHit = World->LineTraceSingleByChannel(
-        HitResult,
-        TraceStart,
-        TraceEnd,
-        ECC_Visibility,
-        Params
-    );
+    FCollisionObjectQueryParams ObjParams;
+    ObjParams.AddObjectTypesToQuery(ECC_Pawn);
 
-    FColor DebugColor = IsA<UGA_RangedAttack>() ? FColor::Red : FColor::Blue;
-    DrawDebugLine(World, TraceStart, bBlockingHit ? HitResult.Location : TraceEnd, DebugColor, false, 5.0f, 0, 1.0f);
+    FHitResult HitResult;
+    const bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(HitResult, TraceStart, TraceEnd, ObjParams, Params);
+
+#if !(UE_BUILD_SHIPPING)
+    DrawDebugLine(GetWorld(), TraceStart, bBlockingHit ? HitResult.Location : TraceEnd,
+        FColor::Red, false, 1.0f, 0, 0.5f);
+#endif
 
     if (bBlockingHit)
     {
         FinalTargetLocation = HitResult.Location;
 
-        if (HitResult.GetActor() != nullptr)
+        if (APawn* HitPawn = Cast<APawn>(HitResult.GetActor()))
         {
             bHitTargetActor = true;
+            UE_LOG(LogTemp, Warning, TEXT("Hit! GA_RangedAttack -> %s"), *HitPawn->GetName());
 
-            UE_LOG(LogTemp, Warning,
-                TEXT(" Hit! GA: %s, Hit Actor: %s"),
-                *GetName(),
-                *HitResult.GetActor()->GetName());
+            if (ActorInfo->IsNetAuthority())
+            {
+                ApplyDamage_ServerSide(HitResult, *ActorInfo);
+            }
+            else
+            {
+                Server_ApplyDamage(HitResult);
+            }
         }
         else
         {
             bHitTargetActor = false;
         }
     }
-    else
+}
+
+void UGA_RangedAttack::ApplyDamage_ServerSide(const FHitResult& Hit, const FGameplayAbilityActorInfo& Info)
+{
+    AActor* TargetActor = Hit.GetActor();
+
+    if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor))
     {
-        FinalTargetLocation = TraceEnd;
-        bHitTargetActor = false;
+        UE_LOG(LogTemp, Warning, TEXT("Target: % s"), *TargetActor->GetName());
+
+        FGameplayEffectContextHandle Ctx = Info.AbilitySystemComponent->MakeEffectContext();
+        Ctx.AddHitResult(Hit);
+
+        FGameplayEffectSpecHandle Spec = Info.AbilitySystemComponent->MakeOutgoingSpec(DamageEffect, GetAbilityLevel(), Ctx);
+        if (Spec.IsValid() && Spec.Data.IsValid())
+        {
+            Spec.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(TEXT("Data.Damage")), -FMath::Abs(BaseDamage));
+
+            Info.AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*Spec.Data.Get(), TargetASC);
+
+            const float NewHealth = TargetASC->GetNumericAttribute(UCharacterAttributeSet::GetHealthAttribute());
+
+            Client_OnDamageConfirmed(TargetActor, NewHealth, FMath::Abs(BaseDamage));
+        }
     }
+}
+
+void UGA_RangedAttack::Server_ApplyDamage_Implementation(const FHitResult& Hit)
+{
+    check(CurrentActorInfo);
+    ApplyDamage_ServerSide(Hit, *CurrentActorInfo);
+}
+
+void UGA_RangedAttack::Client_OnDamageConfirmed_Implementation(AActor* Target, float NewHealth, float AppliedDamage)
+{
+    UE_LOG(LogTemp, Warning, TEXT("[CLIENT] Damage confirmed. Target=%s, Damage=%.1f, NewHealth=%.1f"), Target ? *Target->GetName() : TEXT("None"), AppliedDamage, NewHealth);
 }
 
 void UGA_RangedAttack::EndAbility(
@@ -193,3 +225,4 @@ void UGA_RangedAttack::EndAbility(
     }
     Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
+
