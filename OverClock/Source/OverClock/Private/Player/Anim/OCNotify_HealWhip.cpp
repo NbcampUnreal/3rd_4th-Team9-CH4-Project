@@ -1,7 +1,7 @@
 #include "Player/Anim/OCNotify_HealWhip.h"
 
 #include "Weapons/OCWhipMissile.h"
-#include "Player/OCTheFey.h"
+#include "Player/OCFey.h"
 
 void UOCNotify_HealWhip::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -10,7 +10,7 @@ void UOCNotify_HealWhip::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	AActor* Actor = MeshComp->GetAttachParentActor();
 	if (!Actor) return;
 
-	if (AOCTheFey* TheFey = Cast<AOCTheFey>(Actor))
+	if (AOCFey* TheFey = Cast<AOCFey>(Actor))
 	{
 		// 투사체 발사
 		if (TheFey->HasAuthority())
@@ -20,7 +20,7 @@ void UOCNotify_HealWhip::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	}
 }
 
-void UOCNotify_HealWhip::LaunchMissile(AOCTheFey* Fey)
+void UOCNotify_HealWhip::LaunchMissile(AOCFey* Fey)
 {
 	if (!Fey) return;
 	AOCWhipMissile* Missile = Fey->GetWhipMissileFromPool();

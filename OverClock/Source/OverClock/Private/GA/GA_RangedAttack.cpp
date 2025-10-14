@@ -1,6 +1,6 @@
 #include "GA/GA_RangedAttack.h"
 
-#include "Player/OCCharacterBase.h"  
+#include "Player/OCCharacterBase_V2.h"  
 #include "Player/Anim/OCAnimStruct.h"
 #include "Player/Anim/OCAnimDataAsset.h"
 
@@ -19,6 +19,7 @@
 #include "GameplayEffectTypes.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Data/CharacterAttributeSet.h"
+#include <Abilities/OCGameplayAbility.h>
 
 UGA_RangedAttack::UGA_RangedAttack()
 {
@@ -71,32 +72,18 @@ void UGA_RangedAttack::ActivateAbility(
             return;
         }
     }
-    
-    const ACharacter* CharActor = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
-
-    FGameplayCueParameters Params;
-
-    Params.SourceObject = CharActor->GetMesh();
-
-    ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.Weapon.MuzzleFlash")), Params);
    
     PerformCameraTraceAndFire(Handle, ActorInfo, ActivationInfo);
-    //Animation
-    const AOCCharacterBase* Char = Cast<AOCCharacterBase>(Avatar);
 
-    const FOCAnimStruct* AS = Char->GetAnimDataAsset()->CharacterAnimations.Find(Char->GetCurrentTag());
-
-    UAnimMontage* Montage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(AS->PrimaryAttack, DynamicMontageSlotName, 0.2f, 0.2f, PlayRate, 1, 0.f, 0.f); 
-
-    UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Montage, PlayRate, NAME_None, /*bStopWhenAbilityEnds=*/true, 1.f, 0.f);
-
-    Task->OnCompleted.AddDynamic(this, &UGA_RangedAttack::OnMontageCompleted);
-
-    Task->OnInterrupted.AddDynamic(this, &UGA_RangedAttack::OnMontageInterrupted);
-
-    Task->OnCancelled.AddDynamic(this, &UGA_RangedAttack::OnMontageInterrupted);
-
-    Task->ReadyForActivation();
+    if (DynMontage)
+    {
+        if (UAbilityTask_PlayMontageAndWait* Task = PlayMontageTask(DynMontage))
+        {
+            Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
+            Task->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageInterrupted);
+            Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageInterrupted);
+        }
+    }
 }
 
 void UGA_RangedAttack::OnMontageCompleted()
@@ -226,3 +213,27 @@ void UGA_RangedAttack::EndAbility(
     Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+UAbilityTask_PlayMontageAndWait* UGA_RangedAttack::PlayMontageTask(UAnimMontage* Montage, float PlayRate,
+    FName StartSection, bool bStopWhenAbilityEnds, float RootMotionScale, float StartTimeSeconds,
+    bool bAllowInterruptAfterBlendOut) const
+{
+    if (!Montage) return nullptr;
+
+    UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+        const_cast<UGA_RangedAttack*>(this),
+        NAME_None,
+        Montage,
+        PlayRate,
+        StartSection,
+        bStopWhenAbilityEnds,
+        RootMotionScale,
+        StartTimeSeconds,
+        bAllowInterruptAfterBlendOut
+    );
+
+    if (Task)
+    {
+        Task->ReadyForActivation();
+    }
+    return Task;
+}

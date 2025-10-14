@@ -22,6 +22,7 @@ AVoltexGrenadeProjectile::AVoltexGrenadeProjectile()
     Collision->SetCollisionProfileName(TEXT("Projectile"));
     Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
     Collision->SetNotifyRigidBodyCollision(true);
+
     Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
     Collision->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
     RootComponent = Collision;

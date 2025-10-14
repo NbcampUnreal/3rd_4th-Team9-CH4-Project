@@ -1,8 +1,6 @@
 #include "GA/GA_VoltexGrenade.h"
 
-#include "Player/OCCharacterBase.h"
-#include "Player/Anim/OCAnimStruct.h"
-#include "Player/Anim/OCAnimDataAsset.h"
+#include "Player/OCCharacterBase_V2.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 
@@ -27,27 +25,6 @@ void UGA_VoltexGrenade::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
         return;
     }
 
-    const AOCCharacterBase* Char = Cast<AOCCharacterBase>(ActorInfo->AvatarActor.Get());
-
-    const FGameplayTag CharTypeTag = Char->GetCurrentTag();
-
-    //Animation
-    const FOCAnimStruct* AS = Char->GetAnimDataAsset()->CharacterAnimations.Find(CharTypeTag);
-
-    UAnimMontage* Montage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(AS->Skill2, MontageSlot, 0.2f, 0.2f, PlayRate, 1, 0.f, 0.f);
-
-    UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Montage, PlayRate, NAME_None, true, 1.f, 0.f);
-
-    Task->OnCompleted.AddDynamic(this, &UGA_VoltexGrenade::OnMontageCompleted);
-
-    Task->OnBlendOut.AddDynamic(this, &UGA_VoltexGrenade::OnMontageCompleted);
-
-    Task->OnInterrupted.AddDynamic(this, &UGA_VoltexGrenade::OnMontageInterrupted);
-
-    Task->OnCancelled.AddDynamic(this, &UGA_VoltexGrenade::OnMontageInterrupted);
-
-    Task->ReadyForActivation();
-
     const FGameplayTag SpawnTag = FGameplayTag::RequestGameplayTag(TEXT("Event.Spawn.Grenade"));
 
     UAbilityTask_WaitGameplayEvent * WaitEvt = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, SpawnTag, nullptr, true, true);
@@ -55,6 +32,16 @@ void UGA_VoltexGrenade::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
     WaitEvt->EventReceived.AddDynamic(this, &UGA_VoltexGrenade::OnGrenadeSpawnEvent);
 
     WaitEvt->ReadyForActivation();
+
+    if (DynMontage)
+    {
+        if (UAbilityTask_PlayMontageAndWait* Task = PlayMontageTask(DynMontage))
+        {
+            Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
+            Task->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageInterrupted);
+            Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageInterrupted);
+        }
+    }
 }
 
 void UGA_VoltexGrenade::OnMontageCompleted()
@@ -87,7 +74,7 @@ void UGA_VoltexGrenade::OnGrenadeSpawnEvent(FGameplayEventData Payload)
         return;
     }
 
-    const AOCCharacterBase * Char = Cast<AOCCharacterBase>(CurrentActorInfo->AvatarActor.Get());
+    const AOCCharacterBase_V2 * Char = Cast<AOCCharacterBase_V2>(CurrentActorInfo->AvatarActor.Get());
 
     FVector Start = FVector::ZeroVector;
 
@@ -140,4 +127,29 @@ void UGA_VoltexGrenade::EndAbility(
         }
     }
     Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+UAbilityTask_PlayMontageAndWait* UGA_VoltexGrenade::PlayMontageTask(UAnimMontage* Montage, float PlayRate,
+    FName StartSection, bool bStopWhenAbilityEnds, float RootMotionScale, float StartTimeSeconds,
+    bool bAllowInterruptAfterBlendOut) const
+{
+    if (!Montage) return nullptr;
+
+    UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+        const_cast<UGA_VoltexGrenade*>(this),
+        NAME_None,
+        Montage,
+        PlayRate,
+        StartSection,
+        bStopWhenAbilityEnds,
+        RootMotionScale,
+        StartTimeSeconds,
+        bAllowInterruptAfterBlendOut
+    );
+
+    if (Task)
+    {
+        Task->ReadyForActivation();
+    }
+    return Task;
 }

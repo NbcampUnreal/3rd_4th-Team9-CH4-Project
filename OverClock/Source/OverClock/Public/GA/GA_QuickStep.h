@@ -8,7 +8,7 @@
 #include "GA_QuickStep.generated.h"
 
 class UAnimMontage;
-class UAnimSequenceBase;
+class UAbilityTask_PlayMontageAndWait;
 
 UCLASS()
 class OVERCLOCK_API UGA_QuickStep : public UGA_SharedCooldownBase
@@ -36,9 +36,6 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Anim")
     FName MontageSlot = FName(TEXT("FullBody"));
 
-    UPROPERTY(EditDefaultsOnly, Category = "Roll|Anim")
-    float PlayRate = 1.f;
-
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Move")
     float RollDistance = 600.f;
 
@@ -65,4 +62,11 @@ private:
 
     UFUNCTION() void OnMontageCompleted();
     UFUNCTION() void OnMontageInterrupted();
+
+    UPROPERTY(EditDefaultsOnly, Category = "Anim|Montage")
+    TObjectPtr<UAnimMontage> DynMontage = nullptr;
+
+    UAbilityTask_PlayMontageAndWait* PlayMontageTask(UAnimMontage* Montage, float PlayRate = 1.f,
+        FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float RootMotionScale = 1.f,
+        float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false) const;
 };

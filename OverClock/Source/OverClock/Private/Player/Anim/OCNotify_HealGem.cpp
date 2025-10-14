@@ -1,6 +1,6 @@
 #include "Player/Anim/OCNotify_HealGem.h"
 
-#include "Player/OCTheFey.h"
+#include "Player/OCFey.h"
 
 void UOCNotify_HealGem::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference)
@@ -9,7 +9,7 @@ void UOCNotify_HealGem::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 	AActor* Actor = MeshComp->GetAttachParentActor();
 	if (!Actor) return;
 
-	if (AOCTheFey* TheFey = Cast<AOCTheFey>(Actor))
+	if (AOCFey* TheFey = Cast<AOCFey>(Actor))
 	{
 		// 투사체 발사
 		if (TheFey->HasAuthority())
@@ -19,7 +19,7 @@ void UOCNotify_HealGem::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 	}
 }
 
-void UOCNotify_HealGem::LaunchMissile(AOCTheFey* Fey)
+void UOCNotify_HealGem::LaunchMissile(AOCFey* Fey)
 {
 	if (!Fey) return;
 	AOCGemMissile* Missile = Fey->GetGemMissileFromPool();

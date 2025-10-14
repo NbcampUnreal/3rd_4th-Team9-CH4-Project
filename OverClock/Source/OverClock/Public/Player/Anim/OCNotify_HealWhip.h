@@ -4,7 +4,7 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "OCNotify_HealWhip.generated.h"
 
-class AOCTheFey;
+class AOCFey;
 class AOCWhipMissile;
 
 UCLASS()
@@ -14,7 +14,7 @@ class OVERCLOCK_API UOCNotify_HealWhip : public UAnimNotify
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,const FAnimNotifyEventReference& EventReference) override;
 
-	void LaunchMissile(AOCTheFey* Fey);
+	void LaunchMissile(AOCFey* Fey);
 
 	FVector GetDirection(AActor* InAvatar, FVector SpawnLocation);
 
