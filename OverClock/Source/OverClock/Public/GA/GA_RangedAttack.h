@@ -8,13 +8,8 @@
 class UOCAnimDataAsset;
 class UAnimMontage;
 class UGameplayEffect;
+class UAbilityTask_PlayMontageAndWait;
 
-/**
- * 좌클릭 사격: 1발 = 1애니메이션 (재생 중 재발동 금지는 '쿨타임 GE'로 처리)
- * - AnimDataAsset의 PrimaryAttack 사용(시퀀스면 동적 몽타주로 변환)
- * - 재생만 하고 즉시 EndAbility (상태 태그 잔류 없음)
- * - 쿨타임은 몽타주 길이/PlayRate 만큼 런타임에서 Duration을 오버라이드하여 부여
- */
 UCLASS()
 class OVERCLOCK_API UGA_RangedAttack : public UGameplayAbility
 {
@@ -52,10 +47,6 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Anim")
     FName DynamicMontageSlotName = FName(TEXT("UpperBody"));
 
-    UPROPERTY(EditDefaultsOnly, Category = "Anim")
-    float PlayRate = 1.f;
-
-    //line trace
 protected:
     void PerformCameraTraceAndFire(
         const FGameplayAbilitySpecHandle Handle,
@@ -81,4 +72,11 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
     float BaseDamage = 10.0f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Barrier|Montage")
+    TObjectPtr<UAnimMontage> DynMontage = nullptr;
+
+    UAbilityTask_PlayMontageAndWait* PlayMontageTask(UAnimMontage* Montage, float PlayRate = 1.f, 
+        FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float RootMotionScale = 1.f, 
+        float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false) const;
 };

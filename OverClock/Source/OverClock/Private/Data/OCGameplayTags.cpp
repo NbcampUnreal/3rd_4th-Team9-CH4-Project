@@ -45,13 +45,16 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Mobility_Dash,          "Ability.Mobility.Dash");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet,           "Ability.DeadlyBullet");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack,	  	   "Ability.RangedAttack"); // (임시/특수기 명시)
-	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload,	  	   		   "Ability.Reload");
 	
 	/*The Fey Skill*/
 	UE_DEFINE_GAMEPLAY_TAG(Ability_HealWhip,			   "Ability.HealWhip")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_HealGem,				   "Ability.HealGem")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_PoisonSeed,			   "Ability.PoisonSeed")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_WildStorm,			   "Ability.WildStorm")
+
+	/*The TwinBlasst Skill*/
+	UE_DEFINE_GAMEPLAY_TAG(Ability_VoltexGrenade,		   "Ability.VoltexGrenade")	//twin
+	UE_DEFINE_GAMEPLAY_TAG(Ability_QuickStep,			   "Ability.QuickStep")
 
 	/* Ultimate */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_Earthshatter,  "Ability.Ult.Earthshatter");
@@ -93,6 +96,8 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Control_Mark,   "Cooldown.Control.Mark");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Area_Zone,      "Cooldown.Area.Zone");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Ult,            "Cooldown.Ult");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_QuickStep,		"Cooldown.QuickStep")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_VoltexGrenade,	"Cooldown.VoltexGrenade")
 
 #pragma endregion
 	

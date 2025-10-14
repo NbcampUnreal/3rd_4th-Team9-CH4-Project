@@ -58,6 +58,4 @@ protected:
 
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_ExplosionFX(const FVector_NetQuantize Location);
-
-    
 };

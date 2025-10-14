@@ -31,61 +31,15 @@ void UGA_QuickStep::ActivateAbility(
         return;
     }
 
-    AOCCharacterBase* Char = Cast<AOCCharacterBase>(ActorInfo->AvatarActor.Get());
-    USkeletalMeshComponent* Mesh = Char->GetMesh();
-    UAnimInstance* Anim = Mesh->GetAnimInstance();
-
-    FVector Dir = FVector::ZeroVector;
-    if (const UCharacterMovementComponent* Move = Char->GetCharacterMovement())
+    if (DynMontage)
     {
-        Dir = FVector(Move->GetLastInputVector().X, Move->GetLastInputVector().Y, 0.f);
+        if (UAbilityTask_PlayMontageAndWait* Task = PlayMontageTask(DynMontage))
+        {
+            Task->OnCompleted.AddDynamic(this, &ThisClass::OnMontageCompleted);
+            Task->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageInterrupted);
+            Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageInterrupted);
+        }
     }
-    if (Dir.IsNearlyZero())
-    {
-        const FVector LMIV = Char->GetLastMovementInputVector();
-        Dir = FVector(LMIV.X, LMIV.Y, 0.f);
-    }
-    if (Dir.IsNearlyZero())
-    {
-        const FVector V = Char->GetVelocity();
-        Dir = FVector(V.X, V.Y, 0.f);
-    }
-    if (Dir.IsNearlyZero())
-    {
-        Dir = FVector(Char->GetControlRotation().Vector().X, Char->GetControlRotation().Vector().Y, 0.f);
-    }
-    if (Dir.IsNearlyZero())
-    {
-        Dir = FVector(Char->GetActorForwardVector().X, Char->GetActorForwardVector().Y, 0.f);
-    }
-    Dir.Normalize();
-
-    UAnimSequenceBase* UseSeq = ChooseSequenceForDirection(Char, Dir);
-
-    UAnimMontage* DynMontage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(UseSeq, MontageSlot, 0.05f, 0.05f, PlayRate, 1, 0.f, 0.f);
-
-    UAbilityTask_PlayMontageAndWait* PlayTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, DynMontage, PlayRate, NAME_None, true, 1.f, 0.f, 0.f);
-
-    PlayTask->OnCompleted.AddDynamic(this, &UGA_QuickStep::OnMontageCompleted);
-    PlayTask->OnBlendOut.AddDynamic(this, &UGA_QuickStep::OnMontageCompleted);
-    PlayTask->OnInterrupted.AddDynamic(this, &UGA_QuickStep::OnMontageInterrupted);
-    PlayTask->OnCancelled.AddDynamic(this, &UGA_QuickStep::OnMontageInterrupted);
-    PlayTask->ReadyForActivation();
-
-    const FVector Start = Char->GetActorLocation();
-    const FVector Target = Start + (Dir * RollDistance);
-
-    UAbilityTask_ApplyRootMotionMoveToForce* MoveTask = UAbilityTask_ApplyRootMotionMoveToForce::ApplyRootMotionMoveToForce(
-        this, NAME_None,
-        Target, RollDuration,
-        false, EMovementMode::MOVE_Walking,
-        false,
-        nullptr,
-        ERootMotionFinishVelocityMode::MaintainLastRootMotionVelocity,
-        FVector::ZeroVector,
-        0.f);
-
-    MoveTask->ReadyForActivation();
 }
 
 UAnimSequence* UGA_QuickStep::ChooseSequenceForDirection(const ACharacter* Char, const FVector& WorldDir) const
@@ -142,4 +96,29 @@ void UGA_QuickStep::EndAbility(
         }
     }
     Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+UAbilityTask_PlayMontageAndWait* UGA_QuickStep::PlayMontageTask(UAnimMontage* Montage, float PlayRate,
+    FName StartSection, bool bStopWhenAbilityEnds, float RootMotionScale, float StartTimeSeconds,
+    bool bAllowInterruptAfterBlendOut) const
+{
+    if (!Montage) return nullptr;
+
+    UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+        const_cast<UGA_QuickStep*>(this),
+        NAME_None,
+        Montage,
+        PlayRate,
+        StartSection,
+        bStopWhenAbilityEnds,
+        RootMotionScale,
+        StartTimeSeconds,
+        bAllowInterruptAfterBlendOut
+    );
+
+    if (Task)
+    {
+        Task->ReadyForActivation();
+    }
+    return Task;
 }
