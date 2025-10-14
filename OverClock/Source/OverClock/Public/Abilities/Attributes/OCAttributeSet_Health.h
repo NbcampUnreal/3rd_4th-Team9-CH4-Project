@@ -11,7 +11,7 @@ class OVERCLOCK_API UOCAttributeSet_Health : public UOCAttributeSetBase
 	GENERATED_BODY()
 
 public:
-	UOCAttributeSet_Health(){}
+	UOCAttributeSet_Health();
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing=OnRef_Health)
 	FGameplayAttributeData Health;
@@ -20,6 +20,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing=OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
 	OC_ATTRIBUTE_ACCESSORS(UOCAttributeSet_Health, MaxHealth)
+
+	UPROPERTY(BlueprintReadOnly, Category="Meta")
+	FGameplayAttributeData IncomingDamage;
+	OC_ATTRIBUTE_ACCESSORS(UOCAttributeSet_Health, IncomingDamage)
 	
 	UFUNCTION()
 	void OnRef_Health(const FGameplayAttributeData& OldValue);
