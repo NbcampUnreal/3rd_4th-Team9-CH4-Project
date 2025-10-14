@@ -285,8 +285,8 @@ void AOCPlayerController::Server_EnsureAbilityGivenByTag_Implementation(FGamepla
 	}
 }
 
-void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*/)
-{
+//void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*/)
+//{
 // }
 // AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
 // if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_Attack] PS NULL")); return; }
@@ -319,11 +319,11 @@ void AOCPlayerController::Input_Attack_Pressed(const FInputActionValue& /*Value*
 // 		Server_EnsureAbilityGivenByTag(AttackTag);
 // 		Server_TryActivateByTag(AttackTag);
 // 	}
-}
+//}
 
 // ─────────────── Reload (R) ───────────────
-void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
-{
+//void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
+//{
 // 	AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
 // 	if (!PS) { UE_LOG(LogTemp, Warning, TEXT("[Input_RevReload] PS NULL")); return; }
 //
@@ -355,7 +355,7 @@ void AOCPlayerController::Input_Reload(const FInputActionValue& /*Value*/)
 // 		Server_EnsureAbilityGivenByTag(ReloadTag);
 // 		Server_TryActivateByTag(ReloadTag);
 // 	}
-}
+//}
 
 void AOCPlayerController::Server_TryActivateByTag_Implementation(FGameplayTag AbilityTag)
 {

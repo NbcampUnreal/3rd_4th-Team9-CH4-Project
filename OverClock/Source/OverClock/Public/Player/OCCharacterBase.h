@@ -30,19 +30,11 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
-<<<<<<< HEAD
-	FORCEINLINE FRotator GetAimRotation() const { return AimRotation; }
-
-	UFUNCTION(Server, Unreliable)
-	void ServerSetAimRotation(FRotator InAimRotation);
-
-=======
 	float GetAimPitch() const;
 	
 	UFUNCTION(Server, Unreliable)
 	void ServerSetAimPitch(float InAimPitch);
 	
->>>>>>> 5d8768ae (Aim로직 수정, NetFrequency 함수로 변경)
 	UFUNCTION()
 	FORCEINLINE FGameplayTag GetCurrentTag() const { return CharacterTag; }
 
@@ -99,6 +91,6 @@ protected:
 	float AimPitch;
 	float RotationTemp=0.f;
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	//TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> AbilityMapByTag;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> AbilityMapByTag;
 };

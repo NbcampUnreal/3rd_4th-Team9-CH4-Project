@@ -70,11 +70,8 @@ private:
 
 	void TriggerAbilityByTag(const FGameplayTag& AbilityTag);
 
-	UFUNCTION(Server, Reliable) void Server_EnsureAbilityGivenByTag(FGameplayTag AbilityTag);
-	UFUNCTION(Server, Reliable) void Server_TryActivateByTag(FGameplayTag AbilityTag);
-
-public:
-	UFUNCTION(Server, Reliable) void Server_ActivateSkill(TSubclassOf<UGameplayAbility> DeadlyBulletClass);
+//public:
+	//UFUNCTION(Server, Reliable) void Server_ActivateSkill(TSubclassOf<UGameplayAbility> DeadlyBulletClass);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
