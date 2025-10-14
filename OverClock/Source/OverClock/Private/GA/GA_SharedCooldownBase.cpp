@@ -10,7 +10,7 @@ UGA_SharedCooldownBase::UGA_SharedCooldownBase()
 {
     InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
-    SetByCaller_DurationKey = FGameplayTag::RequestGameplayTag(TEXT("Data.Cooldown.Duration"));
+    SetByCaller_DurationKey = FGameplayTag::RequestGameplayTag(TEXT("Data.Duration.Cooldown"));
 
     CooldownSeconds = FScalableFloat(5.0f);
 }

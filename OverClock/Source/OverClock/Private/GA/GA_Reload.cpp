@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "Animation/AnimMontage.h"
 #include "Player/OCRevenant.h"
+#include "Player/OCCharacterBase.h"
 #include "Player/Anim/OCAnimStruct.h"
 #include "Player/Anim/OCAnimDataAsset.h"
 #include "Component/WeaponAmmoComponent.h"
@@ -28,18 +29,24 @@ void UGA_Reload::ActivateAbility(
 		return;
 	}
 
-	ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.Weapon.Reload")));
+	const AOCCharacterBase* Char = Cast<AOCCharacterBase>(ActorInfo->AvatarActor.Get());
+	const FGameplayTag CharTypeTag = Char->GetCurrentTag();
+
+	const FGameplayTag* ReloadCueTag = ReloadCueByType.Find(CharTypeTag);
+	FGameplayCueParameters Params;
+	Params.SourceObject = Char->GetMesh();
+	ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(*ReloadCueTag, Params);
+	
 	//Animation
-	const AOCRevenant* Rev = CastChecked<AOCRevenant>(ActorInfo->AvatarActor.Get());
-
-	const FOCAnimStruct* AS = Rev->GetAnimDataAsset()->CharacterAnimations.Find(Rev->GetCharacterTypeTag());
-
+	const FOCAnimStruct* AS = Char->GetAnimDataAsset()->CharacterAnimations.Find(CharTypeTag);
 	UAnimMontage* Montage = UAnimMontage::CreateSlotAnimationAsDynamicMontage(AS->Reload, DynamicMontageSlotName, 0.2f, 0.2f, PlayRate, 1, 0.f, 0.f);
 
 	// 애니 끝날 때까지 능력은 "활성(active)" 상태로 유지 → BlockAbilitiesWithTag/ActivationOwnedTags가 살아있음
 	UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Montage, PlayRate, NAME_None, /*bStopWhenAbilityEnds=*/true, 1.f, 0.f);
 
 	Task->OnCompleted.AddDynamic(this, &UGA_Reload::OnMontageCompleted);
+
+	Task->OnBlendOut.AddDynamic(this, &UGA_Reload::OnMontageCompleted);
 
 	Task->OnInterrupted.AddDynamic(this, &UGA_Reload::OnMontageInterrupted);
 
@@ -50,18 +57,25 @@ void UGA_Reload::ActivateAbility(
 
 void UGA_Reload::OnMontageCompleted()
 {
+	AOCRevenant* Rev = Cast<AOCRevenant>(CurrentActorInfo->AvatarActor.Get());
 	if (CurrentActorInfo->IsNetAuthority())
 	{
-		if (AOCRevenant* Rev = Cast<AOCRevenant>(CurrentActorInfo->AvatarActor.Get()))
+		if (UWeaponAmmoComponent* Ammo = Rev->WeaponAmmoComp)
 		{
-			if (UWeaponAmmoComponent* Ammo = Rev->WeaponAmmoComp)  // ← 캐시 포인터만 사용
-			{
-				int32 Before = Ammo->CurrentAmmo;
-				Ammo->RefillAmmo(); // 내부에서 Max(=6)로 클램프
-				UE_LOG(LogTemp, Log, TEXT("[Reload] %d -> %d / Max=%d"), Before, Ammo->CurrentAmmo, Ammo->MaxAmmo);
+			const int32 Before = Ammo->CurrentAmmo;
+			if (Before < Ammo->MaxAmmo) 
+			{ 
+				Ammo->RefillAmmo(); 
 			}
-			else { UE_LOG(LogTemp, Warning, TEXT("[Reload] WeaponAmmo null from Character cache")); }
 		}
+	}
+	else
+	{
+		if (UWeaponAmmoComponent* Ammo = Rev->WeaponAmmoComp)
+		{
+			Ammo->SetCurrentAmmo();
+		}
+		Rev->Server_RequestReloadRefill();
 	}
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, /*bReplicateEndAbility=*/true, /*bWasCancelled=*/false);
 }
@@ -78,5 +92,13 @@ void UGA_Reload::EndAbility(
 	bool bReplicateEndAbility,
 	bool bWasCancelled)
 {
+	if (ActorInfo && ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		const FGameplayTag Lock = FGameplayTag::RequestGameplayTag(TEXT("State.ActionLock"));
+		if (ActorInfo->AbilitySystemComponent->HasMatchingGameplayTag(Lock))
+		{
+			ActorInfo->AbilitySystemComponent->RemoveLooseGameplayTag(Lock);
+		}
+	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

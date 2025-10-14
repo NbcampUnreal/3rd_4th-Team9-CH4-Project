@@ -10,31 +10,31 @@ class USoundBase;
 class USoundAttenuation;
 class USoundConcurrency;
 class USkeletalMeshComponent;
+class UReloadSoundDataAsset;
 
 UCLASS()
 class OVERCLOCK_API UGC_Reload : public UGameplayCueNotify_Burst
 {
 	GENERATED_BODY()
 	
-public: 
+public:
 	virtual bool OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const override;
 
 protected:
-    UPROPERTY(EditDefaultsOnly, Category = "SFX")
-    USoundBase* ReloadSound = nullptr;
+	/** 태그별 리로드 사운드(필수: 항상 세팅됨) */
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	TObjectPtr<UReloadSoundDataAsset> SoundSet = nullptr;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Attach")
-    FName AttachSocket = FName(TEXT("Muzzle"));; // 예: "S_Mag"
+	/** 재생 옵션 */
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	float VolumeMultiplier = 1.f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "SFX")
-    float VolumeMultiplier = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	float PitchMultiplier = 1.f;
 
-    UPROPERTY(EditDefaultsOnly, Category = "SFX")
-    float PitchMultiplier = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	TObjectPtr<USoundAttenuation> AttenuationSettings = nullptr;
 
-    UPROPERTY(EditDefaultsOnly, Category = "SFX")
-    TObjectPtr<USoundAttenuation> AttenuationSettings = nullptr;
-
-    UPROPERTY(EditDefaultsOnly, Category = "SFX")
-    TObjectPtr<USoundConcurrency> ConcurrencySettings = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	TObjectPtr<USoundConcurrency> ConcurrencySettings = nullptr;
 };

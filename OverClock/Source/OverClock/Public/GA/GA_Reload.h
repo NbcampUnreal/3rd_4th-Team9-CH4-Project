@@ -45,6 +45,9 @@ private:
     UFUNCTION() 
     void OnMontageInterrupted();
 
+    UPROPERTY(EditDefaultsOnly, Category = "Cue")
+    TMap<FGameplayTag, FGameplayTag> ReloadCueByType;
+
     UPROPERTY(EditDefaultsOnly, Category = "Anim")
     FName DynamicMontageSlotName = FName(TEXT("UpperBody"));
 

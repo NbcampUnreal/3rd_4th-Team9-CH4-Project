@@ -41,5 +41,8 @@ struct FOCAnimStruct
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimSequenceBase> Skill1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UAnimSequenceBase> Skill2;
 	// 필요한 다른 애니메이션들도 추가
 };

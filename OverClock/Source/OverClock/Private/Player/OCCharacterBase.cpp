@@ -1,68 +1,71 @@
+// AOCCharacterBase.cpp
 #include "Player/OCCharacterBase.h"
-#include "GameFramework/PlayerState.h"
-#include "AbilitySystemComponent.h"
-#include "GameplayAbilitySpec.h"
-#include "EnhancedInputComponent.h"
 #include "Player/OCPlayerState.h"
-#include "Data/DA_OCInputConfig.h"
-#include "Data/DA_OCHeroStartUpData.h"
 
+#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+
+#include "AbilitySystemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AOCCharacterBase::AOCCharacterBase()
+	: WalkSpeed(600.f)
+	, RunSpeed(900.f)
+	, JumpVelocity(600.f)
+	, AimRotation(FRotator::ZeroRotator)
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(GetMesh(), TEXT("Eyes_Position"));
+	SpringArm->TargetArmLength = 0.f;
+	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->bInheritPitch = true;
+	SpringArm->bInheritYaw = true;
+	SpringArm->bInheritRoll = false;
+
+	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComp->SetupAttachment(SpringArm);
+	CameraComp->bUsePawnControlRotation = true;
+
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	GetCharacterMovement()->JumpZVelocity = JumpVelocity;
+}
+
+void AOCCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AOCCharacterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (HasAuthority())
+	{
+		ServerSetAimRotation_Implementation(GetControlRotation());
+	}
 }
 
 UAbilitySystemComponent* AOCCharacterBase::GetAbilitySystemComponent() const
 {
-	if (UAbilitySystemComponent* ASC = GetASC())
+	if (const AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
 	{
-		return ASC;
+		return PS->GetAbilitySystemComponent();
 	}
 	return nullptr;
-}
-
-void AOCCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-
-	ResolveData();
-	if (!InputConfig) return;
-
-	if (UInputAction* InputAction = InputConfig->FindNativeInputActionByTag(FGameplayTag::RequestGameplayTag(TEXT("Input.Move"))))
-	{
-		EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &AOCCharacterBase::Input_Move);
-	}
-	if (UInputAction* InputAction = InputConfig->FindNativeInputActionByTag(FGameplayTag::RequestGameplayTag(TEXT("Input.Look"))))
-	{
-		EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &AOCCharacterBase::Input_Look);
-	}
-	if (UInputAction* InputAction = InputConfig->FindNativeInputActionByTag(FGameplayTag::RequestGameplayTag(TEXT("Input.Jump"))))
-	{
-		EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &AOCCharacterBase::Input_Jump_Pressed);
-		EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &AOCCharacterBase::Input_Jump_Released);
-	}
-
-	AutoBindAbilityInputs(EnhancedInputComponent);
-	
 }
 
 void AOCCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	InitASCFromPalyerState();
-
-	if (HasAuthority())
+	if (AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
 	{
-		ResolveData();
-		if (UAbilitySystemComponent* ASC = GetASC())
+		PS->InitASCForAvatar(this);
+		if (HasAuthority())
 		{
-			if (HeroStartUpData)
-			{
-				
-			}
+			GiveStartupAbilities();
 		}
 	}
 }
@@ -70,202 +73,97 @@ void AOCCharacterBase::PossessedBy(AController* NewController)
 void AOCCharacterBase::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	
-	InitASCFromPalyerState();
-}
 
-void AOCCharacterBase::Input_Move(const FInputActionValue& Value)
-{
-	const FVector2D MovementVector = Value.Get<FVector2D>();
-	if (MovementVector.IsNearlyZero()) return;
-	
-	const FRotator MovementRotation = FRotator(0.0f, GetControlRotation().Yaw, 0.0f);
-
-	if (!FMath::IsNearlyZero(MovementVector.X))
-	{
-		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
-		AddMovementInput(ForwardDirection, MovementVector.X);
-	}
-
-	if (!FMath::IsNearlyZero(MovementVector.Y))
-	{
-		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
-		AddMovementInput(RightDirection, MovementVector.Y);
-	} 
-}
-
-void AOCCharacterBase::Input_Look(const FInputActionValue& Value)
-{
-	const FVector2D LookVector = Value.Get<FVector2D>();
-
-	if (!FMath::IsNearlyZero(LookVector.X))
-	{
-		AddControllerYawInput(LookVector.X);
-	}
-
-	if (!FMath::IsNearlyZero(LookVector.Y))
-	{
-		AddControllerPitchInput(LookVector.Y);
-	}
-}
-
-void AOCCharacterBase::Input_Jump_Pressed(const FInputActionValue& Value)
-{
-	Jump();
-}
-
-void AOCCharacterBase::Input_Jump_Released(const FInputActionValue& Value)
-{
-	StopJumping();
-}
-
-void AOCCharacterBase::Input_Ability_Pressed(const FGameplayTag& InInputTag)
-{
-	if (!InInputTag.IsValid()) return;
-
-	if (UAbilitySystemComponent* ASC = GetASC())
-	{
-		if (IsLocallyControlled())
-		{
-			for (FGameplayAbilitySpec& Spec : ASC->GetActivatableAbilities())
-			{
-				if (Spec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
-				{
-					ASC->AbilitySpecInputPressed(Spec);
-					if (!Spec.IsActive())
-					{
-						ASC->TryActivateAbility(Spec.Handle);
-					}
-				}
-			}
-		}
-		Server_Ability_Pressed(InInputTag);
-	}
-}
-
-void AOCCharacterBase::Input_Ability_Released(const FGameplayTag& InInputTag)
-{
-	if (!InInputTag.IsValid()) return;
-
-	if (UAbilitySystemComponent* ASC = GetASC())
-	{
-		if (IsLocallyControlled())
-		{
-			for (FGameplayAbilitySpec& Spec : ASC->GetActivatableAbilities())
-			{
-				if (Spec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
-				{
-					ASC->AbilitySpecInputReleased(Spec);
-				}
-			}
-		}
-		Server_Ability_Released(InInputTag);
-	}
-}
-
-void AOCCharacterBase::InitASCFromPalyerState()
-{
 	if (AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
 	{
 		PS->InitASCForAvatar(this);
-		ASCWeak = PS->GetAbilitySystemComponent();
-	}
-	else
-	{
-		ASCWeak.Reset();
 	}
 }
 
-void AOCCharacterBase::ResolveData()
+void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (!InputConfig && InputConfigAsset.IsValid())
-	{
-		InputConfig = InputConfigAsset.Get();
-	}
-	if (!InputConfig && InputConfigAsset.ToSoftObjectPath().IsValid())
-	{
-		InputConfig = Cast<UDA_OCInputConfig>(InputConfigAsset.LoadSynchronous());
-	}
-
-	if (!HeroStartUpData && HeroStartUpDataAsset.IsValid())
-	{
-		HeroStartUpData = HeroStartUpDataAsset.Get();
-	}
-	if (!HeroStartUpData && HeroStartUpDataAsset.ToSoftObjectPath().IsValid())
-	{
-		HeroStartUpData = Cast<UDA_OCHeroStartUpData>(HeroStartUpDataAsset.LoadSynchronous());
-	}
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AOCCharacterBase, AimRotation);
 }
 
-void AOCCharacterBase::AutoBindAbilityInputs(UEnhancedInputComponent* EnhancedInputComponent)
+void AOCCharacterBase::ServerSetAimRotation_Implementation(FRotator InAimRotation)
 {
-	UAbilitySystemComponent* ASC = GetASC();
-	if (!ASC || !InputConfig) return;
-
-	TArray<FGameplayAbilitySpec*> AbilitySpecs;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(FGameplayTagContainer(), AbilitySpecs, false);
-
-	for (FGameplayAbilitySpec* Spec : AbilitySpecs)
-	{
-		if (!Spec) continue;
-
-		const FGameplayTagContainer& SourceTags = Spec->GetDynamicSpecSourceTags();
-		for (const FGameplayTag& Tag : SourceTags)
-		{
-			if (!Tag.IsValid()) continue;
-
-			if (UInputAction* InputAction = InputConfig->FindAbilityInputActionByTag(Tag))
-			{
-				
-			}
-		}
-	}
+	AimRotation = InAimRotation;
 }
 
-UAbilitySystemComponent* AOCCharacterBase::GetASC() const
+TSubclassOf<UGameplayAbility> AOCCharacterBase::GetAbilityClassByTag(FGameplayTag AbilityTag) const
 {
-	if (ASCWeak.IsValid())
+	if (const TSubclassOf<UGameplayAbility>* Found = AbilityMapByTag.Find(AbilityTag))
 	{
-		return ASCWeak.Get();
+		return *Found;
 	}
-
-	if (const AOCPlayerState* PS = GetPlayerState<AOCPlayerState>())
-	{
-		return PS->GetAbilitySystemComponent();
-	}
-	
 	return nullptr;
 }
 
-void AOCCharacterBase::Server_Ability_Pressed_Implementation(const FGameplayTag& InInputTag)
+void AOCCharacterBase::GiveStartupAbilities()
 {
-	if (!InInputTag.IsValid()) return;
-	if (UAbilitySystemComponent* ASC = GetASC())
+	if (!HasAuthority()) return;
+
+	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
 	{
-		for (FGameplayAbilitySpec& Spec : ASC->GetActivatableAbilities())
+		for (const TPair<FGameplayTag, TSubclassOf<UGameplayAbility>>& Pair : AbilityMapByTag)
 		{
-			if (Spec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
+			if (!Pair.Value) continue;
+
+			FGameplayAbilitySpec Spec(Pair.Value, 1, INDEX_NONE, this);
+			Spec.DynamicAbilityTags.AddTag(Pair.Key);
+
+			ASC->GiveAbility(Spec);
+		}
+	}
+}
+// ─────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────
+// [공통화] 몽타주 재생 멀티캐스트
+void AOCCharacterBase::Multicast_PlayMontage_Implementation(UAnimMontage* Montage, float InPlayRate, FName InSection)
+{
+	if (!Montage) return;
+
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
+		{
+			if (!Anim->Montage_IsPlaying(Montage))
 			{
-				ASC->AbilitySpecInputPressed(Spec);
-				if (!Spec.IsActive())
+				const float Ret = Anim->Montage_Play(Montage, InPlayRate);
+				if (Ret > 0.f && !InSection.IsNone() && Montage->IsValidSectionName(InSection))
 				{
-					ASC->TryActivateAbility(Spec.Handle);
+					Anim->Montage_JumpToSection(InSection, Montage);
 				}
 			}
 		}
 	}
 }
 
-void AOCCharacterBase::Server_Ability_Released_Implementation(const FGameplayTag& InInputTag)
+void AOCCharacterBase::Multicast_PlaySequenceAsDynamicMontage_Implementation(
+	UAnimSequenceBase* Source, FName SlotName, float InPlayRate, FName Section)
 {
-	if (!InInputTag.IsValid()) return;
-	if (UAbilitySystemComponent* ASC = GetASC())
+	if (!Source) return;
+
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
 	{
-		for (FGameplayAbilitySpec& Spec : ASC->GetActivatableAbilities())
+		if (UAnimInstance* Anim = MeshComp->GetAnimInstance())
 		{
-			if (Spec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
+			UAnimMontage* Dyn = UAnimMontage::CreateSlotAnimationAsDynamicMontage(
+				Source, SlotName, /*BlendIn*/0.2f, /*BlendOut*/0.2f,
+				/*PlayRate*/FMath::Max(InPlayRate, 0.01f),
+				/*LoopCount*/1, /*BlendOutTriggerTime*/0.f, /*InTimeToStartMontageAt*/0.f);
+
+			if (!Dyn) return;
+
+			if (!Anim->Montage_IsPlaying(Dyn))
 			{
-				ASC->AbilitySpecInputReleased(Spec);
+				const float Ret = Anim->Montage_Play(Dyn, 1.f);
+				if (Ret > 0.f && !Section.IsNone() && Dyn->IsValidSectionName(Section))
+				{
+					Anim->Montage_JumpToSection(Section, Dyn);
+				}
 			}
 		}
 	}

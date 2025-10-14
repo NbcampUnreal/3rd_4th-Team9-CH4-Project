@@ -32,6 +32,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon|Ammo")
 	void RefillAmmo();
 
+	void SetCurrentAmmo();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

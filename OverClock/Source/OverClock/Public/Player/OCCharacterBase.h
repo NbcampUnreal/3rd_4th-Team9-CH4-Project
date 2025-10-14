@@ -3,12 +3,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Abilities/GameplayAbility.h"
+#include "GameplayTagContainer.h"
 #include "OCCharacterBase.generated.h"
 
-struct FInputActionValue;
-struct FGameplayTag;
-class UDA_OCInputConfig;
-class UDA_OCHeroStartUpData;
+class UOCAnimDataAsset;
+class UCameraComponent;
+class UAbilitySystemComponent;
+class AOCPlayerState;
+class USpringArmComponent;
 
 UCLASS()
 class OVERCLOCK_API AOCCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -18,51 +21,62 @@ class OVERCLOCK_API AOCCharacterBase : public ACharacter, public IAbilitySystemI
 public:
 	AOCCharacterBase();
 
-	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION()
+	FORCEINLINE FRotator GetAimRotation() const { return AimRotation; }
+
+	UFUNCTION(Server, Unreliable)
+	void ServerSetAimRotation(FRotator InAimRotation);
+
+	UFUNCTION()
+	FORCEINLINE FGameplayTag GetCurrentTag() const { return CharacterTag; }
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	TSubclassOf<UGameplayAbility> GetAbilityClassByTag(FGameplayTag AbilityTag) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	virtual void GiveStartupAbilities();
 	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(class UAnimMontage* Montage, float InPlayRate, FName InSection);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlaySequenceAsDynamicMontage(class UAnimSequenceBase* Source, FName SlotName, float InPlayRate, FName Section);
+
+	UFUNCTION(BlueprintCallable) 
+	FORCEINLINE UOCAnimDataAsset* GetAnimDataAsset() const { return OCAnimDataAsset; }
+
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TSoftObjectPtr<UDA_OCInputConfig> InputConfigAsset;
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(Transient)
-	TObjectPtr<UDA_OCInputConfig> InputConfig = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	TObjectPtr<UCameraComponent> CameraComp;
 
-	UPROPERTY(EditDefaultsOnly, Category="Hero")
-	TSoftObjectPtr<UDA_OCHeroStartUpData> HeroStartUpDataAsset;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	USpringArmComponent* SpringArm;
 
-	UPROPERTY(Transient)
-	TObjectPtr<UDA_OCHeroStartUpData> HeroStartUpData = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DataAsset")
+	TObjectPtr<UOCAnimDataAsset> OCAnimDataAsset;
 
-	TWeakObjectPtr<UAbilitySystemComponent> ASCWeak;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Character")
+	FGameplayTag CharacterTag;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float WalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float RunSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float JumpVelocity;
 
-#pragma region Input_Function
-	void Input_Move(const FInputActionValue& Value);
-	void Input_Look(const FInputActionValue& Value);
-	void Input_Jump_Pressed(const FInputActionValue& Value);
-	void Input_Jump_Released(const FInputActionValue& Value);
-	
-	UFUNCTION()
-	void Input_Ability_Pressed(const FGameplayTag& InInputTag);
+	UPROPERTY(Replicated)
+	FRotator AimRotation;
 
-	UFUNCTION()
-	void Input_Ability_Released(const FGameplayTag& InInputTag);
-
-	UFUNCTION(Server, Reliable)
-	void Server_Ability_Pressed(const FGameplayTag& InInputTag);
-	
-	UFUNCTION(Server, Reliable)
-	void Server_Ability_Released(const FGameplayTag& InInputTag);
-#pragma endregion
-
-	void InitASCFromPalyerState();
-	void ResolveData();
-	void AutoBindAbilityInputs(UEnhancedInputComponent* EnhancedInputComponent);
-
-	UAbilitySystemComponent* GetASC() const;
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> AbilityMapByTag;
 };
