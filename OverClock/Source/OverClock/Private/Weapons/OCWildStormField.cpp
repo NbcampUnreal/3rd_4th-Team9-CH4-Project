@@ -34,7 +34,7 @@ void AOCWildStormField::BeginPlay()
 	GetWorldTimerManager().SetTimer(
 		GETimer, 
 		this, 
-		&AOCWildStormField::ApplyGE, 
+		&AOCWildStormField::ApplyGE,
 		1.0f,
 		true
 	);
