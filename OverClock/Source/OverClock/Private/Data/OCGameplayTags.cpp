@@ -46,6 +46,12 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_DeadlyBullet,           "Ability.DeadlyBullet");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_RangedAttack,	  	   "Ability.RangedAttack"); // (임시/특수기 명시)
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload,	  	   		   "Ability.Reload");
+	
+	/*The Fey Skill*/
+	UE_DEFINE_GAMEPLAY_TAG(Ability_HealWhip,			   "Ability.HealWhip")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_HealGem,				   "Ability.HealGem")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_PoisonSeed,			   "Ability.PoisonSeed")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_WildStorm,			   "Ability.WildStorm")
 
 	/* Ultimate */
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Ult_Earthshatter,  "Ability.Ult.Earthshatter");
