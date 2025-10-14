@@ -1,6 +1,15 @@
 #include "Abilities/Attributes/OCAttributeSet_Health.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+#include "Data/OCGameplayTags.h"
+
+UOCAttributeSet_Health::UOCAttributeSet_Health()
+{
+	InitHealth(100.f);
+	InitMaxHealth(100.f);
+	IncomingDamage.SetBaseValue(0.f);
+	IncomingDamage.SetCurrentValue(0.f);
+}
 
 void UOCAttributeSet_Health::OnRef_Health(const FGameplayAttributeData& OldValue)
 {
@@ -35,7 +44,29 @@ void UOCAttributeSet_Health::PostGameplayEffectExecute(const FGameplayEffectModC
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		const float Damage = IncomingDamage.GetCurrentValue();
+		if (Damage > 0.f)
+		{
+			const float NewHP = FMath::Clamp(Health.GetCurrentValue() - Damage, 0.f, MaxHealth.GetCurrentValue());
+			Health.SetCurrentValue(NewHP);
+			Health.SetBaseValue(NewHP);
+			
+			IncomingDamage.SetCurrentValue(0.f);
+			IncomingDamage.SetBaseValue(0.f);
+			
+			if (NewHP <= 0.f)
+			{
+				if (UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
+				{
+					ASC->AddLooseGameplayTag(OCGameplayTags::State_Dead);
+					ASC->RemoveLooseGameplayTag(OCGameplayTags::State_Alive);
+				}
+			}
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		HandleHealthChanged(Data);
 	}
