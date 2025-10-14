@@ -4,7 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "OverClockStructTypes.generated.h"
 
-class UOCGameplayAbility;
+class UGameplayAbility;
 
 USTRUCT(BlueprintType)
 struct FOCAbilitySet
@@ -15,7 +15,7 @@ struct FOCAbilitySet
 	FGameplayTag InputTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UOCGameplayAbility> AbilityToGrant;
+	TSubclassOf<UGameplayAbility> AbilityToGrant;
 
 	bool IsValid() const;
 };

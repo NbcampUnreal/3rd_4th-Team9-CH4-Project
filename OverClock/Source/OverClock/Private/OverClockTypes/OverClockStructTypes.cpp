@@ -1,5 +1,5 @@
 #include "OverClockTypes/OverClockStructTypes.h"
-#include "Abilities/OCGameplayAbility.h"
+#include "Abilities/GameplayAbility.h"
 
 bool FOCAbilitySet::IsValid() const
 {
