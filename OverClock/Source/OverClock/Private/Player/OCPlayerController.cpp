@@ -21,48 +21,38 @@ AOCPlayerController::AOCPlayerController()
     bReplicates = true;
 }
 
-void AOCPlayerController::BeginPlay()
-{
-    Super::BeginPlay();
-}
-
 void AOCPlayerController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
-    
-    UInputMappingContext* IMC = ResolvePawnMappingContext(InPawn);
-    
-    if (!IMC && FallbackMappingContext)
-    {
-        IMC = FallbackMappingContext;
-    }
-    
-    ApplyMappingContext(IMC,0);
 
-	// PS(Owner)에 ASC가 붙어있다는 가정 → Avatar를 현재 Pawn으로 초기화
-	// if (APlayerState* PS = GetPlayerState<APlayerState>())
-	// {
-	// 	 GetASC()->InitAbilityActorInfo(PS, InPawn);
-	// }
+	if (IsLocalController() && InPawn)
+	{
+		ApplyIMCForPawn(InPawn);
+		SetInputMode(FInputModeGameOnly{});
+		bShowMouseCursor = false;
+	}
+}
 
-	//GA 부여 로직
-	// Ability Tag : Character Tag / AbilityStruct : Character의 GA Struct
-	// if (AOCCharacterBase* C = Cast<AOCCharacterBase>(InPawn))
-	// {
-	// 	if (AbilityDataAsset)
-	// 	{
-	// 		AbilityStruct = AbilityDataAsset->CharacterAbilityTags[C->GetCurrentTag()];
+void AOCPlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
 
-	// 		return;
-	// 	}
-	// }
+	if (IsLocalController() && GetPawn())
+	{
+		ApplyIMCForPawn(GetPawn());
+		SetInputMode(FInputModeGameOnly{});
+		bShowMouseCursor = false;
+	}
 }
 
 void AOCPlayerController::OnUnPossess()
 {
-    RemoveMappingContext();
-
     Super::OnUnPossess();
+
+	if (IsLocalController())
+	{
+		RemoveMappingContext();
+	}
 }
 
 
@@ -78,38 +68,41 @@ UInputMappingContext* AOCPlayerController::ResolvePawnMappingContext(APawn* InPa
         }
     }
     
-    return nullptr;
+    return FallbackMappingContext;
 }
 
-void AOCPlayerController::ApplyMappingContext(UInputMappingContext* IMC, int32 Priority)
+void AOCPlayerController::ApplyIMCForPawn(APawn* InPawn)
 {
-    if (!IMC) return;
-    
-    if (AppliedMappingContext == IMC)
-    {
-        return;
-    }
-    
-    RemoveMappingContext();
+	if (!IsLocalController() || !InPawn) return;
 
-    ULocalPlayer* LocalPlayer = GetLocalPlayer();
-    UEnhancedInputLocalPlayerSubsystem* Subsys = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+	ULocalPlayer* LocalPlayer = GetLocalPlayer();
+	if (!LocalPlayer) return;
 
-    check(Subsys);
-    
-    Subsys->AddMappingContext(IMC, Priority);
-    AppliedMappingContext = IMC;
+	UEnhancedInputLocalPlayerSubsystem* Subsys = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+
+	if (!Subsys) return;
+
+	RemoveMappingContext();
+
+	UInputMappingContext* IMC = ResolvePawnMappingContext(InPawn);
+
+	if (!IMC) return;
+
+	Subsys->AddMappingContext(IMC, MappingPriority);
+	AppliedMappingContext = IMC;
 }
 
 void AOCPlayerController::RemoveMappingContext()
 {
     if (!AppliedMappingContext) return;
 
-    ULocalPlayer* LocalPlayer = GetLocalPlayer();
-    UEnhancedInputLocalPlayerSubsystem* Subsys = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
-
-    check(Subsys);
-    
-    Subsys->RemoveMappingContext(AppliedMappingContext);
+    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+    {
+	    if (UEnhancedInputLocalPlayerSubsystem* Subsys = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+	    {
+		    Subsys->RemoveMappingContext(AppliedMappingContext);
+	    }
+    }
+	
     AppliedMappingContext = nullptr;
 }

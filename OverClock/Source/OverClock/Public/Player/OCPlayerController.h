@@ -23,9 +23,9 @@ class OVERCLOCK_API AOCPlayerController : public APlayerController
 
 public:
 	AOCPlayerController();
-
-	virtual void BeginPlay() override;
+	
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnRep_Pawn() override;
 	virtual void OnUnPossess() override;
 	
 protected:
@@ -34,18 +34,13 @@ protected:
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UInputMappingContext> AppliedMappingContext = nullptr;
-	
 
-private:
-	UInputMappingContext* ResolvePawnMappingContext(APawn* InPawn) const;
+	UPROPERTY(EditDefaultsOnly, Category="OC|Input")
+	int32 MappingPriority = 0;
 	
-	void ApplyMappingContext(UInputMappingContext* IMC, int32 Priority = 0);
+	UInputMappingContext* ResolvePawnMappingContext(APawn* InPawn) const;
+
+	void ApplyIMCForPawn(APawn* InPawn);
 	void RemoveMappingContext();
 	
-	// UPROPERTY(Replicated)
-	// FOCAbilityStruct AbilityStruct;
-	
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerData", meta = (AllowPrivateAccess = "true"))
-	// TObjectPtr<UOCAbilityDataAsset> AbilityDataAsset;
-
 };
