@@ -10,6 +10,7 @@
 #include "OverClockDebugHelper.h"
 #include "Abilities/OCMarkComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "AbilitySystemInterface.h"
 
 AOCCharacterBase::AOCCharacterBase()
 	:WalkSpeed(600.0f),
@@ -41,6 +42,7 @@ AOCCharacterBase::AOCCharacterBase()
 void AOCCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void AOCCharacterBase::Tick(float DeltaTime)
@@ -49,6 +51,25 @@ void AOCCharacterBase::Tick(float DeltaTime)
 	if (!HasAuthority())
 	{
 		UpdateRotation();
+	}
+}
+
+void AOCCharacterBase::OnStunTagChanged(const FGameplayTag GameplayTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+		{
+			MoveComp->DisableMovement();
+			MoveComp->StopMovementImmediately();
+		}
+	}
+	else
+	{
+		if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+		{
+			MoveComp->SetMovementMode(MOVE_Walking);
+		}
 	}
 }
 
@@ -72,6 +93,15 @@ void AOCCharacterBase::PossessedBy(AController* NewController)
 		{
 			GiveStartupAbilities();
 		}
+		
+		const FString ASCText = FString::Printf(TEXT("Owner Actor : %s, AvatarActor : %s"), *GetAbilitySystemComponent()->GetOwnerActor()->GetActorLabel(), *GetAbilitySystemComponent()->GetAvatarActor()->GetActorLabel());
+		Debug::Print(TEXT("Ability system component valid") + ASCText, FColor::Green);
+	}
+	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+	{
+		// ASC의 태그 변화 바인딩
+		ASC->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("State.Stun")), EGameplayTagEventType::NewOrRemoved)
+			.AddUObject(this, &AOCCharacterBase::OnStunTagChanged);
 	}
 	MarkComp->ASCBind();
 }

@@ -35,6 +35,10 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Reload, "Ability.Reload")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Skill1, "Ability.Skill1")
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Skill2, "Ability.Skill2")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_HealWhip, "Ability.HealWhip")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_HealGem, "Ability.HealGem")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_PoisonSeed, "Ability.PoisonSeed")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_WildStorm, "Ability.WildStorm")
 
 	/*State Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(State_Alive, "State.Alive")
@@ -45,6 +49,9 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_RangedAttack, "State.ActionLock.RangedAttack")
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_Reload, "State.ActionLock.Reload")
 	UE_DEFINE_GAMEPLAY_TAG(State_Twin_SpecialAmmo, "State.Twin.SpecialAmmo") // 윈도우 태그
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Hidden, "State.Weapon.Hidden")
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Scaling, "State.Weapon.Scaling")
+	UE_DEFINE_GAMEPLAY_TAG(State_Stun, "State.Stun")
 
 	/*Effect Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")
