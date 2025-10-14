@@ -1,10 +1,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Data/OCAbilityStruct.h"
+//#include "Abilities/GameplayAbility.h"
 #include "GameFramework/PlayerController.h"
 #include "OCPlayerController.generated.h"
 
 class UInputMappingContext;
+// class UAbilitySystemComponent;      // �������̽� ���漱��
+// class UOCAbilityDataAsset;
+// struct FGameplayTagContainer;
+// class UDA_OCInputConfig;
+// class UOCInputComponent;
 class UEnhancedInputLocalPlayerSubsystem;
 class UDA_OCInputConfig;
 
@@ -33,4 +41,11 @@ private:
 	
 	void ApplyMappingContext(UInputMappingContext* IMC, int32 Priority = 0);
 	void RemoveMappingContext();
+	
+	// UPROPERTY(Replicated)
+	// FOCAbilityStruct AbilityStruct;
+	
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerData", meta = (AllowPrivateAccess = "true"))
+	// TObjectPtr<UOCAbilityDataAsset> AbilityDataAsset;
+
 };

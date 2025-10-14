@@ -7,25 +7,15 @@
 #include "GameFramework/SpringArmComponent.h"
 
 #include "AbilitySystemComponent.h"
-<<<<<<< HEAD
-=======
 #include "OverClockDebugHelper.h"
 #include "Abilities/OCMarkComponent.h"
->>>>>>> 5d8768ae (Aim로직 수정, NetFrequency 함수로 변경)
 #include "Net/UnrealNetwork.h"
 
 AOCCharacterBase::AOCCharacterBase()
-<<<<<<< HEAD
-	: WalkSpeed(600.f)
-	, RunSpeed(900.f)
-	, JumpVelocity(600.f)
-	, AimRotation(FRotator::ZeroRotator)
-=======
 	:WalkSpeed(600.0f),
 	RunSpeed(900.0f),
 	JumpVelocity(600.0f),
 	AimPitch(0.f)
->>>>>>> 5d8768ae (Aim로직 수정, NetFrequency 함수로 변경)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -41,12 +31,9 @@ AOCCharacterBase::AOCCharacterBase()
 	CameraComp->SetupAttachment(SpringArm);
 	CameraComp->bUsePawnControlRotation = true;
 
-<<<<<<< HEAD
-=======
-	//MarkComp = CreateDefaultSubobject<UOCMarkComponent>(TEXT("StatusMark"));
-	//MarkComp->SetupAttachment(RootComponent);
+	MarkComp = CreateDefaultSubobject<UOCMarkComponent>(TEXT("StatusMark"));
+	MarkComp->SetupAttachment(RootComponent);
 	
->>>>>>> 5d8768ae (Aim로직 수정, NetFrequency 함수로 변경)
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = JumpVelocity;
 }
@@ -86,6 +73,7 @@ void AOCCharacterBase::PossessedBy(AController* NewController)
 			GiveStartupAbilities();
 		}
 	}
+	MarkComp->ASCBind();
 }
 
 void AOCCharacterBase::OnRep_PlayerState()

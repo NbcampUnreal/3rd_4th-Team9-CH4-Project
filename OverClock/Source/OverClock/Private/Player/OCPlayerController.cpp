@@ -4,6 +4,18 @@
 #include "Player/OCCharacterBase_V2.h"
 #include "Data/DA_OCInputConfig.h"
 
+// #include "InputActionValue.h"
+// #include "GameplayTagContainer.h"
+// #include "GameFramework/Pawn.h"
+// #include "GameFramework/Character.h"
+// #include "Player/OCCharacterBase.h"
+// #include "Player/OCPlayerState.h"
+// #include "GA/GA_RangedAttack.h"
+// #include "Abilities/OCAbilityDataAsset.h"
+// #include "GameFramework/InputSettings.h"
+// #include "Player/OCRevenant.h"
+// #include "OverClock.h"
+
 AOCPlayerController::AOCPlayerController()
 {
     bReplicates = true;
@@ -26,6 +38,24 @@ void AOCPlayerController::OnPossess(APawn* InPawn)
     }
     
     ApplyMappingContext(IMC,0);
+
+	// PS(Owner)에 ASC가 붙어있다는 가정 → Avatar를 현재 Pawn으로 초기화
+	// if (APlayerState* PS = GetPlayerState<APlayerState>())
+	// {
+	// 	 GetASC()->InitAbilityActorInfo(PS, InPawn);
+	// }
+
+	//GA 부여 로직
+	// Ability Tag : Character Tag / AbilityStruct : Character의 GA Struct
+	// if (AOCCharacterBase* C = Cast<AOCCharacterBase>(InPawn))
+	// {
+	// 	if (AbilityDataAsset)
+	// 	{
+	// 		AbilityStruct = AbilityDataAsset->CharacterAbilityTags[C->GetCurrentTag()];
+
+	// 		return;
+	// 	}
+	// }
 }
 
 void AOCPlayerController::OnUnPossess()
