@@ -1,7 +1,6 @@
 #include "GameEffects/GE_MarkEffect.h"
 
 #include "Abilities/OCRBMissile.h"
-#include "Data/OCGameplayTags.h"
 
 UGE_MarkEffect::UGE_MarkEffect()
 {
@@ -20,6 +19,3 @@ UGE_MarkEffect::UGE_MarkEffect()
 	// 표식 태그 부여
 	// FGameplayTag MarkTag = FGameplayTag::RequestGameplayTag(FName("State.Marked"));
 	// FGameplayTag EffectTag = FGameplayTag::RequestGameplayTag(FName("Effect.Mark"));
-
-
-//마크 태그가 들어오면 ? 컴포넌트가 캐릭터의 머리 위에 딱!

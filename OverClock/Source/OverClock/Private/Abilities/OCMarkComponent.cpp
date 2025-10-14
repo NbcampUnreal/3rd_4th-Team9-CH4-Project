@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "NiagaraSystem.h"
 
 UOCMarkComponent::UOCMarkComponent()
 {
