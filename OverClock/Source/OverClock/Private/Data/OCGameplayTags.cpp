@@ -48,6 +48,15 @@ namespace OCGameplayTags
 
 	/*Effect Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark, "Effect.Mark")
+	UE_DEFINE_GAMEPLAY_TAG(Effect_Fey_Heal, "Effect.Fey.Heal")
+	UE_DEFINE_GAMEPLAY_TAG(Effect_Fey_Deal, "Effect.Fey.Deal")
+	//temporary
+	UE_DEFINE_GAMEPLAY_TAG(Ability_PeaceKeeper, "Ability.PeaceKeeper")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_RevReload, "Ability.RevReload")
+	UE_DEFINE_GAMEPLAY_TAG(State_Firing, "State.Firing")
+	UE_DEFINE_GAMEPLAY_TAG(State_RevReloading, "State.RevReloading")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_PeaceKeeper, "Cooldown.PeaceKeeper")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RevReload, "Cooldown.RevReload")
 
 	//Cooldown Tag
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Rev_DeathBullet, "Cooldown.Rev.DeathBullet")
