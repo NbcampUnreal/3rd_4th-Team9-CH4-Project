@@ -17,11 +17,11 @@ class OVERCLOCK_API AOCRevenant : public AOCCharacterBase
 public:
 	AOCRevenant();
 
-	// ·¹¹ö³ÍÆ® Àü¿ë: ¹«±âÅºÃ¢
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ÅºÃ¢
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UWeaponAmmoComponent* WeaponAmmoComp = nullptr;
 
-	// ¸®·Îµå ¼­¹ö Ã³¸®(·¹¹ö³ÍÆ® Àü¿ë)
+	// ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½)
 	UFUNCTION(Server, Reliable)
 	void Server_RequestReloadRefill();
 

@@ -78,8 +78,8 @@ protected:
 	UPROPERTY(Replicated, EditAnywhere,BlueprintReadOnly, Category = "Character")
 	FGameplayTag CharacterTag;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
-	//TObjectPtr<UOCMarkComponent> MarkComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	TObjectPtr<UOCMarkComponent> MarkComp;
 	
 	// 아직 프로토타입 단계라 안전성을 위해 사용 X
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|State")
