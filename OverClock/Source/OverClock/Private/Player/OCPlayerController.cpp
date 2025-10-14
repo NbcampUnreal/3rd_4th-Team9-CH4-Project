@@ -11,6 +11,7 @@
 #include "GameplayTagContainer.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
+#include "Abilities/OCAbilityDataAsset.h"
 #include "Player/OCCharacterBase.h"
 #include "Player/OCPlayerState.h"
 #include "GA/GA_RangedAttack.h"
