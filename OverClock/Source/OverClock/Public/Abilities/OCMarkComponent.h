@@ -49,23 +49,4 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Positioning")
 	FVector MarkOffset = FVector(0, 0, 120);
 	
-// protected:
-// 	virtual void BeginPlay() override;
-// 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-//
-// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mark System")
-// 	TSubclassOf<class AMarkVisualActor> MarkVisualActorClass;
-//
-// private:
-// 	void SetupGlobalASCEvents();
-//     
-// 	UFUNCTION()
-// 	void OnActorSpawned(AActor* SpawnedActor);
-//     
-// 	void OnMarkTagChanged(const FGameplayTag CallbackTag, int32 NewCount, AActor* Actor);
-//     
-// 	UPROPERTY()
-// 	TMap<TWeakObjectPtr<AActor>, TWeakObjectPtr<class AMarkVisualActor>> ActiveMarks;
-//     
-// 	FDelegateHandle ActorSpawnedHandle;
 };

@@ -69,11 +69,11 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock,		"State.ActionLock")
 
 	
-	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_QuickStep, "State.ActionLock.QuickStep")
-	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_RangedAttack, "State.ActionLock.RangedAttack")
-	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_Reload, "State.ActionLock.Reload")
-	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead")
-	UE_DEFINE_GAMEPLAY_TAG(State_Twin_SpecialAmmo, "State.Twin.SpecialAmmo") // 윈도우 태그
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_QuickStep, 		"State.ActionLock.QuickStep")
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_RangedAttack, 	"State.ActionLock.RangedAttack")
+	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_Reload, 		"State.ActionLock.Reload")
+	UE_DEFINE_GAMEPLAY_TAG(State_Dead, 						"State.Dead")
+	UE_DEFINE_GAMEPLAY_TAG(State_Twin_SpecialAmmo, 			"State.Twin.SpecialAmmo") // 윈도우 태그
 
 	/* Cooldown */
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Weapon_Reload,  "Cooldown.Weapon.Reload");
@@ -98,6 +98,17 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Heal_Instant,     "Effect.Heal.Instant");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Heal_HoT,         "Effect.Heal.HoT");
 	UE_DEFINE_GAMEPLAY_TAG(Effect_Mark,				"Effect.Mark");
+	
+	UE_DEFINE_GAMEPLAY_TAG(Effect_Fey_Heal, "Effect.Fey.Heal")
+	UE_DEFINE_GAMEPLAY_TAG(Effect_Fey_Deal, "Effect.Fey.Deal")
+
+	//temporary
+	UE_DEFINE_GAMEPLAY_TAG(Ability_PeaceKeeper, "Ability.PeaceKeeper")
+	UE_DEFINE_GAMEPLAY_TAG(Ability_RevReload, "Ability.RevReload")
+	UE_DEFINE_GAMEPLAY_TAG(State_Firing, "State.Firing")
+	UE_DEFINE_GAMEPLAY_TAG(State_RevReloading, "State.RevReloading")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_PeaceKeeper, "Cooldown.PeaceKeeper")
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RevReload, "Cooldown.RevReload")
 
 #pragma endregion
 	
@@ -124,6 +135,6 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Character_Died, "Event.Character.Died")
 
 	/*Team Tags*/
-	UE_DEFINE_GAMEPLAY_TAG(Team_Red, "Team.Red")
-	UE_DEFINE_GAMEPLAY_TAG(Team_Blue, "Team.Blue")
+	UE_DEFINE_GAMEPLAY_TAG(Team_Red,	"Team.Red")
+	UE_DEFINE_GAMEPLAY_TAG(Team_Blue,	"Team.Blue")
 }
