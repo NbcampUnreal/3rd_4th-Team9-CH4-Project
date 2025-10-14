@@ -7,13 +7,25 @@
 #include "GameFramework/SpringArmComponent.h"
 
 #include "AbilitySystemComponent.h"
+<<<<<<< HEAD
+=======
+#include "OverClockDebugHelper.h"
+#include "Abilities/OCMarkComponent.h"
+>>>>>>> 5d8768ae (AimÎ°úÏßÅ ÏàòÏ†ï, NetFrequency Ìï®ÏàòÎ°ú Î≥ÄÍ≤Ω)
 #include "Net/UnrealNetwork.h"
 
 AOCCharacterBase::AOCCharacterBase()
+<<<<<<< HEAD
 	: WalkSpeed(600.f)
 	, RunSpeed(900.f)
 	, JumpVelocity(600.f)
 	, AimRotation(FRotator::ZeroRotator)
+=======
+	:WalkSpeed(600.0f),
+	RunSpeed(900.0f),
+	JumpVelocity(600.0f),
+	AimPitch(0.f)
+>>>>>>> 5d8768ae (AimÎ°úÏßÅ ÏàòÏ†ï, NetFrequency Ìï®ÏàòÎ°ú Î≥ÄÍ≤Ω)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -29,6 +41,12 @@ AOCCharacterBase::AOCCharacterBase()
 	CameraComp->SetupAttachment(SpringArm);
 	CameraComp->bUsePawnControlRotation = true;
 
+<<<<<<< HEAD
+=======
+	//MarkComp = CreateDefaultSubobject<UOCMarkComponent>(TEXT("StatusMark"));
+	//MarkComp->SetupAttachment(RootComponent);
+	
+>>>>>>> 5d8768ae (AimÎ°úÏßÅ ÏàòÏ†ï, NetFrequency Ìï®ÏàòÎ°ú Î≥ÄÍ≤Ω)
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->JumpZVelocity = JumpVelocity;
 }
@@ -41,9 +59,9 @@ void AOCCharacterBase::BeginPlay()
 void AOCCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (HasAuthority())
+	if (!HasAuthority())
 	{
-		ServerSetAimRotation_Implementation(GetControlRotation());
+		UpdateRotation();
 	}
 }
 
@@ -83,12 +101,17 @@ void AOCCharacterBase::OnRep_PlayerState()
 void AOCCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AOCCharacterBase, AimRotation);
+	
+	DOREPLIFETIME(AOCCharacterBase, AimPitch);
 }
 
-void AOCCharacterBase::ServerSetAimRotation_Implementation(FRotator InAimRotation)
+float AOCCharacterBase::GetAimPitch() const//AnimInstance Tick
 {
-	AimRotation = InAimRotation;
+	if (GetNetMode()==ROLE_AutonomousProxy)
+	{
+		return GetControlRotation().Pitch;
+	}
+	return AimPitch;
 }
 
 TSubclassOf<UGameplayAbility> AOCCharacterBase::GetAbilityClassByTag(FGameplayTag AbilityTag) const
@@ -117,10 +140,10 @@ void AOCCharacterBase::GiveStartupAbilities()
 		}
 	}
 }
-// ¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°
+// ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
 
-// ¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°¶°
-// [∞¯≈Î»≠] ∏˘≈∏¡÷ ¿Áª˝ ∏÷∆ºƒ≥Ω∫∆Æ
+// ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
+// [ÔøΩÔøΩÔøΩÔøΩ»≠] ÔøΩÔøΩ≈∏ÔøΩÔøΩ ÔøΩÔøΩÔøΩ ÔøΩÔøΩ∆ºƒ≥ÔøΩÔøΩ∆Æ
 void AOCCharacterBase::Multicast_PlayMontage_Implementation(UAnimMontage* Montage, float InPlayRate, FName InSection)
 {
 	if (!Montage) return;
@@ -167,4 +190,17 @@ void AOCCharacterBase::Multicast_PlaySequenceAsDynamicMontage_Implementation(
 			}
 		}
 	}
+}
+void AOCCharacterBase::UpdateRotation()//Tick
+{
+	if (FMath::Abs(RotationTemp - GetControlRotation().Pitch) > 1.f)
+	{
+		RotationTemp=GetControlRotation().Pitch;
+		ServerSetAimPitch(RotationTemp);
+	}
+}
+
+void AOCCharacterBase::ServerSetAimPitch_Implementation(float InAimPitch)
+{
+	AimPitch=InAimPitch;
 }

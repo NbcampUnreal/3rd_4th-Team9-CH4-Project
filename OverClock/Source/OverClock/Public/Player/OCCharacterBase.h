@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "OCCharacterBase.generated.h"
 
+class UOCMarkComponent;
 class UOCAnimDataAsset;
 class UCameraComponent;
 class UAbilitySystemComponent;
@@ -28,11 +29,19 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
+<<<<<<< HEAD
 	FORCEINLINE FRotator GetAimRotation() const { return AimRotation; }
 
 	UFUNCTION(Server, Unreliable)
 	void ServerSetAimRotation(FRotator InAimRotation);
 
+=======
+	float GetAimPitch() const;
+	
+	UFUNCTION(Server, Unreliable)
+	void ServerSetAimPitch(float InAimPitch);
+	
+>>>>>>> 5d8768ae (Aim로직 수정, NetFrequency 함수로 변경)
 	UFUNCTION()
 	FORCEINLINE FGameplayTag GetCurrentTag() const { return CharacterTag; }
 
@@ -55,7 +64,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	void UpdateRotation();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera")
 	TObjectPtr<UCameraComponent> CameraComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -64,9 +75,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DataAsset")
 	TObjectPtr<UOCAnimDataAsset> OCAnimDataAsset;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(Replicated, EditAnywhere,BlueprintReadOnly, Category = "Character")
 	FGameplayTag CharacterTag;
 
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	//TObjectPtr<UOCMarkComponent> MarkComp;
+	
+	// 아직 프로토타입 단계라 안전성을 위해 사용 X
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|State")
+	TObjectPtr<AOCPlayerState> CachedPlayerState;*/
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
@@ -75,8 +93,9 @@ protected:
 	float JumpVelocity;
 
 	UPROPERTY(Replicated)
-	FRotator AimRotation;
+	float AimPitch;
+	float RotationTemp=0.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> AbilityMapByTag;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	//TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> AbilityMapByTag;
 };
