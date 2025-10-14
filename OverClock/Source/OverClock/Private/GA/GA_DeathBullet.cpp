@@ -6,7 +6,7 @@
 #include "Animation/AnimSequenceBase.h"
 #include "Component/WeaponAmmoComponent.h"
 
-// Ä³¸¯ÅÍº° ÀåÀü ¸ğ¼Ç µ¥ÀÌÅÍ(¿¹½Ã)
+// Ä³ï¿½ï¿½ï¿½Íºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)
 #include "Player/OCCharacterBase.h" 
 #include "Player/Anim/OCAnimDataAsset.h"
 #include "Player/Anim/OCAnimStruct.h"
@@ -54,8 +54,10 @@ void UGA_DeathBullet::OnMontageCompleted()
 {
     if (CurrentActorInfo->IsNetAuthority())
     {
-        AOCPlayerController* PC = Cast<AOCPlayerController>(CurrentActorInfo->PlayerController.Get());
-        UAbilitySystemComponent* ASC = PC->GetASC();
+    	//ë³‘í•© ì¶©ëŒë¡œ ì¸í•œ ìˆ˜ì •
+    	//AOCPlayerController* PC = Cast<AOCPlayerController>(CurrentActorInfo->PlayerController.Get());
+    	//UAbilitySystemComponent* ASC = PC->GetASC();
+    	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
         if (!ASC)
         {
             EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false); return;

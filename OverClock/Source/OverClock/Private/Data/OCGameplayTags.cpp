@@ -71,7 +71,7 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Firing,     "State.Weapon.Firing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Mobility_Dashing,  "State.Mobility.Dashing");
 	UE_DEFINE_GAMEPLAY_TAG(State_Defense_Blocking,  "State.Defense.Blocking");
-	UE_DEFINE_GAMEPLAY_TAG(State_Ultimate_Active,  "State.Ultimate.Active");
+	UE_DEFINE_GAMEPLAY_TAG(State_Ultimate_Active,   "State.Ultimate.Active");
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock,		"State.ActionLock")
 
 	
@@ -80,6 +80,10 @@ namespace OCGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(State_ActionLock_Reload, 		"State.ActionLock.Reload")
 	UE_DEFINE_GAMEPLAY_TAG(State_Dead, 						"State.Dead")
 	UE_DEFINE_GAMEPLAY_TAG(State_Twin_SpecialAmmo, 			"State.Twin.SpecialAmmo") // 윈도우 태그
+
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Hidden, 			"State.Weapon.Hidden")
+	UE_DEFINE_GAMEPLAY_TAG(State_Weapon_Scaling, 			"State.Weapon.Scaling")
+	UE_DEFINE_GAMEPLAY_TAG(State_Stun, 						"State.Stun")
 
 	/* Cooldown */
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Weapon_Reload,  "Cooldown.Weapon.Reload");
