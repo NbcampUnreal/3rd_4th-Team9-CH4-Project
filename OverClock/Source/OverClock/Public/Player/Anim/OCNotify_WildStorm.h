@@ -7,7 +7,7 @@
 #include "OCNotify_WildStorm.generated.h"
 
 class AOCWildStormField;
-class AOCTheFey;
+class AOCFey;
 
 UCLASS()
 class OVERCLOCK_API UOCNotify_WildStorm : public UAnimNotify
@@ -16,7 +16,7 @@ class OVERCLOCK_API UOCNotify_WildStorm : public UAnimNotify
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,const FAnimNotifyEventReference& EventReference) override;
 
-	void SpawnAbilityField(AOCTheFey* Fey);
+	void SpawnAbilityField(AOCFey* Fey);
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AOCWildStormField> StormClass;
