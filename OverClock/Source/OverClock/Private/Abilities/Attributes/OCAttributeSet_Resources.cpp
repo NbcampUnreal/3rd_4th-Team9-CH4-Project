@@ -2,6 +2,12 @@
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 
+UOCAttributeSet_Resources::UOCAttributeSet_Resources()
+{
+	InitUltCharge(1.f);
+	InitMaxUltCharge(1.f);
+}
+
 void UOCAttributeSet_Resources::OnRep_UltCharge(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UOCAttributeSet_Resources, UltCharge, OldValue);
