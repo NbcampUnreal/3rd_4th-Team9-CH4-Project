@@ -59,7 +59,7 @@ void AOCTheFey::Tick(float DeltaTime)
 	}
 }
 
-void AOCTheFey::GiveStartupAbilities()
+void AOCTheFey::GiveStartAbilities()
 {
 	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(this))
 	{

@@ -40,7 +40,7 @@ public:
 	}
 	
 	UFUNCTION()
-	void GiveStartupAbilities();
+	void GiveStartAbilities();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> HealWhipAbilityClass;
