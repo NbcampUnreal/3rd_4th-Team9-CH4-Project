@@ -1,5 +1,5 @@
 #include "Data/DA_OCHeroStartUpData.h"
-#include "Abilities/OCGameplayAbility.h"
+#include "Abilities/GameplayAbility.h"
 #include "Abilities/OCAbilitySystemComponent.h"
 
 void UDA_OCHeroStartUpData::GiveToAbilitySystemComponent(UOCAbilitySystemComponent* ASC, int32 ApplyLevel) const
@@ -37,12 +37,12 @@ void UDA_OCHeroStartUpData::GiveToAbilitySystemComponent(UOCAbilitySystemCompone
 }
 
 
-void UDA_OCHeroStartUpData::GrantAbilities(const TArray<TSubclassOf<UOCGameplayAbility>>& InAbilitiesToGive,
+void UDA_OCHeroStartUpData::GrantAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilitiesToGive,
 	UOCAbilitySystemComponent* ASC, int32 ApplyLevel) const
 {
 	if (!ASC || InAbilitiesToGive.IsEmpty()) return;
 
-	for (const TSubclassOf<UOCGameplayAbility>& Ability : InAbilitiesToGive)
+	for (const TSubclassOf<UGameplayAbility>& Ability : InAbilitiesToGive)
 	{
 		if (!IsValid(Ability)) continue;
 

@@ -5,7 +5,7 @@
 #include "DA_OCHeroStartUpData.generated.h"
 
 class UOCAbilitySystemComponent;
-class UOCGameplayAbility;
+class UGameplayAbility;
 class UGameplayEffect;
 
 UCLASS()
@@ -19,10 +19,10 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="StartUpData")
-	TArray<TSubclassOf<UOCGameplayAbility>> ActivateOnGivenAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> ActivateOnGivenAbilities;
 
 	UPROPERTY(EditDefaultsOnly, Category="StartUpData")
-	TArray<TSubclassOf<UOCGameplayAbility>> ReactiveAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> ReactiveAbilities;
 
 	UPROPERTY(EditDefaultsOnly, Category="StartUpData")
 	TArray<TSubclassOf<UGameplayEffect>> StartUpGameplayEffects;
@@ -31,6 +31,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="StartUpData")
 	TArray<FOCAbilitySet> HeroStartUpAbilitySets;
 	
-	void GrantAbilities(const TArray<TSubclassOf<UOCGameplayAbility>>& InAbilitiesToGive, UOCAbilitySystemComponent* ASC, int32 ApplyLevel) const;
+	void GrantAbilities(const TArray<TSubclassOf<UGameplayAbility>>& InAbilitiesToGive, UOCAbilitySystemComponent* ASC, int32 ApplyLevel) const;
 	
 };
