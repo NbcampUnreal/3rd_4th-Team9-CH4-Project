@@ -2,6 +2,12 @@
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
+UOCAttributeSet_Health::UOCAttributeSet_Health()
+{
+	InitMaxHealth(1.f);
+	InitHealth(1.f);
+}
+
 void UOCAttributeSet_Health::OnRef_Health(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UOCAttributeSet_Health, Health, OldValue);
