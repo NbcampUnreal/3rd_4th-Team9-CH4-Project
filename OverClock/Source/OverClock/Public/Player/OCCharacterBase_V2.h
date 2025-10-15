@@ -14,6 +14,8 @@ class UOCInputComponent;
 class UDA_OCInputConfig;
 class UDA_OCHeroStartUpData;
 class AOCPlayerState;
+class UOCUIComponent;
+class UOCAttributeSet_Health;
 struct FInputActionValue;
 
 UCLASS(meta=(DisplayName="OC Character Base V2"))
@@ -38,7 +40,8 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     TObjectPtr<UCameraComponent> Camera;
 
-    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "OC|UI")
+    UOCUIComponent* UICompRef = nullptr;
     
 #pragma endregion
     
@@ -89,5 +92,10 @@ protected:
     
     UOCAbilitySystemComponent* GetOCASC() const;
 
- 
+    UPROPERTY(Transient)
+    UOCAttributeSet_Health* HealthSet = nullptr;
+
+    void SetupHealthBinding();
+    void PushHealthToUI();
+    void OnHealthChanged(const struct FOnAttributeChangeData& Data);
 };

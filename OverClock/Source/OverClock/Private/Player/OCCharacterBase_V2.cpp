@@ -11,6 +11,8 @@
 #include "InputActionValue.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Component/OCUIComponent.h"
+#include "Abilities/Attributes/OCAttributeSet_Health.h"
 
 AOCCharacterBase_V2::AOCCharacterBase_V2()
 {
@@ -45,12 +47,15 @@ void AOCCharacterBase_V2::PossessedBy(AController* NewController)
             }
         }
     }
+
+    SetupHealthBinding();
 }
 
 void AOCCharacterBase_V2::OnRep_PlayerState()
 {
     Super::OnRep_PlayerState();
     InitASCFromPlayerState();
+    SetupHealthBinding();
 }
 
 const UDA_OCInputConfig* AOCCharacterBase_V2::GetInputConfig() const
@@ -95,6 +100,8 @@ void AOCCharacterBase_V2::InitASCFromPlayerState()
 
     ASCWeak = ASC;
     ASC->InitAbilityActorInfo(PS, this);
+
+    HealthSet = GetPlayerState<AOCPlayerState>()->GetHealthAttributeSet();
 }
 
 UOCAbilitySystemComponent* AOCCharacterBase_V2::GetOCASC() const
@@ -184,4 +191,32 @@ void AOCCharacterBase_V2::Server_Ability_Released_Implementation(FGameplayTag In
     {
         ASC->OnAbilityInputReleased(InInputTag);
     }
+}
+
+void AOCCharacterBase_V2::SetupHealthBinding()
+{
+    if (!UICompRef) { UICompRef = FindComponentByClass<UOCUIComponent>(); }
+
+    AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+    UOCAbilitySystemComponent* ASC = Cast<UOCAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+
+    PushHealthToUI();
+
+    ASC->GetGameplayAttributeValueChangeDelegate(HealthSet->GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthChanged);
+}
+
+void AOCCharacterBase_V2::OnHealthChanged(const FOnAttributeChangeData& /*Data*/)
+{
+    PushHealthToUI();
+}
+
+void AOCCharacterBase_V2::PushHealthToUI()
+{
+    AOCPlayerState* PS = GetPlayerState<AOCPlayerState>();
+    UOCAbilitySystemComponent* ASC = Cast<UOCAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+
+    const int32 Cur = FMath::RoundToInt(ASC->GetNumericAttribute(HealthSet->GetHealthAttribute()));
+    const int32 Max = FMath::RoundToInt(ASC->GetNumericAttribute(HealthSet->GetMaxHealthAttribute()));
+
+    UICompRef->PushHealth(Cur, Max);
 }
