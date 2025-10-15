@@ -4,6 +4,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "GA_PlayMontage.generated.h"
 
+class UAbilityTask_PlayMontageAndWait;
+
 UCLASS()
 class OVERCLOCK_API UGA_PlayMontage : public UGameplayAbility
 {
@@ -22,13 +24,20 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility, bool bWasCancelled) override;
 
+	UPROPERTY()
+	UAbilityTask_PlayMontageAndWait* Task = nullptr;
+
 	UFUNCTION()
 	void OnMontageCompleted();
 
 	UFUNCTION()
 	void OnMontageCancelled();
 
+	UFUNCTION()
+	void OnTimerExpired();
+
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAnimMontage> AbilityMontage;
-	
+
+	FTimerHandle AbilityTimerHandle;
 };
