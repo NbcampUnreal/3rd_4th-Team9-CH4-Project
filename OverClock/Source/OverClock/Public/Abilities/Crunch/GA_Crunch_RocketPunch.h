@@ -17,6 +17,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Dash|Montage")
 	TObjectPtr<UAnimMontage> Montage = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category="Dash|Damage")
+	float RocketDamage = 100.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Dash|Move")
 	float DashDistance = 800.f;
 
@@ -31,10 +34,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Dash")
 	float CapsuleHalfHeight = 100.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Dash|Damage")
-	TSubclassOf<UGameplayEffect> DamageGE;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category="Dash|Knockback")
 	float KnockbackStrength = 1200.f;
 

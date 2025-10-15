@@ -140,6 +140,7 @@ void UGA_Crunch_RocketPunch::TickDash_Server()
 		AActor* HitActor = Hit.GetActor();
 		if (HitActor && HitActor != C)
 		{
+			ApplyDamageToActor(HitActor, RocketDamage, &Hit);
 			ApplyHitToActor_Server(HitActor, StartLocation, DashDirection);
 			FinishDash_Server(true);
 			return;
@@ -191,24 +192,6 @@ void UGA_Crunch_RocketPunch::FinishDash_Server(bool bHitSomething)
 
 void UGA_Crunch_RocketPunch::ApplyHitToActor_Server(AActor* HitActor, const FVector& From, const FVector& Forward) const
 {
-	if (DamageGE)
-	{
-		if (UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo())
-		{
-			if (UAbilitySystemComponent* TargetASC =
-				UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitActor))
-			{
-				FGameplayEffectContextHandle Ctx = SourceASC->MakeEffectContext();
-				Ctx.AddSourceObject(GetAvatarActorFromActorInfo());
-				FGameplayEffectSpecHandle   Spec = SourceASC->MakeOutgoingSpec(DamageGE, GetAbilityLevel(), Ctx);
-				if (Spec.IsValid())
-				{
-					SourceASC->ApplyGameplayEffectSpecToTarget(*Spec.Data.Get(), TargetASC);
-				}
-			}
-		}
-	}
-	
 	const FVector Push = Forward * KnockbackStrength + FVector(0,0,KnockbackUp);
 	if (ACharacter* VictimChar = Cast<ACharacter>(HitActor))
 	{
