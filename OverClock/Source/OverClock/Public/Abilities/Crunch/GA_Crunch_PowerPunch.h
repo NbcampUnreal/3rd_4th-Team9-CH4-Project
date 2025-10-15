@@ -20,18 +20,18 @@ protected:
 
     UPROPERTY(EditDefaultsOnly, Category="Combo|Timing", meta=(ClampMin="0"))
     TArray<float> ComboWindowCloses;
-
+    
     UPROPERTY(EditDefaultsOnly, Category="Combo|Damage")
-    TSubclassOf<UGameplayEffect> DamageGE;
+    float PunchDamage = 50.f;
+    
+    UPROPERTY(EditDefaultsOnly, Category="Combo|Trace")
+    float PunchRange = 200.f;
 
     UPROPERTY(EditDefaultsOnly, Category="Combo|Trace")
-    float PunchRange = 250.f;
-
-    UPROPERTY(EditDefaultsOnly, Category="Combo|Trace")
-    FVector PunchHalfExtent = FVector(35.f, 65.f, 65.f);
+    FVector PunchHalfExtent = FVector(50.f, 50.f, 50.f);
 
     UPROPERTY(EditDefaultsOnly, Category="Combo")
-    float ComboResetTime = 0.35f;
+    float ComboResetTime = 0.25f;
 
     int32 CurrentComboIndex = 0;
     bool bWindowOpen = false;
