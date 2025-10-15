@@ -9,6 +9,7 @@
 
 class UAnimMontage;
 class UAbilityTask_PlayMontageAndWait;
+class UAbilityTask_ApplyRootMotionMoveToForce;
 
 UCLASS()
 class OVERCLOCK_API UGA_QuickStep : public UGA_SharedCooldownBase
@@ -33,14 +34,14 @@ protected:
         bool bWasCancelled) override;
 
 private:
-    UPROPERTY(EditDefaultsOnly, Category = "Roll|Anim")
-    FName MontageSlot = FName(TEXT("FullBody"));
-
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Move")
     float RollDistance = 600.f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Move")
     float RollDuration = 0.f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Roll|Move", meta = (ClampMin = "1.0"))
+    float RollSpeed = 2400.f;
 
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Move")
     bool bFaceInputDirection = true;
@@ -48,17 +49,7 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Roll|Directional")
     bool bUseEightWay = true;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Roll|Directional") 
-    UAnimSequence* Seq_F = nullptr;
-    UPROPERTY(EditDefaultsOnly, Category = "Roll|Directional") 
-    UAnimSequence* Seq_B = nullptr;
-    UPROPERTY(EditDefaultsOnly, Category = "Roll|Directional") 
-    UAnimSequence* Seq_L = nullptr;
-    UPROPERTY(EditDefaultsOnly, Category = "Roll|Directional") 
-    UAnimSequence* Seq_R = nullptr;
-
 private:
-    UAnimSequence* ChooseSequenceForDirection(const class ACharacter* Char, const FVector& WorldDir) const;
 
     UFUNCTION() void OnMontageCompleted();
     UFUNCTION() void OnMontageInterrupted();
@@ -69,4 +60,19 @@ private:
     UAbilityTask_PlayMontageAndWait* PlayMontageTask(UAnimMontage* Montage, float PlayRate = 1.f,
         FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float RootMotionScale = 1.f,
         float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false) const;
+
+    FVector GetQuickStepDirection(const class ACharacter* Char) const;
+
+    void StartMoveTask(class ACharacter* Char, const FVector& Dir);
+
+    UPROPERTY()
+    UAbilityTask_ApplyRootMotionMoveToForce* MoveTask = nullptr;
+
+    UFUNCTION() 
+    void OnMoveEnded();   
+
+    UFUNCTION() 
+    void OnMoveTimedOut();         
+    UFUNCTION() 
+    void OnMoveReachedDestination();
 };

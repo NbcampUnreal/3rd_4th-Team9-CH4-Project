@@ -31,6 +31,23 @@ void UGA_QuickStep::ActivateAbility(
         return;
     }
 
+    ACharacter* Char =  Cast<ACharacter>(ActorInfo->AvatarActor.Get());
+    if (!Char)
+    {
+        EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+        return;
+    }
+
+    const FVector Dir = GetQuickStepDirection(Char);
+
+    if (bFaceInputDirection && !Dir.IsNearlyZero())
+    {
+        const FRotator NewYaw(0.f, Dir.Rotation().Yaw, 0.f);
+        Char->SetActorRotation(NewYaw);
+    }
+
+    StartMoveTask(Char, Dir);
+
     if (DynMontage)
     {
         if (UAbilityTask_PlayMontageAndWait* Task = PlayMontageTask(DynMontage))
@@ -39,34 +56,6 @@ void UGA_QuickStep::ActivateAbility(
             Task->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageInterrupted);
             Task->OnCancelled.AddDynamic(this, &ThisClass::OnMontageInterrupted);
         }
-    }
-}
-
-UAnimSequence* UGA_QuickStep::ChooseSequenceForDirection(const ACharacter* Char, const FVector& WorldDir) const
-{
-    const FRotator InvYaw(0.f, -Char->GetActorRotation().Yaw, 0.f);
-    const FVector Local = InvYaw.RotateVector(WorldDir).GetSafeNormal2D();
-
-    const float Deg = FMath::RadiansToDegrees(FMath::Atan2(Local.Y, Local.X));
-    auto InRange = [](float A, float Min, float Max)
-        {
-            return (A >= Min && A < Max);
-        };
-
-    if (bUseEightWay)
-    {
-        if (InRange(Deg, -22.5f, 22.5f))  return Seq_F;
-        if (InRange(Deg, 67.5f, 112.5f))  return Seq_R;
-        if (Deg >= 157.5f || Deg < -157.5f) return Seq_B;
-        if (InRange(Deg, -112.5f, -67.5f))  return Seq_L;
-        return Seq_F;
-    }
-    else
-    {
-        if (InRange(Deg, -45.f, 45.f))   return Seq_F;
-        if (InRange(Deg, 45.f, 135.f))   return Seq_R;
-        if (InRange(Deg, -135.f, -45.f)) return Seq_L;
-        return Seq_B;
     }
 }
 
@@ -87,6 +76,12 @@ void UGA_QuickStep::EndAbility(
     bool bReplicateEndAbility,
     bool bWasCancelled)
 {
+    if (MoveTask)
+    {
+        MoveTask->EndTask();
+        MoveTask = nullptr;
+    }
+
     if (ActorInfo && ActorInfo->AbilitySystemComponent.IsValid())
     {
         const FGameplayTag Lock = FGameplayTag::RequestGameplayTag(TEXT("State.ActionLock"));
@@ -121,4 +116,74 @@ UAbilityTask_PlayMontageAndWait* UGA_QuickStep::PlayMontageTask(UAnimMontage* Mo
         Task->ReadyForActivation();
     }
     return Task;
+}
+
+FVector UGA_QuickStep::GetQuickStepDirection(const ACharacter* Char) const
+{
+    if (!Char) return FVector::ZeroVector;
+
+    FVector Dir = Char->GetLastMovementInputVector();
+    Dir.Z = 0.f;
+
+    if (Dir.IsNearlyZero())
+    {
+        Dir = Char->GetVelocity();
+        Dir.Z = 0.f;
+    }
+
+    if (Dir.IsNearlyZero())
+    {
+        const APawn* Pawn = Cast<APawn>(Char);
+        const FRotator ControlYaw(0.f, Pawn && Pawn->GetController() ? Pawn->GetController()->GetControlRotation().Yaw : Char->GetActorRotation().Yaw, 0.f);
+        Dir = ControlYaw.Vector();
+    }
+
+    return Dir.GetSafeNormal2D();
+}
+
+void UGA_QuickStep::StartMoveTask(ACharacter* Char, const FVector& Dir)
+{
+    if (!Char || Dir.IsNearlyZero())
+        return;
+
+    const FVector StartLoc = Char->GetActorLocation();
+    const FVector TargetLoc = StartLoc + Dir * RollDistance;
+
+    float Duration = RollDuration > 0.f ? RollDuration : (RollDistance / FMath::Max(1.f, RollSpeed));
+
+    MoveTask = UAbilityTask_ApplyRootMotionMoveToForce::ApplyRootMotionMoveToForce(
+        this,
+        NAME_None,
+        TargetLoc,
+        Duration,
+        false,
+        EMovementMode::MOVE_Walking,
+        false,
+        nullptr,
+        ERootMotionFinishVelocityMode::MaintainLastRootMotionVelocity,
+        FVector::ZeroVector,
+        false
+    );
+
+    if (MoveTask)
+    {
+        MoveTask->OnTimedOut.AddDynamic(this, &ThisClass::OnMoveTimedOut);
+        MoveTask->OnTimedOutAndDestinationReached.AddDynamic(this, &ThisClass::OnMoveReachedDestination);
+        MoveTask->ReadyForActivation();
+    }
+}
+
+void UGA_QuickStep::OnMoveEnded()
+{
+    // 필요한 경우 여기서 후처리(예: 태그 해제/다음 상태 전환)
+}
+
+void UGA_QuickStep::OnMoveTimedOut()
+{
+    OnMoveEnded();
+}
+
+void UGA_QuickStep::OnMoveReachedDestination()
+{
+    OnMoveEnded();
 }
