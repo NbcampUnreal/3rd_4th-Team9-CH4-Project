@@ -68,7 +68,7 @@ void AOCWhipMissile::BeginPlay()
 void AOCWhipMissile::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
-    CollisionComponent->OnComponentHit.AddDynamic(this, &AOCWhipMissile::OnHit);
+    CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AOCWhipMissile::OnOverlapBegin);
 }
 
 void AOCWhipMissile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
