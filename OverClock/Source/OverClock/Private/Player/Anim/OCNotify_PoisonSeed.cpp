@@ -13,11 +13,7 @@ void UOCNotify_PoisonSeed::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 
 	if (AOCFey* TheFey = Cast<AOCFey>(Actor))
 	{
-		// 투사체 발사
-		if (TheFey->HasAuthority())
-		{
-			LaunchMissile(TheFey);
-		}
+		LaunchMissile(TheFey);
 	}
 }
 

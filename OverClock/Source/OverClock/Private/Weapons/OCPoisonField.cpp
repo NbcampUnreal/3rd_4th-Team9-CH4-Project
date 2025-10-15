@@ -55,7 +55,7 @@ void AOCPoisonField::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!HasAuthority()) return;
-	if (!OtherActor || OtherActor == GetOwner() || IsTeam(OtherActor)) return;
+	if (!OtherActor || OtherActor == GetOwner() /* || IsTeam(OtherActor) */ ) return;
     
 	if (APawn* TargetPawn = Cast<APawn>(OtherActor))
 	{
@@ -141,7 +141,7 @@ void AOCPoisonField::ApplyDamage()
 	if (!DamageEffect) return;
 	for (UAbilitySystemComponent* ASC : OverlappingASCs)
 	{
-		if (ASC && ASC->GetOwnerActor() && !IsTeam(ASC->GetOwnerActor()))
+		if (ASC && ASC->GetOwnerActor() /* && !IsTeam(ASC->GetOwnerActor())*/ )
 		{
 			ASC->ApplyGameplayEffectToSelf(
 				DamageEffect.GetDefaultObject(),

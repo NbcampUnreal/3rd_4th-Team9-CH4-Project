@@ -61,14 +61,14 @@ void AOCWildStormField::ApplyGE()
 	TArray<AActor*> OverlappingActors;
 	SphereCollision->GetOverlappingActors(OverlappingActors);
 	
-	FGameplayTag OwnerTeamTag;
-	if (IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(GetOwner()))
-	{
-		if (UAbilitySystemComponent* OwnerASC = OwnerASI->GetAbilitySystemComponent())
-		{
-			OwnerTeamTag = GetTeamTag(OwnerASC);
-		}
-	}
+	// FGameplayTag OwnerTeamTag;
+	// if (IAbilitySystemInterface* OwnerASI = Cast<IAbilitySystemInterface>(GetOwner()))
+	// {
+	// 	if (UAbilitySystemComponent* OwnerASC = OwnerASI->GetAbilitySystemComponent())
+	// 	{
+	// 		OwnerTeamTag = GetTeamTag(OwnerASC);
+	// 	}
+	// }
 
 	for (AActor* Actor : OverlappingActors)
 	{
@@ -80,7 +80,7 @@ void AOCWildStormField::ApplyGE()
 			{
 				FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
 				EffectContext.AddSourceObject(this);
-				if (GetTeamTag(ASC)==OwnerTeamTag)
+				//if (GetTeamTag(ASC)==OwnerTeamTag)
 				{
 					// Damage GE 적용                    
                     FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(
@@ -93,19 +93,19 @@ void AOCWildStormField::ApplyGE()
                     	ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
                     }
 				}
-				else
-				{
-					//Heal GE 적용                    
-					FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(
-						HealGE, 
-						1.0f,  // Level
-						EffectContext
-					);
-					if (SpecHandle.IsValid())
-					{
-						ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-					}
-				}
+				// else
+				// {
+				// 	//Heal GE 적용                    
+				// 	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(
+				// 		HealGE, 
+				// 		1.0f,  // Level
+				// 		EffectContext
+				// 	);
+				// 	if (SpecHandle.IsValid())
+				// 	{
+				// 		ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				// 	}
+				// }
 			}
 		}
 	}

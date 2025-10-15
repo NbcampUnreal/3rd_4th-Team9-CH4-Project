@@ -1,8 +1,6 @@
 #include "Weapons/OCPoisonMissile.h"
 
 #include "Components/SphereComponent.h"
-#include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Weapons/OCPoisonField.h"
@@ -35,19 +33,19 @@ void AOCPoisonMissile::PostInitializeComponents()
 	{
 		CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
 	}
-	TArray<AActor*> AllWorldActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), AllWorldActors);
-	FGameplayTag OwnerTag = GetTeamTag(GetOwner());
-	for (AActor* Actor : AllWorldActors)
-	{
-		if (Actor && Actor!=GetOwner())
-		{
-			if (GetTeamTag(Actor) == OwnerTag)
-			{
-				CollisionComponent->IgnoreActorWhenMoving(Actor, true);
-			}
-		}
-	}
+	// TArray<AActor*> AllWorldActors;
+	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), AllWorldActors);
+	// FGameplayTag OwnerTag = GetTeamTag(GetOwner());
+	// for (AActor* Actor : AllWorldActors)
+	// {
+	// 	if (Actor && Actor!=GetOwner())
+	// 	{
+	// 		if (GetTeamTag(Actor) == OwnerTag)
+	// 		{
+	// 			CollisionComponent->IgnoreActorWhenMoving(Actor, true);
+	// 		}
+	// 	}
+	// }
 }
 
 void AOCPoisonMissile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -56,11 +54,6 @@ void AOCPoisonMissile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 	//ProjectileMovement->Velocity = InitialSpeed;
 	if (!OtherActor || OtherActor == GetOwner()) return;
-	
-	if (OtherActor->IsA(APawn::StaticClass()))
-	{
-		if(GetTeamTag(OtherActor)==GetTeamTag(GetOwner())) return;
-	}
 	
 	// 장판 생성 함수 호출 후 삭제
 	if (PoisonFieldClass)

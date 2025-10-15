@@ -78,6 +78,9 @@ protected:
     
     UFUNCTION()
     void Input_Ability_Released(FGameplayTag InInputTag);
+    
+    UFUNCTION()
+    void OnStunTagChanged(FGameplayTag GameplayTag, int32 NewCount);
 
     UFUNCTION(Server, Reliable)
     void Server_Ability_Pressed(FGameplayTag InInputTag);

@@ -49,6 +49,13 @@ void AOCCharacterBase_V2::PossessedBy(AController* NewController)
     }
 
     SetupHealthBinding();
+    
+    if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+    {
+        // ASC의 태그 변화 바인딩
+        ASC->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("State.Stun")), EGameplayTagEventType::NewOrRemoved)
+            .AddUObject(this, &AOCCharacterBase_V2::OnStunTagChanged);
+    }
 }
 
 void AOCCharacterBase_V2::OnRep_PlayerState()
@@ -219,4 +226,23 @@ void AOCCharacterBase_V2::PushHealthToUI()
     const int32 Max = FMath::RoundToInt(ASC->GetNumericAttribute(HealthSet->GetMaxHealthAttribute()));
 
     UICompRef->PushHealth(Cur, Max);
+}
+
+void AOCCharacterBase_V2::OnStunTagChanged(const FGameplayTag GameplayTag, int32 NewCount)
+{
+    if (NewCount > 0)
+    {
+        if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+        {
+            MoveComp->DisableMovement();
+            MoveComp->StopMovementImmediately();
+        }
+    }
+    else
+    {
+        if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+        {
+            MoveComp->SetMovementMode(MOVE_Walking);
+        }
+    }
 }
