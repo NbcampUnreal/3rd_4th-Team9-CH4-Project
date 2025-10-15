@@ -27,6 +27,8 @@ AOCWhipMissile::AOCWhipMissile()
 void AOCWhipMissile::Init()
 {
 	Super::Init();
+	//TimerHandle 초기화
+	
 	if (!bInitial) return;
 	
 	TArray<AActor*> AllWorldActors;
@@ -41,6 +43,18 @@ void AOCWhipMissile::Init()
 				CollisionComponent->IgnoreActorWhenMoving(Actor, true);
 			}
 		}
+	}
+	GetWorld()->GetTimerManager().SetTimer(EndTimerHandle, this, 
+	&AOCWhipMissile::UnInit, 5.0f, false);
+}
+
+void AOCWhipMissile::UnInit()
+{
+	Super::UnInit();
+	
+	if (EndTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(EndTimerHandle);
 	}
 }
 

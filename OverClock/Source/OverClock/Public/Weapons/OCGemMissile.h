@@ -18,7 +18,8 @@ public:
 	TObjectPtr<UNiagaraComponent> NiagaraComp;
 
 	virtual void Init() override;
-	
+	virtual void UnInit() override;
+
 protected:
 	virtual void PostInitializeComponents() override;
 
@@ -29,6 +30,8 @@ protected:
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
+
+	FTimerHandle EndTimerHandle;
 
 public:	
 	void SetVelocity(const FVector& NewVelocity);

@@ -46,13 +46,17 @@ void AOCGemMissile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (!bInitial) return;
-	AddActorLocalRotation(FRotator(0, 0, DeltaTime * 180.0f));
-	UE_LOG(LogTemp, Warning, TEXT("%f"),GetActorRotation().Roll)
+
+	static float TotalYaw = 0.0f;
+	TotalYaw += DeltaTime * 180.0f;
+
+	SetActorRotation(FRotator(0, TotalYaw, 0));
 }
 
 void AOCGemMissile::Init()
 {
 	Super::Init();
+
 	if (!bInitial) return;
 	
 	TArray<AActor*> AllWorldActors;
@@ -67,6 +71,18 @@ void AOCGemMissile::Init()
 				CollisionComponent->IgnoreActorWhenMoving(Actor, true);
 			}
 		}
+	}
+	GetWorld()->GetTimerManager().SetTimer(EndTimerHandle, this, 
+		&AOCGemMissile::UnInit, 5.0f, false);
+}
+
+void AOCGemMissile::UnInit()
+{
+	Super::UnInit();
+
+	if (EndTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(EndTimerHandle);
 	}
 }
 

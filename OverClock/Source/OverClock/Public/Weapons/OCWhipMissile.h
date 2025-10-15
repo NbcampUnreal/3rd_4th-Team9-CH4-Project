@@ -16,6 +16,8 @@ public:
 	float Damage = 20.0f;
 
 	virtual void Init() override;
+	
+	virtual void UnInit() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -26,6 +28,8 @@ protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
 
+	FTimerHandle EndTimerHandle;
+	
 public:	
 	void SetVelocity(const FVector& NewVelocity);
 };
