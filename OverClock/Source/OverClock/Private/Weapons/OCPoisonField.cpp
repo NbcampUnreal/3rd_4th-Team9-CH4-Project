@@ -161,11 +161,10 @@ void AOCPoisonField::Tick(float DeltaTime)
 
 	FieldMesh->SetWorldScale3D(FVector(Scale, Scale, Scale/2));
 
-	UE_LOG(LogTemp, Warning, TEXT("[AOCPoisonField] Scale : %f"), Scale);
-
 	if (Alpha >= 1.0f)
 	{
 		DeltaSum=0.0f;
+		UE_LOG(LogTemp, Warning, TEXT("NetMode : %s"),*ToString(GetNetMode()))
 		SetActorTickEnabled(false);
 	}
 }

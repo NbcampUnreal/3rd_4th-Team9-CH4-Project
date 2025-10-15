@@ -57,6 +57,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TObjectPtr<USoundBase> HitSound;
 
+	bool IsFirst=true;
+	bool GetIsFirst() const { return IsFirst; }
+	
 public:
 	virtual void Alloc() override;
 	virtual void Init() override;//사용할 때 속도 방향 구현

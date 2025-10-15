@@ -15,6 +15,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	float Damage = 20.0f;
 
+	virtual void Init() override;
+
 protected:
 	virtual void BeginPlay() override;
 	

@@ -82,7 +82,6 @@ void AOCMissileBase::Init()
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);
 	SetActorTickEnabled(true);
-	bInitial=false;
 	if (LaunchSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());

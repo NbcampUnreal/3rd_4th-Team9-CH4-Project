@@ -41,6 +41,7 @@ public:
 	{
 		return WeaponRoot->GetComponentRotation();
 	}
+
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<UGameplayAbility> HealWhipAbilityClass;
@@ -52,6 +53,13 @@ public:
 	TSubclassOf<UGameplayAbility> WildStormAbilityClass;
 
 #pragma region Weapon
+	
+	void OnHiddenTagChanged(const FGameplayTag GameplayTag, int32 NewCount);
+	void OnScalingTagChanged(const FGameplayTag GameplayTag, int32 NewCount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> ScalingEffect;
+	
 	/*Whip Pool*/
 	TUniquePtr<TItemPool<AOCWhipMissile>> WhipPool;
 
@@ -73,12 +81,6 @@ public:
 	
 	UFUNCTION(Category="Weapon")
 	AOCGemMissile* GetGemMissileFromPool();
-
-	//Weapon Hidden/Scaling
-	UFUNCTION()
-	void ScalingWeapon();
-	UFUNCTION()
-	void HiddenWeapon();
 
 	bool bIsScaling;
 	float DeltaSum;

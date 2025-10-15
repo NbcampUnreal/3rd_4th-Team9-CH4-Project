@@ -24,27 +24,30 @@ AOCWhipMissile::AOCWhipMissile()
 	ProjectileMovement->ProjectileGravityScale=0.0f;
 }
 
-void AOCWhipMissile::BeginPlay()
+void AOCWhipMissile::Init()
 {
-	Super::BeginPlay();
-	if (GetOwner())
-	{
-		CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
-	}
-
+	Super::Init();
+	if (!bInitial) return;
+	
 	TArray<AActor*> AllWorldActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), AllWorldActors);
 	FGameplayTag OwnerTag = GetTeamTag(GetOwner());
 	for (AActor* Actor : AllWorldActors)
 	{
-		if (Actor && Actor!=GetOwner())
+		if (Actor)
 		{
-			if (GetTeamTag(Actor) == OwnerTag)
+			if (GetTeamTag(Actor) == OwnerTag) // 같은 team이면 ignore
 			{
 				CollisionComponent->IgnoreActorWhenMoving(Actor, true);
 			}
 		}
 	}
+}
+
+void AOCWhipMissile::BeginPlay()
+{
+	Super::BeginPlay();
+
 }
 
 void AOCWhipMissile::PostInitializeComponents()

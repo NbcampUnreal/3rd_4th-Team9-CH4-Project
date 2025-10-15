@@ -35,25 +35,11 @@ void AOCGemMissile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
     CollisionComponent->OnComponentHit.AddDynamic(this, &AOCGemMissile::OnHit);
+}
 
-	if (GetOwner())
-	{
-		CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
-	}
-
-	TArray<AActor*> AllWorldActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), AllWorldActors);
-	FGameplayTag OwnerTag = GetTeamTag(GetOwner());
-	for (AActor* Actor : AllWorldActors)
-	{
-		if (Actor && Actor!=GetOwner())
-		{
-			if (GetTeamTag(Actor) != OwnerTag) // 다른 team이면 ignore
-			{
-				CollisionComponent->IgnoreActorWhenMoving(Actor, true);
-			}
-		}
-	}
+void AOCGemMissile::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void AOCGemMissile::Tick(float DeltaTime)
@@ -62,6 +48,26 @@ void AOCGemMissile::Tick(float DeltaTime)
 	if (!bInitial) return;
 	AddActorLocalRotation(FRotator(0, 0, DeltaTime * 180.0f));
 	UE_LOG(LogTemp, Warning, TEXT("%f"),GetActorRotation().Roll)
+}
+
+void AOCGemMissile::Init()
+{
+	Super::Init();
+	if (!bInitial) return;
+	
+	TArray<AActor*> AllWorldActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), AllWorldActors);
+	FGameplayTag OwnerTag = GetTeamTag(GetOwner());
+	for (AActor* Actor : AllWorldActors)
+	{
+		if (Actor)
+		{
+			if (GetTeamTag(Actor) != OwnerTag) // 다른 team이면 ignore
+			{
+				CollisionComponent->IgnoreActorWhenMoving(Actor, true);
+			}
+		}
+	}
 }
 
 void AOCGemMissile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

@@ -15,7 +15,7 @@ class OVERCLOCK_API IPooledInterface
 	GENERATED_BODY()
 
 public:
-	bool bInitial = false;
+	bool bInitial = true;
 
 	virtual void Alloc() = 0;
 	virtual void Init() = 0;

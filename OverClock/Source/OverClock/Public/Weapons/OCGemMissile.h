@@ -17,8 +17,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UNiagaraComponent> NiagaraComp;
 
+	virtual void Init() override;
+	
 protected:
 	virtual void PostInitializeComponents() override;
+
+	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 
