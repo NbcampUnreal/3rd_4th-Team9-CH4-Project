@@ -17,14 +17,21 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UNiagaraComponent> NiagaraComp;
 
+	virtual void Init() override;
+	virtual void UnInit() override;
+
 protected:
 	virtual void PostInitializeComponents() override;
+
+	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse, const FHitResult& Hit) override;
+
+	FTimerHandle EndTimerHandle;
 
 public:	
 	void SetVelocity(const FVector& NewVelocity);

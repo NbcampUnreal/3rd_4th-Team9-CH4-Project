@@ -35,18 +35,36 @@ void AOCGemMissile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
     CollisionComponent->OnComponentHit.AddDynamic(this, &AOCGemMissile::OnHit);
+}
 
-	if (GetOwner())
-	{
-		CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
-	}
+void AOCGemMissile::BeginPlay()
+{
+	Super::BeginPlay();
+}
 
+void AOCGemMissile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (!bInitial) return;
+
+	static float TotalYaw = 0.0f;
+	TotalYaw += DeltaTime * 180.0f;
+
+	SetActorRotation(FRotator(0, TotalYaw, 0));
+}
+
+void AOCGemMissile::Init()
+{
+	Super::Init();
+
+	if (!bInitial) return;
+	
 	TArray<AActor*> AllWorldActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APawn::StaticClass(), AllWorldActors);
 	FGameplayTag OwnerTag = GetTeamTag(GetOwner());
 	for (AActor* Actor : AllWorldActors)
 	{
-		if (Actor && Actor!=GetOwner())
+		if (Actor)
 		{
 			if (GetTeamTag(Actor) != OwnerTag) // 다른 team이면 ignore
 			{
@@ -54,14 +72,18 @@ void AOCGemMissile::PostInitializeComponents()
 			}
 		}
 	}
+	GetWorld()->GetTimerManager().SetTimer(EndTimerHandle, this, 
+		&AOCGemMissile::UnInit, 5.0f, false);
 }
 
-void AOCGemMissile::Tick(float DeltaTime)
+void AOCGemMissile::UnInit()
 {
-	Super::Tick(DeltaTime);
-	if (!bInitial) return;
-	AddActorLocalRotation(FRotator(0, 0, DeltaTime * 180.0f));
-	UE_LOG(LogTemp, Warning, TEXT("%f"),GetActorRotation().Roll)
+	Super::UnInit();
+
+	if (EndTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(EndTimerHandle);
+	}
 }
 
 void AOCGemMissile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

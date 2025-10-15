@@ -1,5 +1,7 @@
 #include "Player/OCFey.h"
 
+#include "AbilitySystemComponent.h"
+
 AOCFey::AOCFey()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -27,6 +29,15 @@ void AOCFey::BeginPlay()
 	WhipPool->AllocateAll(WhipPoolClass, WhipPoolSize);
 	GemPool = MakeUnique<TItemPool<AOCGemMissile>>(GetWorld(), GemPoolSize);
 	GemPool->AllocateAll(GemPoolClass, GemPoolSize);
+
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (!ASC) return;
+
+	// 추가/제거 모두 감지
+	ASC->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("State.Weapon.Hidden")), EGameplayTagEventType::NewOrRemoved)
+		.AddUObject(this, &AOCFey::OnHiddenTagChanged);
+	ASC->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("State.Weapon.Scaling")), EGameplayTagEventType::NewOrRemoved)
+		.AddUObject(this, &AOCFey::OnScalingTagChanged);
 }
 
 void AOCFey::Tick(float DeltaTime)
@@ -51,6 +62,31 @@ void AOCFey::Tick(float DeltaTime)
 	}
 }
 
+void AOCFey::OnHiddenTagChanged(const FGameplayTag GameplayTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		WeaponMesh->SetWorldScale3D(FVector(0.0f));
+	}
+	else
+	{
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+		if (!ASC) return;
+		
+		FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+		ASC->ApplyGameplayEffectToSelf(ScalingEffect.GetDefaultObject(),1,EffectContext);
+	}
+}
+
+void AOCFey::OnScalingTagChanged(const FGameplayTag GameplayTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		bIsScaling=true;
+		SetActorTickEnabled(true);
+	}
+}
+
 AOCWhipMissile* AOCFey::GetWhipMissileFromPool()
 {
 	if (!HasAuthority()) return nullptr;
@@ -68,7 +104,7 @@ AOCWhipMissile* AOCFey::GetWhipMissileFromPool()
 
 AOCGemMissile* AOCFey::GetGemMissileFromPool()
 {
-	if (!WhipPool) return nullptr;
+	if (!HasAuthority()) return nullptr;
 	if (!GemPool) return nullptr;
 	AOCGemMissile* Missile = GemPool->GetPooledActor();
 	const FVector MuzzleLocation = WeaponRoot->GetComponentLocation();
@@ -76,19 +112,8 @@ AOCGemMissile* AOCFey::GetGemMissileFromPool()
 
 	if (!IsValid(Missile)) return nullptr;
 	Missile->SetActorLocationAndRotation(MuzzleLocation, MuzzleRotation);
-	
+
 	Missile->Init();
 	
 	return Missile;
-}
-
-void AOCFey::ScalingWeapon()
-{
-	bIsScaling=true;
-	SetActorTickEnabled(true);
-}
-
-void AOCFey::HiddenWeapon()
-{
-	WeaponMesh->SetWorldScale3D(FVector(0.0f));
 }

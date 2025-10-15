@@ -47,17 +47,5 @@ FVector UOCNotify_HealWhip::GetDirection(AActor* InAvatar, FVector SpawnLocation
 	FVector TargetPoint = CamLoc + CamRot.Vector() * 10000.f; // 100m 앞
 	FVector LaunchDirection = (TargetPoint - SpawnLocation).GetSafeNormal();
 
-	//확인용
-	DrawDebugLine(
-		InAvatar->GetWorld(),
-		SpawnLocation,
-		SpawnLocation + LaunchDirection * 1000.f, // 10m 길이
-		FColor::Yellow,
-		false,
-		2.0f,
-		0,
-		2.0f
-	);
-
 	return LaunchDirection;
 }

@@ -55,38 +55,31 @@ void AOCPoisonMissile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 {
 	Super::OnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 	//ProjectileMovement->Velocity = InitialSpeed;
-	if (!HasAuthority() || !OtherActor || OtherActor == GetOwner()) return;
+	if (!OtherActor || OtherActor == GetOwner()) return;
 	
 	if (OtherActor->IsA(APawn::StaticClass()))
 	{
 		if(GetTeamTag(OtherActor)==GetTeamTag(GetOwner())) return;
 	}
-	else
-	{
-		//바닥인지 확인
-		const float Verticality = FVector::DotProduct(Hit.ImpactNormal, FVector::UpVector);
-		if (Verticality < 0.8f) return;
-	}
 	
-	// 히트 사운드 재생
-	if (HitSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, HitSound, Hit.Location);
-	}
 	// 장판 생성 함수 호출 후 삭제
 	if (PoisonFieldClass)
 	{
 		FActorSpawnParameters Params;
         Params.Owner = GetOwner();
         Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-        GetWorld()->SpawnActor<AOCPoisonField>(
+        if (GetWorld()->SpawnActor<AOCPoisonField>(
         		PoisonFieldClass,
         		Hit.ImpactPoint,
         		FRotator::ZeroRotator,
         		Params
-        	);
+        	))
+        {
+        	if (!HitSound) return;
+        	UGameplayStatics::PlaySoundAtLocation(this, HitSound, Hit.Location);
+        }
+		ProjectileMovement->StopMovementImmediately();
 	}
-	ProjectileMovement->StopMovementImmediately();
 	Destroy();
 }
 
