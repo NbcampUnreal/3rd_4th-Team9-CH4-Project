@@ -15,6 +15,7 @@ class UInputMappingContext;
 // class UOCInputComponent;
 class UEnhancedInputLocalPlayerSubsystem;
 class UDA_OCInputConfig;
+class UOCUIComponent;
 
 UCLASS()
 class OVERCLOCK_API AOCPlayerController : public APlayerController
@@ -43,4 +44,6 @@ protected:
 	void ApplyIMCForPawn(APawn* InPawn);
 	void RemoveMappingContext();
 	
+private:
+	TWeakObjectPtr<UOCUIComponent> ActiveUIComp;
 };

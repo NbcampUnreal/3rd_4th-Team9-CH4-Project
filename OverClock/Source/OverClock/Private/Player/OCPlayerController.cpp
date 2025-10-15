@@ -3,6 +3,7 @@
 #include "InputMappingContext.h"
 #include "Player/OCCharacterBase_V2.h"
 #include "Data/DA_OCInputConfig.h"
+#include "Component/OCUIComponent.h"
 
 // #include "InputActionValue.h"
 // #include "GameplayTagContainer.h"
@@ -15,6 +16,14 @@
 // #include "GameFramework/InputSettings.h"
 // #include "Player/OCRevenant.h"
 // #include "OverClock.h"
+
+namespace
+{
+	static UOCUIComponent* FindHUDComp(APawn* Pawn)
+	{
+		return Pawn->FindComponentByClass<UOCUIComponent>();
+	}
+}
 
 AOCPlayerController::AOCPlayerController()
 {
@@ -30,6 +39,18 @@ void AOCPlayerController::OnPossess(APawn* InPawn)
 		ApplyIMCForPawn(InPawn);
 		SetInputMode(FInputModeGameOnly{});
 		bShowMouseCursor = false;
+
+		if (ActiveUIComp.IsValid())
+		{
+			ActiveUIComp->HideUI();
+			ActiveUIComp = nullptr;
+		}
+		if (UOCUIComponent* NewComp = FindHUDComp(InPawn))
+		{
+			NewComp->InitializeForOwner();
+			NewComp->ShowUI();
+			ActiveUIComp = NewComp;
+		}
 	}
 }
 
@@ -42,6 +63,18 @@ void AOCPlayerController::OnRep_Pawn()
 		ApplyIMCForPawn(GetPawn());
 		SetInputMode(FInputModeGameOnly{});
 		bShowMouseCursor = false;
+
+		if (ActiveUIComp.IsValid())
+		{
+			ActiveUIComp->HideUI();
+			ActiveUIComp = nullptr;
+		}
+		if (UOCUIComponent* NewComp = FindHUDComp(GetPawn()))
+		{
+			NewComp->InitializeForOwner();
+			NewComp->ShowUI();
+			ActiveUIComp = NewComp;
+		}
 	}
 }
 
@@ -52,6 +85,12 @@ void AOCPlayerController::OnUnPossess()
 	if (IsLocalController())
 	{
 		RemoveMappingContext();
+
+		if (ActiveUIComp.IsValid())
+		{
+			ActiveUIComp->HideUI();
+			ActiveUIComp = nullptr;
+		}
 	}
 }
 

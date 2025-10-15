@@ -11,7 +11,7 @@ UOCAttributeSet_Health::UOCAttributeSet_Health()
 	IncomingDamage.SetCurrentValue(0.f);
 }
 
-void UOCAttributeSet_Health::OnRef_Health(const FGameplayAttributeData& OldValue)
+void UOCAttributeSet_Health::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UOCAttributeSet_Health, Health, OldValue);
 }

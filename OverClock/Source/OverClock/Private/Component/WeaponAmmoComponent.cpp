@@ -26,7 +26,21 @@ void UWeaponAmmoComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void UWeaponAmmoComponent::OnRep_CurrentAmmo()
 {
-	// TODO: HUD °»½Å µî
+	static const FName FuncName(TEXT("OnAmmoChanged"));
+	if (UFunction* SelfFn = FindFunction(FuncName))
+	{
+		struct { int32 Current; int32 Max; } Params{ CurrentAmmo, MaxAmmo };
+		ProcessEvent(SelfFn, &Params);
+	}
+
+	if (AActor* Owner = GetOwner())
+	{
+		if (UFunction* OwnerFn = Owner->FindFunction(FuncName))
+		{
+			struct { int32 Current; int32 Max; } Params{ CurrentAmmo, MaxAmmo };
+			Owner->ProcessEvent(OwnerFn, &Params);
+		}
+	}
 }
 
 bool UWeaponAmmoComponent::ConsumeAmmo(int32 Amount)
@@ -36,6 +50,7 @@ bool UWeaponAmmoComponent::ConsumeAmmo(int32 Amount)
 	if (CurrentAmmo < Amount) return false;
 
 	CurrentAmmo -= Amount;
+	OnRep_CurrentAmmo();
 	return true;
 }
 
@@ -43,9 +58,11 @@ void UWeaponAmmoComponent::RefillAmmo()
 {
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
 	CurrentAmmo = MaxAmmo;
+	OnRep_CurrentAmmo();
 }
 
 void UWeaponAmmoComponent::SetCurrentAmmo()
 {
 	CurrentAmmo = MaxAmmo;
+	OnRep_CurrentAmmo();
 }

@@ -39,5 +39,6 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	UFUNCTION() void OnRep_CurrentAmmo();
+	UFUNCTION(BlueprintCallable)
+	void OnRep_CurrentAmmo();
 };
