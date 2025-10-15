@@ -111,7 +111,7 @@ void UGA_Crunch_PowerPunch::CloseWindow()
 
 void UGA_Crunch_PowerPunch::DoHit_Server()
 {
-	if (!IsServerAuthority() || DamageGE == nullptr) return;
+	if (!IsServerAuthority()) return;
 
 	ACharacter* C = GetOCCharacter();
 	if (C == nullptr) return;
@@ -119,11 +119,22 @@ void UGA_Crunch_PowerPunch::DoHit_Server()
 	const FVector Start = C->GetActorLocation() + C->GetActorForwardVector() * 100.f + FVector(0.f, 0.f, 50.f);
 	const FVector End = Start + C->GetActorForwardVector() * PunchRange;
 
-	DrawDebugLine(GetWorld(), Start, End, FColor::Yellow, /*bPersistentLines=*/false, /*LifeTime=*/1.f, 0, 2.f);
-	DrawDebugBox(GetWorld(), Start, PunchHalfExtent, C->GetActorQuat(), FColor::Green, /*bPersistentLines=*/false, /*LifeTime=*/1.f);
-	DrawDebugBox(GetWorld(), End,   PunchHalfExtent, C->GetActorQuat(), FColor::Red,   /*bPersistentLines=*/false, /*LifeTime=*/1.f);
+	TArray<FHitResult> Hits;
+	FCollisionShape Shape = FCollisionShape::MakeBox(PunchHalfExtent);
 
-	BoxTraceAndApplyToTargets_Server(Start, End, PunchHalfExtent, DamageGE, true);
+	const bool bHit = GetWorld()->SweepMultiByChannel(Hits, Start, End, C->GetActorQuat(), ECC_Pawn, Shape);
+
+	if (!bHit) return;
+	
+	TSet<AActor*> IgnoreActors;
+	for (const FHitResult& Hit : Hits)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor || HitActor == C || IgnoreActors.Contains(HitActor)) continue;
+		IgnoreActors.Add(HitActor);
+		ApplyDamageToActor(HitActor, PunchDamage, &Hit);
+	}
+	
 }
 
 void UGA_Crunch_PowerPunch::OnStepEnd()
