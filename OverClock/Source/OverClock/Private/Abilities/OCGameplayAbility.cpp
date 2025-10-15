@@ -1,7 +1,9 @@
 #include "Abilities/OCGameplayAbility.h"
+#include "AbilitySystemGlobals.h"
 #include "Abilities/OCAbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "TimerManager.h"
+#include "Data/OCGameplayTags.h"
 #include "GameFramework/Character.h"
 
 UOCGameplayAbility::UOCGameplayAbility()
@@ -47,6 +49,35 @@ UAbilityTask_PlayMontageAndWait* UOCGameplayAbility::PlayMontageTask(UAnimMontag
 		Task->ReadyForActivation();
 	}
 	return Task;
+}
+
+void UOCGameplayAbility::ApplyDamageToActor(AActor* TargetActor, float Damage, const FHitResult* OptionalHit) const
+{
+	if (!IsServerAuthority() || !TargetActor || Damage <= 0.f || !DefaultDamageGE) return;
+	
+	if (!CanDamageTarget(TargetActor)) return;
+	
+	UAbilitySystemComponent* TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetActor);
+
+	if (TargetASC)
+	{
+		ApplyDamageToASC(TargetASC, Damage, OptionalHit);
+	}
+}
+
+void UOCGameplayAbility::ApplyDamageToASC(UAbilitySystemComponent* TargetASC, float Damage,
+	const FHitResult* OptionalHit) const
+{
+	if (!IsServerAuthority() || !TargetASC || Damage <= 0.f || !DefaultDamageGE) return;
+	
+	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
+	if (!SourceASC) return;
+	
+	FGameplayEffectSpecHandle Spec = BuildDamageSpec(SourceASC, Damage, OptionalHit);
+	if (Spec.IsValid())
+	{
+		SourceASC->ApplyGameplayEffectSpecToTarget(*Spec.Data.Get(), TargetASC);
+	}
 }
 
 
@@ -103,4 +134,33 @@ void UOCGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, con
 			ActorInfo->AbilitySystemComponent->ClearAbility(Handle);
 		}
 	}
+}
+
+FGameplayEffectSpecHandle UOCGameplayAbility::BuildDamageSpec(UAbilitySystemComponent* SourceASC, float Damage,
+	const FHitResult* OptionalHit) const
+{
+	FGameplayEffectSpecHandle Spec;
+
+	if (!SourceASC || Damage <= 0.f || !DefaultDamageGE)
+	{
+		return Spec;
+	}
+	
+	FGameplayEffectContextHandle Ctx = SourceASC->MakeEffectContext();
+	if (AActor* Avatar = GetAvatarActorFromActorInfo())
+	{
+		Ctx.AddSourceObject(Avatar);
+		Ctx.AddInstigator(Avatar, Avatar);
+	}
+	if (OptionalHit)
+	{
+		Ctx.AddHitResult(*OptionalHit);
+	}
+
+	Spec = SourceASC->MakeOutgoingSpec(DefaultDamageGE, GetAbilityLevel(), Ctx);
+	if (Spec.IsValid())
+	{
+		Spec.Data->SetSetByCallerMagnitude(OCGameplayTags::Data_Damage, Damage);
+	}
+	return Spec;
 }
