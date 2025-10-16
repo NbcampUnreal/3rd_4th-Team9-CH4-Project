@@ -8,9 +8,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "OverClockDebugHelper.h"
-#include "Abilities/OCMarkComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "AbilitySystemInterface.h"
+#include "Component/OCMarkComponent.h"
 
 AOCCharacterBase::AOCCharacterBase()
 	:WalkSpeed(600.0f),
