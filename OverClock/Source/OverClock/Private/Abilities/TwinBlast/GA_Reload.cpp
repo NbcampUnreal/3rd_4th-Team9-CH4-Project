@@ -1,5 +1,5 @@
 // GE_Reload.cpp
-#include "GA/GA_Reload.h"
+#include "Abilities/TwinBlast/GA_Reload.h"
 
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"

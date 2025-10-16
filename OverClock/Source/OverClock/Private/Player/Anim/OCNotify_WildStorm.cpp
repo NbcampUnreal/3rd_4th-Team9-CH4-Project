@@ -1,7 +1,7 @@
 #include "Player/Anim/OCNotify_WildStorm.h"
 
 #include "Player/OCFey.h"
-#include "Weapons/OCWildStormField.h"
+#include "Actors/OCWildStormField.h"
 
 void UOCNotify_WildStorm::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
                                  const FAnimNotifyEventReference& EventReference)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Weapons/OCMissileBase.h"
+#include "Actors/OCMissileBase.h"
 #include "OCGemMissile.generated.h"
 
 class UNiagaraComponent;

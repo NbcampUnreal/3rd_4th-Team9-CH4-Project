@@ -1,4 +1,4 @@
-#include "Weapons/OCWildStormField.h"
+#include "Actors/OCWildStormField.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"

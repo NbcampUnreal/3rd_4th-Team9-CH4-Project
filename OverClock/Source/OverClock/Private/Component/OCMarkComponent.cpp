@@ -1,4 +1,4 @@
-#include "Abilities/OCMarkComponent.h"
+#include "Component/OCMarkComponent.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"

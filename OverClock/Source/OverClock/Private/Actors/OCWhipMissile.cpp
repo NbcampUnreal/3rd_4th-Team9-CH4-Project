@@ -1,12 +1,10 @@
-#include "Weapons/OCWhipMissile.h"
+#include "Actors/OCWhipMissile.h"
 
 #include "Components/SphereComponent.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "GameplayTagContainer.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"//사운드 변경 후 삭제
-#include "ProfilingDebugging/CookStats.h"
 
 AOCWhipMissile::AOCWhipMissile()
 {

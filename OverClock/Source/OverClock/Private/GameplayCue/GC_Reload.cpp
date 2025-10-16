@@ -1,5 +1,5 @@
 #include "GC/GC_Reload.h"
-#include "GC/ReloadSoundDataAsset.h"
+#include "Data/ReloadSoundDataAsset.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/SkeletalMeshComponent.h"

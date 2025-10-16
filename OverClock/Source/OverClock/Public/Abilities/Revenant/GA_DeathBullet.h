@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "GA/GA_SharedCooldownBase.h"
+#include "Abilities/TwinBlast/GA_SharedCooldownBase.h"
 #include "GA_DeathBullet.generated.h"
 
 class UAnimSequenceBase;
@@ -12,10 +12,10 @@ class UAnimMontage;
 class UOCAnimDataAsset;
 
 /**
- * E ¸¦ ´©¸£¸é °úÀåµÈ ÀåÀü(RMB Reload Med)À» Àç»ýÇÏ°í,
- * InputWindowSec ³»¿¡ ÁÂÅ¬¸¯ÀÌ µé¾î¿À¸é C->C->B ¼¼ ¹ßÀ» ºü¸£°Ô Àç»ý.
- * ÀÔ·ÂÀÌ ¾øÀ¸¸é Ãë¼ÒµÇÁö¸¸ ÄðÅ¸ÀÓÀº Àû¿ë.
- * ½ÇÇà µ¿¾È State.ActionLock À¸·Î ´Ù¸¥ ½ºÅ³ Â÷´Ü.
+ * E ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(RMB Reload Med)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï°ï¿½,
+ * InputWindowSec ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ C->C->B ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.
+ * ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+ * ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ State.ActionLock ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½.
  */
 
 UCLASS()

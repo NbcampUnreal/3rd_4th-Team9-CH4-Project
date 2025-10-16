@@ -1,8 +1,6 @@
-#include "GA/GA_QuickStep.h"
+#include "Abilities/TwinBlast/GA_QuickStep.h"
 
 #include "Player/OCCharacterBase.h" 
-#include "Player/Anim/OCAnimStruct.h"
-#include "Player/Anim/OCAnimDataAsset.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotionMoveToForce.h"
@@ -175,7 +173,7 @@ void UGA_QuickStep::StartMoveTask(ACharacter* Char, const FVector& Dir)
 
 void UGA_QuickStep::OnMoveEnded()
 {
-    // ÇÊ¿äÇÑ °æ¿ì ¿©±â¼­ ÈÄÃ³¸®(¿¹: ÅÂ±× ÇØÁ¦/´ÙÀ½ »óÅÂ ÀüÈ¯)
+    // ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½ï¿½Ã³ï¿½ï¿½(ï¿½ï¿½: ï¿½Â±ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯)
 }
 
 void UGA_QuickStep::OnMoveTimedOut()

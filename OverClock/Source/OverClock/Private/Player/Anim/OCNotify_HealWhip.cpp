@@ -1,6 +1,6 @@
 #include "Player/Anim/OCNotify_HealWhip.h"
 
-#include "Weapons/OCWhipMissile.h"
+#include "Actors/OCWhipMissile.h"
 #include "Player/OCFey.h"
 
 void UOCNotify_HealWhip::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

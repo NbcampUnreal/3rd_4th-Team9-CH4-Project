@@ -1,4 +1,4 @@
-#include "GA/GA_VoltexGrenade.h"
+#include "Abilities/TwinBlast/GA_VoltexGrenade.h"
 
 #include "Player/OCCharacterBase_V2.h"
 

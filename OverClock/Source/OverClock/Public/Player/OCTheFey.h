@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "ItemPool.h"
 #include "Player/OCCharacterBase.h"
-#include "Weapons/OCGemMissile.h"
+#include "Actors/OCGemMissile.h"
 #include "OCTheFey.generated.h"
 
 class AOCWhipMissile;

@@ -1,6 +1,6 @@
 #include "Player/Anim/OCNotify_PoisonSeed.h"
 
-#include "Weapons/OCPoisonMissile.h"
+#include "Actors/OCPoisonMissile.h"
 #include "Player/OCFey.h"
 
 void UOCNotify_PoisonSeed::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,

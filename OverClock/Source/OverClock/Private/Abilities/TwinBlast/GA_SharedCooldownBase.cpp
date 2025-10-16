@@ -1,6 +1,6 @@
-#include "GA/GA_SharedCooldownBase.h"
+#include "Abilities/TwinBlast/GA_SharedCooldownBase.h"
 
-// ¸í½ÃÀû include
+// ï¿½ï¿½ï¿½ï¿½ï¿½ include
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectTypes.h"

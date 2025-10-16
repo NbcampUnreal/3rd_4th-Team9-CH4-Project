@@ -1,9 +1,9 @@
-#include "Weapons/OCPoisonMissile.h"
+#include "Actors/OCPoisonMissile.h"
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Weapons/OCPoisonField.h"
+#include "Actors/OCPoisonField.h"
 
 AOCPoisonMissile::AOCPoisonMissile()
 {

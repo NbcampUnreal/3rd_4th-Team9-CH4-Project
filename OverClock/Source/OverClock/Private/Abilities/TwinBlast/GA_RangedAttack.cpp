@@ -1,8 +1,4 @@
-#include "GA/GA_RangedAttack.h"
-
-#include "Player/OCCharacterBase_V2.h"  
-#include "Player/Anim/OCAnimStruct.h"
-#include "Player/Anim/OCAnimDataAsset.h"
+#include "Abilities/TwinBlast/GA_RangedAttack.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -17,9 +13,7 @@
 #include "DrawDebugHelpers.h"
 
 #include "GameplayEffectTypes.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Data/CharacterAttributeSet.h"
-#include <Abilities/OCGameplayAbility.h>
 
 UGA_RangedAttack::UGA_RangedAttack()
 {

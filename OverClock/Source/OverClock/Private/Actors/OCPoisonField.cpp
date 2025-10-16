@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapons/OCPoisonField.h"
+#include "Actors/OCPoisonField.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"

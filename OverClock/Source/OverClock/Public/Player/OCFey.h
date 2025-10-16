@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "ItemPool.h"
 #include "Player/OCCharacterBase_V2.h"
-#include "Weapons/OCWhipMissile.h"
-#include "Weapons/OCGemMissile.h"
+#include "Actors/OCWhipMissile.h"
+#include "Actors/OCGemMissile.h"
 
 #include "OCFey.generated.h"
 

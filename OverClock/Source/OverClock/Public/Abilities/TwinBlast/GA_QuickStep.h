@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "GA/GA_SharedCooldownBase.h"
+#include "Abilities/TwinBlast/GA_SharedCooldownBase.h"
 #include "GA_QuickStep.generated.h"
 
 class UAnimMontage;

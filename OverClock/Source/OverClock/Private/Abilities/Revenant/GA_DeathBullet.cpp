@@ -1,16 +1,14 @@
-#include "GA/GA_DeathBullet.h"
+#include "Abilities/Revenant/GA_DeathBullet.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystemComponent.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimSequenceBase.h"
-#include "Component/WeaponAmmoComponent.h"
 
 // ĳ���ͺ� ���� ��� ������(����)
 #include "Player/OCCharacterBase.h" 
 #include "Player/Anim/OCAnimDataAsset.h"
 #include "Player/Anim/OCAnimStruct.h"
-#include "Player/OCPlayerController.h"
 
 UGA_DeathBullet::UGA_DeathBullet()
 {

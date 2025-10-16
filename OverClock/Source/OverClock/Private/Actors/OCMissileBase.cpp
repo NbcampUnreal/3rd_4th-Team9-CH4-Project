@@ -1,4 +1,4 @@
-#include "Weapons/OCMissileBase.h"
+#include "Actors/OCMissileBase.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"

@@ -2,7 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameplayAbilitySpec.h"
-#include "Weapons/OCWhipMissile.h"
+#include "Actors/OCWhipMissile.h"
 
 AOCTheFey::AOCTheFey()
 {
