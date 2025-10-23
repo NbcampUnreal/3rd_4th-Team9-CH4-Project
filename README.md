@@ -124,13 +124,123 @@
 
 ---
 
-## 📂 폴더 구조 예시
+📂 **폴더 구조 (주요 파일만 명시)**
 
-/OverClock
-
-//미작성
-
----
+```
+OverClock/
+└── Source/
+    ├── OverClock/
+    │   ├── OverClock.Build.cs
+    │   ├── OverClockDebugHelper.h
+    │   ├── Private/
+    │   └── Public/
+    │       │  OverClock.Build.cs
+    │       │  OverClockDebugHelper.h
+    │       │
+    │       ├─Private
+    │       │
+    │       └─Public
+    │           │  OCGameInstance.h
+    │           │  OverClock.h
+    │           │
+    │           ├─Abilities
+    │           │  │  OCAttributeSet.h
+    │           │  │
+    │           │  ├─Attributes
+    │           │  │      OCAttributeSetBase.h
+    │           │  │
+    │           │  ├─Crunch
+    │           │  │      GA_CrunchBase.h
+    │           │  │
+    │           │  ├─Revenant
+    │           │  │      GA_DeadlyBullet.h
+    │           │  │
+    │           │  ├─TheFey
+    │           │  │      GA_PlayMontage.h
+    │           │  │
+    │           │  └─TwinBlast
+    │           │          GA_QuickStep.h
+    │           │
+    │           ├─Actors
+    │           │      OCBarrierProjectile.h
+    │           │      OCMissileBase.h
+    │           │
+    │           ├─AnimInstances
+    │           │      OCBaseAnimInstance.h
+    │           │      OCCharacterAnimInstance.h
+    │           │
+    │           ├─Component
+    │           │      OCUIComponent.h
+    │           │
+    │           ├─Data
+    │           │  │  CacheDataTable.h
+    │           │  │  CharacterAttributeSet.h
+    │           │  │  DA_OCHeroStartUpData.h
+    │           │  │
+    │           │  └─Tag
+    │           │          NewGameplayTag.h
+    │           │
+    │           ├─Game
+    │           │  │  OCGameMode.h
+    │           │  │  OCGameState.h
+    │           │  │  Team.h
+    │           │  │
+    │           │  └─GameModes
+    │           │          OCGameModeBase_Min.h
+    │           │
+    │           ├─GameplayEffects
+    │           │      GE_RangedAttackCooldown.h
+    │           │
+    │           ├─GC
+    │           │      GC_Fire.h
+    │           │
+    │           ├─Input
+    │           │      OCInputComponent.h
+    │           │
+    │           ├─Interface
+    │           │      ChangeGameInterface.h
+    │           │      OCBarrierInteract.h
+    │           │      OCGameInterface.h
+    │           │      PooledInterface.h
+    │           │      TableKey.h
+    │           │      TeamInfoInterface.h
+    │           │
+    │           ├─OverClockTypes
+    │           │      OverClockStructTypes.h
+    │           │
+    │           ├─Physics
+    │           │      OCCollision.h
+    │           │
+    │           ├─Player
+    │           │  │  ItemPool.h
+    │           │  │  OCAnimInstance.h
+    │           │  │  OCCharacterBase_V2.h
+    │           │  │  OCPlayerController.h
+    │           │  │  OCPlayerState.h
+    │           │  │
+    │           │  └─Anim
+    │           │          OCAnimDataAsset.h
+    │           │          OCAnimStruct.h
+    │           │          OCNotify_PoisonSeed.h
+    │           │
+    │           ├─Subsystem
+    │           │      OCDataTableSubsystem.h
+    │           │
+    │           ├─Test
+    │           │      TestActor.h
+    │           │
+    │           └─Util
+    │                  UtilTeam.h
+    │
+    └─OverClockEditor/
+        │  OverClockEditor.Build.cs
+        │
+        ├─Private
+        │      CSVToDataTableToolSubsystem.cpp
+        │
+        └─Public
+               CSVToDataTableToolSubsystem.h
+```
 
 ## ⚡ 설치 및 실행
 
